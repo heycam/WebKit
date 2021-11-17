@@ -618,7 +618,7 @@ OffscreenCanvasEnabled:
     WebKitLegacy:
       default: false
     WebKit:
-      "ENABLE(EXPERIMENTAL_FEATURES) && (PLATFORM(GTK) || PLATFORM(WPE))": true
+      "ENABLE(EXPERIMENTAL_FEATURES)": true
       default: false
 
 OffscreenCanvasInWorkersEnabled:
@@ -631,7 +631,7 @@ OffscreenCanvasInWorkersEnabled:
     WebKitLegacy:
       default: false
     WebKit:
-      "ENABLE(EXPERIMENTAL_FEATURES) && (PLATFORM(GTK) || PLATFORM(WPE))": true
+      "ENABLE(EXPERIMENTAL_FEATURES)": true
       default: false
 
 PreferFasterClickOverDoubleTap:
