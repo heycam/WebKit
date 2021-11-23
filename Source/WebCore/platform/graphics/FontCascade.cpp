@@ -342,6 +342,8 @@ GlyphData FontCascade::glyphDataForCharacter(UChar32 c, bool mirror, FontVariant
 // all platforms.
 bool FontCascade::hasValidAverageCharWidth() const
 {
+    ASSERT(isMainThread());
+
     const AtomString& family = firstFamily();
     if (family.isEmpty())
         return false;
