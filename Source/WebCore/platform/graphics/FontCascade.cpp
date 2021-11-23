@@ -441,11 +441,10 @@ String FontCascade::normalizeSpaces(const UChar* characters, unsigned length)
     return normalizeSpacesInternal(characters, length);
 }
 
-static bool shouldUseFontSmoothing = true;
+static std::atomic<bool> shouldUseFontSmoothing = true;
 
 void FontCascade::setShouldUseSmoothing(bool shouldUseSmoothing)
 {
-    ASSERT(isMainThread());
     shouldUseFontSmoothing = shouldUseSmoothing;
 }
 
