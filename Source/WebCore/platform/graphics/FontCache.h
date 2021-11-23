@@ -46,6 +46,7 @@
 #include <wtf/ListHashSet.h>
 #include <wtf/PointerComparison.h>
 #include <wtf/RefPtr.h>
+#include <wtf/RobinHoodHashSet.h>
 #include <wtf/UniqueRef.h>
 #include <wtf/Vector.h>
 #include <wtf/WorkQueue.h>
@@ -165,6 +166,8 @@ public:
     FontCascadeCache& fontCascadeCache() { return m_fontCascadeCache; }
     SystemFallbackFontCache& systemFallbackFontCache() { return m_systemFallbackFontCache; }
 
+    bool useBackslashAsYenSignForFamily(const AtomString& family);
+
 private:
     WEBCORE_EXPORT void purgeInactiveFontDataIfNeeded();
 
@@ -189,6 +192,7 @@ private:
     UniqueRef<FontDataCaches> m_fontDataCaches;
     FontCascadeCache m_fontCascadeCache;
     SystemFallbackFontCache m_systemFallbackFontCache;
+    MemoryCompactLookupOnlyRobinHoodHashSet<AtomString> m_familiesUsingBackslashAsYenSign;
 
     unsigned short m_generation { 0 };
 
