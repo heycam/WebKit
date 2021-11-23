@@ -1,3 +1,31 @@
+2021-12-02  Cameron McCormack  <heycam@apple.com>
+
+        Move computeUserPrefersSimplified to Language.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=233983
+
+        Reviewed by Myles Maxfield.
+
+        cachedUserPrefersSimplified in FontGenericFamilies.cpp can be called
+        from worker threads with OffscreenCanvas, but it uses a static
+        variable to cache the result without any synchronization.
+
+        This patch moves the functionality into a userPrefersSimplifiedChinese
+        function in Language.cpp, which avoids the need to register a language
+        change listener, and means we can use the same locking that the other
+        language preference functions use.
+
+        Simplify the locking by having all language preference functions use
+        the same Lock.
+
+        * wtf/Language.cpp:
+        (WTF::WTF_REQUIRES_LOCK):
+        (WTF::languageDidChange):
+        (WTF::userPreferredLanguagesOverride):
+        (WTF::overrideUserPreferredLanguages):
+        (WTF::userPreferredLanguages):
+        (WTF::userPrefersSimplifiedChinese):
+        * wtf/Language.h:
+
 2022-01-16  David Kilzer  <ddkilzer@apple.com>
 
         [WTF] Add TollFreeBridging.h to Xcode project
