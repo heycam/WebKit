@@ -1,3 +1,27 @@
+2021-12-09  Cameron McCormack  <heycam@apple.com>
+
+        Remove FontCascade::s_codePath
+        https://bugs.webkit.org/show_bug.cgi?id=233979
+
+        Reviewed by NOBODY (OOPS!).
+
+        Remove the ability to set the text code path.
+
+        * UIProcess/API/C/WKContext.cpp:
+        (WKContextSetAlwaysUsesComplexTextCodePath): Deleted.
+        * UIProcess/API/C/WKContextPrivate.h:
+        * UIProcess/WebProcessPool.cpp:
+        (WebKit::WebProcessPool::initializeNewWebProcess):
+        (WebKit::WebProcessPool::setAlwaysUsesComplexTextCodePath): Deleted.
+        * UIProcess/WebProcessPool.h:
+        * UIProcess/glib/WebProcessPoolGLib.cpp:
+        (WebKit::WebProcessPool::platformInitialize):
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::initializeWebProcess):
+        (WebKit::WebProcess::setAlwaysUsesComplexTextCodePath): Deleted.
+        * WebProcess/WebProcess.h:
+        * WebProcess/WebProcess.messages.in:
+
 2022-01-16  Cameron McCormack  <heycam@apple.com>
 
         Ensure in flight layer transactions don't accumulate further canvas drawing

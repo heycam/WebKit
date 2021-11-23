@@ -1,3 +1,16 @@
+2021-12-09  Cameron McCormack  <heycam@apple.com>
+
+        Remove FontCascade::s_codePath
+        https://bugs.webkit.org/show_bug.cgi?id=233979
+
+        Reviewed by NOBODY (OOPS!).
+
+        Remove the ability to set the text code path.
+
+        * WebView/WebView.mm:
+        (+[WebView _setAlwaysUsesComplexTextCodePath:]): Deleted.
+        * WebView/WebViewPrivate.h:
+
 2022-01-15  Chris Dumez  <cdumez@apple.com>
 
         Introduce dynamicDowncast<>() for convenience

@@ -2261,11 +2261,6 @@ static NSMutableSet *knownPluginMIMETypes()
     return NO;
 }
 
-+ (void)_setAlwaysUsesComplexTextCodePath:(BOOL)f
-{
-    WebCore::FontCascade::setCodePath(f ? WebCore::FontCascade::CodePath::Complex : WebCore::FontCascade::CodePath::Auto);
-}
-
 + (BOOL)canCloseAllWebViews
 {
     return WebCore::DOMWindow::dispatchAllPendingBeforeUnloadEvents();

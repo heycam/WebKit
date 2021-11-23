@@ -1,3 +1,33 @@
+2021-12-09  Cameron McCormack  <heycam@apple.com>
+
+        Remove FontCascade::s_codePath
+        https://bugs.webkit.org/show_bug.cgi?id=233979
+
+        Reviewed by NOBODY (OOPS!).
+
+        Remove support for the --complex-text argument when running tests.
+
+        * DumpRenderTree/mac/DumpRenderTree.mm:
+        (initializeGlobalsFromCommandLineOptions):
+        (dumpRenderTree):
+        * DumpRenderTree/win/DumpRenderTree.cpp:
+        (createWebViewAndOffscreenWindow):
+        * Scripts/webkit-tools-completion.sh:
+        * Scripts/webkitpy/layout_tests/run_webkit_tests.py:
+        (parse_args):
+        * Scripts/webkitpy/layout_tests/run_webkit_tests_integrationtest.py:
+        (RunTest.serial_test_check_for_world_leaks):
+        (RunTest.serial_test_complex_text): Deleted.
+        * Scripts/webkitpy/port/driver.py:
+        (Driver.cmd_line):
+        * WebKitTestRunner/Options.cpp:
+        (WTR::OptionsHandler::OptionsHandler):
+        (WTR::handleOptionComplexText): Deleted.
+        * WebKitTestRunner/Options.h:
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::initialize):
+        (WTR::TestController::generatePageConfiguration):
+
 2022-01-15  Sam Weinig  <weinig@apple.com>
 
         CSS Gradients: interpolation mode should default to OKLab if any non-legacy color syntax colors are used in the stops

@@ -1,3 +1,18 @@
+2021-12-09  Cameron McCormack  <heycam@apple.com>
+
+        Remove FontCascade::s_codePath
+        https://bugs.webkit.org/show_bug.cgi?id=233979
+
+        Reviewed by NOBODY (OOPS!).
+
+        Remove the ability to set the text code path.
+
+        * Interfaces/IWebViewPrivate.idl:
+        * WebView.cpp:
+        (WebView::setAlwaysUsesComplexTextCodePath): Deleted.
+        (WebView::alwaysUsesComplexTextCodePath): Deleted.
+        * WebView.h:
+
 2022-01-15  Sam Weinig  <weinig@apple.com>
 
         CSS Gradients: interpolation mode should default to OKLab if any non-legacy color syntax colors are used in the stops

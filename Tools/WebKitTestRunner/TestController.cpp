@@ -545,7 +545,6 @@ void TestController::initialize(int argc, const char* argv[])
     m_verbose = options.verbose;
     m_gcBetweenTests = options.gcBetweenTests;
     m_shouldDumpPixelsForAllTests = options.shouldDumpPixelsForAllTests;
-    m_forceComplexText = options.forceComplexText;
     m_paths = options.paths;
     m_allowedHosts = options.allowedHosts;
     m_checkForWorldLeaks = options.checkForWorldLeaks;
@@ -693,9 +692,6 @@ WKRetainPtr<WKPageConfigurationRef> TestController::generatePageConfiguration(co
 
     if (testPluginDirectory())
         WKContextSetAdditionalPluginsDirectory(m_context.get(), testPluginDirectory());
-
-    if (m_forceComplexText)
-        WKContextSetAlwaysUsesComplexTextCodePath(m_context.get(), true);
 
     auto pageConfiguration = adoptWK(WKPageConfigurationCreate());
     WKPageConfigurationSetContext(pageConfiguration.get(), m_context.get());

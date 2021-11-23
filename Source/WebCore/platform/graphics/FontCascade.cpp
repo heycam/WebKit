@@ -47,8 +47,6 @@ namespace WebCore {
 
 using namespace WTF::Unicode;
 
-FontCascade::CodePath FontCascade::s_codePath = CodePath::Auto;
-
 // ============================================================================================
 // FontCascade Implementation (Cross-Platform Portion)
 // ============================================================================================
@@ -460,21 +458,8 @@ bool FontCascade::isSubpixelAntialiasingAvailable()
 }
 #endif
 
-void FontCascade::setCodePath(CodePath p)
-{
-    s_codePath = p;
-}
-
-FontCascade::CodePath FontCascade::codePath()
-{
-    return s_codePath;
-}
-
 FontCascade::CodePath FontCascade::codePath(const TextRun& run, std::optional<unsigned> from, std::optional<unsigned> to) const
 {
-    if (s_codePath != CodePath::Auto)
-        return s_codePath;
-
 #if !USE(FREETYPE)
     // FIXME: Use the fast code path once it handles partial runs with kerning and ligatures. See http://webkit.org/b/100050
     if ((enableKerning() || requiresShaping()) && (from.value_or(0) || to.value_or(run.length()) != run.length()))
