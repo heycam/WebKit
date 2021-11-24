@@ -284,6 +284,57 @@ SystemFontDatabaseCoreText::CascadeListParameters SystemFontDatabaseCoreText::sy
     return result;
 }
 
+std::optional<SystemFontKind> SystemFontDatabaseCoreText::matchSystemFontUse(const AtomString& string)
+{
+    if (equalLettersIgnoringASCIICase(string, "-webkit-system-font")
+        || equalLettersIgnoringASCIICase(string, "-apple-system")
+        || equalLettersIgnoringASCIICase(string, "-apple-system-font")
+        || equalLettersIgnoringASCIICase(string, "system-ui")
+        || equalLettersIgnoringASCIICase(string, "ui-sans-serif"))
+        return SystemFontKind::SystemUI;
+
+#if HAVE(DESIGN_SYSTEM_UI_FONTS)
+    if (equalLettersIgnoringASCIICase(string, "ui-serif"))
+        return SystemFontKind::UISerif;
+    if (equalLettersIgnoringASCIICase(string, "ui-monospace"))
+        return SystemFontKind::UIMonospace;
+    if (equalLettersIgnoringASCIICase(string, "ui-rounded"))
+        return SystemFontKind::UIRounded;
+#endif
+
+    auto compareAsPointer = [](const AtomString& lhs, const AtomString& rhs) {
+        return lhs.impl() < rhs.impl();
+    };
+
+    if (m_textStyles.isEmpty()) {
+        m_textStyles = {
+            kCTUIFontTextStyleHeadline,
+            kCTUIFontTextStyleBody,
+            kCTUIFontTextStyleTitle1,
+            kCTUIFontTextStyleTitle2,
+            kCTUIFontTextStyleTitle3,
+            kCTUIFontTextStyleSubhead,
+            kCTUIFontTextStyleFootnote,
+            kCTUIFontTextStyleCaption1,
+            kCTUIFontTextStyleCaption2,
+            kCTUIFontTextStyleShortHeadline,
+            kCTUIFontTextStyleShortBody,
+            kCTUIFontTextStyleShortSubhead,
+            kCTUIFontTextStyleShortFootnote,
+            kCTUIFontTextStyleShortCaption1,
+            kCTUIFontTextStyleTallBody,
+            kCTUIFontTextStyleTitle0,
+            kCTUIFontTextStyleTitle4,
+        };
+        std::sort(m_textStyles.begin(), m_textStyles.end(), compareAsPointer);
+    }
+
+    if (std::binary_search(m_textStyles.begin(), m_textStyles.end(), string, compareAsPointer))
+        return SystemFontKind::TextStyle;
+
+    return std::nullopt;
+}
+
 Vector<RetainPtr<CTFontDescriptorRef>> SystemFontDatabaseCoreText::cascadeList(const FontDescription& description, const AtomString& cssFamily, SystemFontKind systemFontKind, AllowUserInstalledFonts allowUserInstalledFonts)
 {
     return cascadeList(systemFontParameters(description, cssFamily, systemFontKind, allowUserInstalledFonts), systemFontKind);

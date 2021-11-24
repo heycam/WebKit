@@ -92,6 +92,7 @@ public:
 
     static SystemFontDatabaseCoreText& singleton();
 
+    std::optional<SystemFontKind> matchSystemFontUse(const AtomString& family);
     Vector<RetainPtr<CTFontDescriptorRef>> cascadeList(const FontDescription&, const AtomString& cssFamily, SystemFontKind, AllowUserInstalledFonts);
 
     String serifFamily(const String& locale);
@@ -123,6 +124,8 @@ private:
     HashMap<String, String> m_cursiveFamilies;
     HashMap<String, String> m_fantasyFamilies;
     HashMap<String, String> m_monospaceFamilies;
+
+    Vector<AtomString> m_textStyles;
 };
 
 }
