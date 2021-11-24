@@ -397,6 +397,7 @@ void FontCache::invalidate()
     m_fontDataCaches->verticalData.clear();
 #endif
     m_fontCascadeCache.invalidate();
+    platformInvalidate();
 
     ++m_generation;
 
@@ -454,6 +455,10 @@ void FontCache::prewarm(const PrewarmInformation&)
 RefPtr<Font> FontCache::similarFont(const FontDescription&, const String&)
 {
     return nullptr;
+}
+
+void FontCache::platformInvalidate()
+{
 }
 #endif
 

@@ -56,6 +56,7 @@
 #if PLATFORM(COCOA)
 #include "FontCacheCoreText.h"
 #include "FontDatabase.h"
+#include "FontFamilySpecificationCoreTextCache.h"
 #endif
 
 #if PLATFORM(IOS_FAMILY)
@@ -166,10 +167,14 @@ public:
 
     FontCascadeCache& fontCascadeCache() { return m_fontCascadeCache; }
     SystemFallbackFontCache& systemFallbackFontCache() { return m_systemFallbackFontCache; }
+#if PLATFORM(COCOA)
+    FontFamilySpecificationCoreTextCache& fontFamilySpecificationCoreTextCache() { return m_fontFamilySpecificationCoreTextCache; }
+#endif
 
     bool useBackslashAsYenSignForFamily(const AtomString& family);
 
 private:
+    void platformInvalidate();
     WEBCORE_EXPORT void purgeInactiveFontDataIfNeeded();
 
     FontPlatformData* cachedFontPlatformData(const FontDescription&, const String& family, const FontCreationContext& = { }, bool checkingAlternateName = false);
@@ -215,6 +220,8 @@ private:
 
     using FallbackFontSet = HashSet<RetainPtr<CTFontRef>, WTF::RetainPtrObjectHash<CTFontRef>, WTF::RetainPtrObjectHashTraits<CTFontRef>>;
     FallbackFontSet m_fallbackFonts;
+
+    FontFamilySpecificationCoreTextCache m_fontFamilySpecificationCoreTextCache;
 
     ListHashSet<String> m_seenFamiliesForPrewarming;
     ListHashSet<String> m_fontNamesRequiringSystemFallbackForPrewarming;

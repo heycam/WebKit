@@ -1131,13 +1131,16 @@ static FontLookup platformFontLookupWithFamily(FontDatabase& fontDatabase, const
     return { nullptr };
 }
 
+void FontCache::platformInvalidate()
+{
+    m_fontFamilySpecificationCoreTextCache.clear();
+}
+
 static void invalidateFontCache()
 {
     ensureOnMainThread([] {
         // FIXME: Workers need to access SystemFontDatabaseCoreText.
         SystemFontDatabaseCoreText::singleton().clear();
-        // FIXME: Workers need to access FontFamilySpecificationCoreTextCache.
-        clearFontFamilySpecificationCoreTextCache();
 
         FontCache::invalidateAllFontCaches();
     });
