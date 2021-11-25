@@ -955,8 +955,6 @@ TEST(AffineTransform, ToTransformationMatrix)
 
 TEST(AffineTransform, MakeMapBetweenRects)
 {
-    WebCore::AffineTransform transform;
-
     WebCore::FloatRect fromRect(10.0f, 10.0f, 100.0f, 100.0f);
     WebCore::FloatRect toRect(70.0f, 70.0f, 200.0f, 50.0f);
 

@@ -1,3 +1,13 @@
+2021-12-08  Cameron McCormack  <heycam@apple.com>
+
+        Remove unused AffineTransform variable from a test
+        https://bugs.webkit.org/show_bug.cgi?id=234052
+
+        Unreviewed.
+
+        * TestWebKitAPI/Tests/WebCore/AffineTransform.cpp:
+        (TestWebKitAPI::TEST):
+
 2021-12-09  Cameron McCormack  <heycam@apple.com>
 
         Remove FontCascade::s_codePath

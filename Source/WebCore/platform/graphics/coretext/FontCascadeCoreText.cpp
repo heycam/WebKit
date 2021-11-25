@@ -54,11 +54,7 @@ FontCascade::FontCascade(const FontPlatformData& fontData, FontSmoothingMode fon
     m_fontDescription.setWeight((CTFontGetSymbolicTraits(fontData.ctFont()) & kCTFontTraitBold) ? boldWeightValue() : normalWeightValue());
 }
 
-static const AffineTransform& rotateLeftTransform()
-{
-    static AffineTransform result(0, -1, 1, 0, 0, 0);
-    return result;
-}
+static constexpr AffineTransform rotateLeftTransform { 0, -1, 1, 0, 0, 0 };
 
 AffineTransform computeOverallTextMatrix(const Font& font)
 {
@@ -95,7 +91,7 @@ AffineTransform computeVerticalTextMatrix(const Font& font, const AffineTransfor
     // this matrix is inverted in fillVectorWithVerticalGlyphPositions to place the glyphs in the CTM's coordinate system.
     // All we're trying to do here is rotate the text matrix so glyphs appear visually upright.
     // We have to include the previous text matrix because it includes things like synthetic oblique.
-    return rotateLeftTransform() * previousTextMatrix;
+    return rotateLeftTransform * previousTextMatrix;
 }
 
 #if !PLATFORM(WIN)
@@ -145,7 +141,7 @@ static void fillVectorWithVerticalGlyphPositions(Vector<CGPoint, 256>& positions
 
     auto position = CGPointMake(point.x(), point.y() + ascentDelta);
     for (unsigned i = 0; i < count; ++i) {
-        CGSize translation = CGSizeApplyAffineTransform(translations[i], rotateLeftTransform());
+        CGSize translation = CGSizeApplyAffineTransform(translations[i], rotateLeftTransform);
         positions[i] = CGPointApplyAffineTransform(CGPointMake(position.x - translation.width, position.y + translation.height), transform);
         position.x += advances[i].width;
         position.y += advances[i].height;
