@@ -1134,14 +1134,12 @@ static FontLookup platformFontLookupWithFamily(FontDatabase& fontDatabase, const
 void FontCache::platformInvalidate()
 {
     m_fontFamilySpecificationCoreTextCache.clear();
+    m_systemFontDatabaseCoreText.clear();
 }
 
 static void invalidateFontCache()
 {
     ensureOnMainThread([] {
-        // FIXME: Workers need to access SystemFontDatabaseCoreText.
-        SystemFontDatabaseCoreText::singleton().clear();
-
         FontCache::invalidateAllFontCaches();
     });
 }
@@ -1166,7 +1164,7 @@ static RetainPtr<CTFontRef> fontWithFamilySpecialCase(const AtomString& family, 
     }
 
     if (systemDesign) {
-        auto cascadeList = SystemFontDatabaseCoreText::singleton().cascadeList(fontDescription, family, *systemDesign, allowUserInstalledFonts);
+        auto cascadeList = SystemFontDatabaseCoreText::forCurrentThread().cascadeList(fontDescription, family, *systemDesign, allowUserInstalledFonts);
         if (cascadeList.isEmpty())
             return nullptr;
         return createFontForInstalledFonts(cascadeList[0].get(), size, allowUserInstalledFonts);

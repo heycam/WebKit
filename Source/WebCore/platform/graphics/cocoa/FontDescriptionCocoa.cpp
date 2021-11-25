@@ -32,7 +32,7 @@ namespace WebCore {
 
 static inline Vector<RetainPtr<CTFontDescriptorRef>> systemFontCascadeList(const FontDescription& description, const AtomString& cssFamily, SystemFontKind systemFontKind, AllowUserInstalledFonts allowUserInstalledFonts)
 {
-    return SystemFontDatabaseCoreText::singleton().cascadeList(description, cssFamily, systemFontKind, allowUserInstalledFonts);
+    return SystemFontDatabaseCoreText::forCurrentThread().cascadeList(description, cssFamily, systemFontKind, allowUserInstalledFonts);
 }
 
 unsigned FontCascadeDescription::effectiveFamilyCount() const
@@ -41,7 +41,7 @@ unsigned FontCascadeDescription::effectiveFamilyCount() const
     unsigned result = 0;
     for (unsigned i = 0; i < familyCount(); ++i) {
         const auto& cssFamily = familyAt(i);
-        if (auto use = SystemFontDatabaseCoreText::singleton().matchSystemFontUse(cssFamily))
+        if (auto use = SystemFontDatabaseCoreText::forCurrentThread().matchSystemFontUse(cssFamily))
             result += systemFontCascadeList(*this, cssFamily, *use, shouldAllowUserInstalledFonts()).size();
         else
             ++result;
@@ -59,7 +59,7 @@ FontFamilySpecification FontCascadeDescription::effectiveFamilyAt(unsigned index
     // These two behaviors should be unified, which would hopefully allow us to delete this duplicate code.
     for (unsigned i = 0; i < familyCount(); ++i) {
         const auto& cssFamily = familyAt(i);
-        if (auto use = SystemFontDatabaseCoreText::singleton().matchSystemFontUse(cssFamily)) {
+        if (auto use = SystemFontDatabaseCoreText::forCurrentThread().matchSystemFontUse(cssFamily)) {
             auto cascadeList = systemFontCascadeList(*this, cssFamily, *use, shouldAllowUserInstalledFonts());
             if (index < cascadeList.size())
                 return FontFamilySpecification(cascadeList[index].get());
@@ -82,15 +82,15 @@ AtomString FontDescription::platformResolveGenericFamily(UScriptCode script, con
 
     // FIXME: Use the system font database to handle standardFamily
     if (familyName == serifFamily)
-        return SystemFontDatabaseCoreText::singleton().serifFamily(locale.string());
+        return SystemFontDatabaseCoreText::forCurrentThread().serifFamily(locale.string());
     if (familyName == sansSerifFamily)
-        return SystemFontDatabaseCoreText::singleton().sansSerifFamily(locale.string());
+        return SystemFontDatabaseCoreText::forCurrentThread().sansSerifFamily(locale.string());
     if (familyName == cursiveFamily)
-        return SystemFontDatabaseCoreText::singleton().cursiveFamily(locale.string());
+        return SystemFontDatabaseCoreText::forCurrentThread().cursiveFamily(locale.string());
     if (familyName == fantasyFamily)
-        return SystemFontDatabaseCoreText::singleton().fantasyFamily(locale.string());
+        return SystemFontDatabaseCoreText::forCurrentThread().fantasyFamily(locale.string());
     if (familyName == monospaceFamily)
-        return SystemFontDatabaseCoreText::singleton().monospaceFamily(locale.string());
+        return SystemFontDatabaseCoreText::forCurrentThread().monospaceFamily(locale.string());
 
     return nullAtom();
 }

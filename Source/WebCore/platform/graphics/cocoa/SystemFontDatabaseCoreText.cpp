@@ -34,15 +34,12 @@
 
 namespace WebCore {
 
-SystemFontDatabaseCoreText& SystemFontDatabaseCoreText::singleton()
+SystemFontDatabaseCoreText& SystemFontDatabaseCoreText::forCurrentThread()
 {
-    static NeverDestroyed<SystemFontDatabaseCoreText> database = SystemFontDatabaseCoreText();
-    return database.get();
+    return FontCache::forCurrentThread().systemFontDatabaseCoreText();
 }
 
-SystemFontDatabaseCoreText::SystemFontDatabaseCoreText()
-{
-}
+SystemFontDatabaseCoreText::SystemFontDatabaseCoreText() = default;
 
 RetainPtr<CTFontRef> SystemFontDatabaseCoreText::createSystemUIFont(const CascadeListParameters& parameters, CFStringRef locale)
 {
@@ -257,23 +254,19 @@ SystemFontDatabaseCoreText::CascadeListParameters SystemFontDatabaseCoreText::sy
 
     switch (systemFontKind) {
     case SystemFontKind::SystemUI: {
-        static MainThreadNeverDestroyed<const AtomString> systemUI = AtomString("system-ui", AtomString::ConstructFromLiteral);
-        result.fontName = systemUI.get();
+        result.fontName = AtomString("system-ui", AtomString::ConstructFromLiteral);
         break;
     }
     case SystemFontKind::UISerif: {
-        static MainThreadNeverDestroyed<const AtomString> systemUISerif = AtomString("ui-serif", AtomString::ConstructFromLiteral);
-        result.fontName = systemUISerif.get();
+        result.fontName = AtomString("ui-serif", AtomString::ConstructFromLiteral);
         break;
     }
     case SystemFontKind::UIMonospace: {
-        static MainThreadNeverDestroyed<const AtomString> systemUIMonospace = AtomString("ui-monospace", AtomString::ConstructFromLiteral);
-        result.fontName = systemUIMonospace.get();
+        result.fontName = AtomString("ui-monospace", AtomString::ConstructFromLiteral);
         break;
     }
     case SystemFontKind::UIRounded: {
-        static MainThreadNeverDestroyed<const AtomString> systemUIRounded = AtomString("ui-rounded", AtomString::ConstructFromLiteral);
-        result.fontName = systemUIRounded.get();
+        result.fontName = AtomString("ui-rounded", AtomString::ConstructFromLiteral);
         break;
     }
     case SystemFontKind::TextStyle:

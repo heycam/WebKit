@@ -47,7 +47,8 @@ namespace WebCore {
 
 void platformReleaseMemory(Critical)
 {
-    SystemFontDatabaseCoreText::singleton().clear();
+    // FIXME: Should clear this on all workers.
+    SystemFontDatabaseCoreText::forCurrentThread().clear();
     // FIXME: Should clear this on all workers.
     FontFamilySpecificationCoreTextCache::forCurrentThread().clear();
 

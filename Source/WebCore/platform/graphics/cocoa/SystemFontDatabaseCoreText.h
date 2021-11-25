@@ -90,7 +90,8 @@ public:
         bool italic { false };
     };
 
-    static SystemFontDatabaseCoreText& singleton();
+    SystemFontDatabaseCoreText();
+    static SystemFontDatabaseCoreText& forCurrentThread();
 
     std::optional<SystemFontKind> matchSystemFontUse(const AtomString& family);
     Vector<RetainPtr<CTFontDescriptorRef>> cascadeList(const FontDescription&, const AtomString& cssFamily, SystemFontKind, AllowUserInstalledFonts);
@@ -104,8 +105,6 @@ public:
     void clear();
 
 private:
-    SystemFontDatabaseCoreText();
-
     Vector<RetainPtr<CTFontDescriptorRef>> cascadeList(const CascadeListParameters&, SystemFontKind);
 
     RetainPtr<CTFontRef> createSystemUIFont(const CascadeListParameters&, CFStringRef locale);
