@@ -2077,6 +2077,7 @@ platform/graphics/RoundedRect.cpp
 platform/graphics/ShadowBlur.cpp
 platform/graphics/SourceBufferPrivate.cpp
 platform/graphics/StringTruncator.cpp
+platform/graphics/SystemFallbackFontCache.cpp
 platform/graphics/TextRun.cpp
 platform/graphics/TextTrackRepresentation.cpp
 platform/graphics/TrackPrivateBase.cpp
