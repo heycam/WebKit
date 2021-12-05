@@ -430,6 +430,13 @@ void FontCache::invalidateAllFontCaches()
     });
 }
 
+void FontCache::setShouldMockBoldSystemFontForAccessibilityOnAllFontCaches(bool shouldMock)
+{
+    callOnAllFontCaches([shouldMock](FontCache& fontCache) {
+        fontCache.m_shouldMockBoldSystemFontForAccessibility = shouldMock;
+    });
+}
+
 bool FontCache::useBackslashAsYenSignForFamily(const AtomString& family)
 {
     if (family.isEmpty())

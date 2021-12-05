@@ -149,8 +149,8 @@ public:
 
     std::unique_ptr<FontPlatformData> createFontPlatformDataForTesting(const FontDescription&, const AtomString& family);
     
-    bool shouldMockBoldSystemFontForAccessibility() const { return m_shouldMockBoldSystemFontForAccessibility; }
-    void setShouldMockBoldSystemFontForAccessibility(bool shouldMockBoldSystemFontForAccessibility) { m_shouldMockBoldSystemFontForAccessibility = shouldMockBoldSystemFontForAccessibility; }
+    bool shouldMockBoldSystemFontForAccessibility() { return m_shouldMockBoldSystemFontForAccessibility; }
+    WEBCORE_EXPORT static void setShouldMockBoldSystemFontForAccessibilityOnAllFontCaches(bool);
 
     struct PrewarmInformation {
         Vector<String> seenFamilies;
