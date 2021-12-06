@@ -407,12 +407,27 @@ void FontCache::invalidate()
     purgeInactiveFontData();
 }
 
-void FontCache::invalidateAllFontCaches()
+template<typename F>
+static void callOnAllFontCaches(F function)
 {
     ASSERT(isMainThread());
 
-    // FIXME: Invalidate FontCaches in workers too.
-    FontCache::forCurrentThread().invalidate();
+    function(FontCache::forCurrentThread());
+
+    Locker locker { WorkerOrWorkletThread::workerOrWorkletThreadsLock() };
+    for (auto thread : WorkerOrWorkletThread::workerOrWorkletThreads()) {
+        thread->runLoop().postTask([function](ScriptExecutionContext&) {
+            if (auto fontCache = FontCache::forCurrentThreadIfExists())
+                function(*fontCache);
+        });
+    }
+}
+
+void FontCache::invalidateAllFontCaches()
+{
+    callOnAllFontCaches([](FontCache& fontCache) {
+        fontCache.invalidate();
+    });
 }
 
 bool FontCache::useBackslashAsYenSignForFamily(const AtomString& family)
