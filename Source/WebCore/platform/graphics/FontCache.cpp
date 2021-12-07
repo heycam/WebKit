@@ -437,6 +437,20 @@ void FontCache::setShouldMockBoldSystemFontForAccessibilityOnAllFontCaches(bool 
     });
 }
 
+void FontCache::releaseNoncriticalMemory()
+{
+    purgeInactiveFontData();
+    m_fontCascadeCache.clearWidthCaches();
+    platformReleaseNoncriticalMemory();
+}
+
+void FontCache::releaseNoncriticalMemoryInAllFontCaches()
+{
+    callOnAllFontCaches([](FontCache& fontCache) {
+        fontCache.releaseNoncriticalMemory();
+    });
+}
+
 bool FontCache::useBackslashAsYenSignForFamily(const AtomString& family)
 {
     if (family.isEmpty())
@@ -480,6 +494,10 @@ RefPtr<Font> FontCache::similarFont(const FontDescription&, const String&)
 }
 
 void FontCache::platformInvalidate()
+{
+}
+
+void FontCache::platformReleaseNoncriticalMemory()
 {
 }
 #endif

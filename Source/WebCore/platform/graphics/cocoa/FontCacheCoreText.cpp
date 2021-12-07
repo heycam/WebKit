@@ -1571,4 +1571,10 @@ void FontCache::prewarmGlobally()
 #endif
 }
 
+void FontCache::platformReleaseNoncriticalMemory()
+{
+    m_systemFontDatabaseCoreText.clear();
+    m_fontFamilySpecificationCoreTextCache.clear();
+}
+
 }
