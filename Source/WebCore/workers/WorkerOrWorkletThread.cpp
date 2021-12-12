@@ -26,6 +26,7 @@
 #include "config.h"
 #include "WorkerOrWorkletThread.h"
 
+#include "FontCache.h"
 #include "ThreadGlobalData.h"
 #include "WorkerEventLoop.h"
 #include "WorkerOrWorkletGlobalScope.h"
@@ -209,8 +210,11 @@ void WorkerOrWorkletThread::workerOrWorkletThread()
     // We cannot let any objects survive past thread exit, because no other thread will run GC or otherwise destroy them.
     workerGlobalScopeToDelete = nullptr;
 
-    // Clean up WebCore::ThreadGlobalData before WTF::Thread goes away!
+    // Clean up any TLS data that contains AtomStrings before WTF::Thread goes
+    // away, otherwise AtomStrings would be destroyed after the thread's atom
+    // string table is destroyed.
     threadGlobalData().destroy();
+    FontCache::destroy();
 
     // Send the last WorkerThread Ref to be Deref'ed on the main thread.
     callOnMainThread([protectedThis = WTFMove(protectedThis)] { });
