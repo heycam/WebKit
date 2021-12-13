@@ -254,7 +254,7 @@ SystemFontDatabaseCoreText::CascadeListParameters SystemFontDatabaseCoreText::sy
 
     switch (systemFontKind) {
     case SystemFontKind::SystemUI: {
-        result.fontName = AtomString("system-ui", AtomString::ConstructFromLiteral);
+        result.fontName = m_systemUI; // AtomString("system-ui", AtomString::ConstructFromLiteral);
         break;
     }
     case SystemFontKind::UISerif: {

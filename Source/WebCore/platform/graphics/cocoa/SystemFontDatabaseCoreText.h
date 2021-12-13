@@ -114,7 +114,7 @@ private:
     static RetainPtr<CTFontRef> createFontByApplyingWeightWidthItalicsAndFallbackBehavior(CTFontRef, CGFloat weight, CGFloat width, bool italic, float size, AllowUserInstalledFonts, CFStringRef design = nullptr);
     static RetainPtr<CTFontDescriptorRef> removeCascadeList(CTFontDescriptorRef);
     static Vector<RetainPtr<CTFontDescriptorRef>> computeCascadeList(CTFontRef, CFStringRef locale);
-    static CascadeListParameters systemFontParameters(const FontDescription&, const AtomString& familyName, SystemFontKind, AllowUserInstalledFonts);
+    CascadeListParameters systemFontParameters(const FontDescription&, const AtomString& familyName, SystemFontKind, AllowUserInstalledFonts);
 
     HashMap<CascadeListParameters, Vector<RetainPtr<CTFontDescriptorRef>>, CascadeListParameters::Hash, SimpleClassHashTraits<CascadeListParameters>> m_systemFontCache;
 
@@ -125,6 +125,8 @@ private:
     HashMap<String, String> m_monospaceFamilies;
 
     Vector<AtomString> m_textStyles;
+
+    AtomString m_systemUI { "system-ui", AtomString::ConstructFromLiteral };
 };
 
 }
