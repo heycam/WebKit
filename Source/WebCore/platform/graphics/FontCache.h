@@ -89,9 +89,18 @@ using IMLangFontLinkType = IMLangFontLink;
 
 class FontCache {
     WTF_MAKE_NONCOPYABLE(FontCache); WTF_MAKE_FAST_ALLOCATED;
+    WEBCORE_EXPORT static FontCache& forMainThread();
+    WEBCORE_EXPORT static FontCache& forWorkerThread();
+    WEBCORE_EXPORT static FontCache* forWorkerThreadIfExists();
 public:
-    WEBCORE_EXPORT static FontCache& forCurrentThread();
-    static FontCache* forCurrentThreadIfExists();
+    WEBCORE_EXPORT static FontCache& forCurrentThread()
+    {
+        return isMainThread() ? forMainThread() : forWorkerThread();
+    }
+    static FontCache* forCurrentThreadIfExists()
+    {
+        return isMainThread() ? &forMainThread() : forWorkerThreadIfExists();
+    }
     static void destroy();
 
     FontCache();

@@ -122,7 +122,13 @@ struct FontCache::FontDataCaches {
 #endif
 };
 
-static FontCache*& fontCacheForCurrentThread()
+FontCache& FontCache::forMainThread()
+{
+    static MainThreadNeverDestroyed<FontCache> globalFontCache;
+    return globalFontCache;
+}
+
+static FontCache*& fontCacheForWorkerThread()
 {
     static ThreadSpecific<FontCache*>* fontCache;
     static std::once_flag onceFlag;
@@ -132,22 +138,24 @@ static FontCache*& fontCacheForCurrentThread()
     return **fontCache;
 }
 
-FontCache& FontCache::forCurrentThread()
+FontCache& FontCache::forWorkerThread()
 {
-    auto& fontCache = fontCacheForCurrentThread();
+    auto& fontCache = fontCacheForWorkerThread();
     if (UNLIKELY(!fontCache))
         fontCache = new FontCache;
     return *fontCache;
 }
 
-FontCache* FontCache::forCurrentThreadIfExists()
+FontCache* FontCache::forWorkerThreadIfExists()
 {
-    return fontCacheForCurrentThread();
+    return fontCacheForWorkerThread();
 }
 
 void FontCache::destroy()
 {
-    fontCacheForCurrentThread() = nullptr;
+    if (isMainThread())
+        return;
+    fontCacheForWorkerThread() = nullptr;
 }
 
 FontCache::FontCache()
