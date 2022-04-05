@@ -570,8 +570,7 @@ ExceptionOr<void> InternalSettings::setShouldMockBoldSystemFontForAccessibility(
     if (!m_page)
         return Exception { InvalidAccessError };
     RenderTheme::singleton().setShouldMockBoldSystemFontForAccessibility(should);
-    // FIXME: Call setShouldMockBoldSystemFontForAccessibility() on all workers.
-    FontCache::forCurrentThread().setShouldMockBoldSystemFontForAccessibility(should);
+    FontCache::setShouldMockBoldSystemFontForAccessibilityOnAllFontCaches(should);
     return { };
 }
 

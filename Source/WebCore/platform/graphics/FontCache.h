@@ -93,7 +93,7 @@ class FontCache {
     WEBCORE_EXPORT static FontCache& forWorkerThread();
     WEBCORE_EXPORT static FontCache* forWorkerThreadIfExists();
 public:
-    WEBCORE_EXPORT static FontCache& forCurrentThread()
+    static FontCache& forCurrentThread()
     {
         return isMainThread() ? forMainThread() : forWorkerThread();
     }
