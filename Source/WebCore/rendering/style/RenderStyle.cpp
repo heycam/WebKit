@@ -513,7 +513,7 @@ unsigned RenderStyle::hashForTextAutosizing() const
     hash ^= m_rareInheritedData->nbspMode;
     hash ^= m_rareInheritedData->lineBreak;
     hash ^= WTF::FloatHash<float>::hash(m_inheritedData->specifiedLineHeight.value());
-    hash ^= computeFontHash(m_inheritedData->fontCascade);
+    hash ^= computeFontHash(m_inheritedData->font->fontCascade);
     hash ^= WTF::FloatHash<float>::hash(m_inheritedData->horizontalBorderSpacing);
     hash ^= WTF::FloatHash<float>::hash(m_inheritedData->verticalBorderSpacing);
     hash ^= m_inheritedFlags.boxDirection;
@@ -535,7 +535,7 @@ bool RenderStyle::equalForTextAutosizing(const RenderStyle& other) const
         && m_rareInheritedData->lineBreak == other.m_rareInheritedData->lineBreak
         && m_rareInheritedData->textSecurity == other.m_rareInheritedData->textSecurity
         && m_inheritedData->specifiedLineHeight == other.m_inheritedData->specifiedLineHeight
-        && m_inheritedData->fontCascade.equalForTextAutoSizing(other.m_inheritedData->fontCascade)
+        && m_inheritedData->font->fontCascade.equalForTextAutoSizing(other.m_inheritedData->font->fontCascade)
         && m_inheritedData->horizontalBorderSpacing == other.m_inheritedData->horizontalBorderSpacing
         && m_inheritedData->verticalBorderSpacing == other.m_inheritedData->verticalBorderSpacing
         && m_inheritedFlags.boxDirection == other.m_inheritedFlags.boxDirection
@@ -947,7 +947,7 @@ bool RenderStyle::changeRequiresLayout(const RenderStyle& other, OptionSet<Style
 #if ENABLE(TEXT_AUTOSIZING)
             || m_inheritedData->specifiedLineHeight != other.m_inheritedData->specifiedLineHeight
 #endif
-            || m_inheritedData->fontCascade != other.m_inheritedData->fontCascade
+            || m_inheritedData->font != other.m_inheritedData->font
             || m_inheritedData->horizontalBorderSpacing != other.m_inheritedData->horizontalBorderSpacing
             || m_inheritedData->verticalBorderSpacing != other.m_inheritedData->verticalBorderSpacing)
             return true;
@@ -1939,17 +1939,17 @@ float RenderStyle::usedPerspective(const RenderObject& object) const
 
 const FontCascade& RenderStyle::fontCascade() const
 {
-    return m_inheritedData->fontCascade;
+    return m_inheritedData->font->fontCascade;
 }
 
 const FontMetrics& RenderStyle::metricsOfPrimaryFont() const
 {
-    return m_inheritedData->fontCascade.metricsOfPrimaryFont();
+    return m_inheritedData->font->fontCascade.metricsOfPrimaryFont();
 }
 
 const FontCascadeDescription& RenderStyle::fontDescription() const
 {
-    return m_inheritedData->fontCascade.fontDescription();
+    return m_inheritedData->font->fontCascade.fontDescription();
 }
 
 float RenderStyle::specifiedFontSize() const
@@ -1974,14 +1974,14 @@ const Length& RenderStyle::wordSpacing() const
 
 float RenderStyle::letterSpacing() const
 {
-    return m_inheritedData->fontCascade.letterSpacing();
+    return m_inheritedData->font->fontCascade.letterSpacing();
 }
 
 bool RenderStyle::setFontDescription(FontCascadeDescription&& description)
 {
-    if (m_inheritedData->fontCascade.fontDescription() == description)
+    if (m_inheritedData->font->fontCascade.fontDescription() == description)
         return false;
-    auto& cascade = m_inheritedData.access().fontCascade;
+    auto& cascade = m_inheritedData.access().font.access().fontCascade;
     cascade = { WTFMove(description), cascade.letterSpacing(), cascade.wordSpacing() };
     return true;
 }
@@ -2052,7 +2052,7 @@ void RenderStyle::setWordSpacing(Length&& value)
         fontWordSpacing = 0;
         break;
     }
-    m_inheritedData.access().fontCascade.setWordSpacing(fontWordSpacing);
+    m_inheritedData.access().font.access().fontCascade.setWordSpacing(fontWordSpacing);
     m_rareInheritedData.access().wordSpacing = WTFMove(value);
 }
 
@@ -2069,7 +2069,7 @@ void RenderStyle::setLetterSpacing(float letterSpacing)
 
 void RenderStyle::setLetterSpacingWithoutUpdatingFontDescription(float letterSpacing)
 {
-    m_inheritedData.access().fontCascade.setLetterSpacing(letterSpacing);
+    m_inheritedData.access().font.access().fontCascade.setLetterSpacing(letterSpacing);
 }
 
 void RenderStyle::setFontSize(float size)
@@ -2639,12 +2639,17 @@ void RenderStyle::setColumnStylesFromPaginationMode(const Pagination::Mode& pagi
     }
 }
 
-void RenderStyle::deduplicateInheritedCustomProperties(const RenderStyle& other)
+template <typename T>
+static void deduplicate(const DataRef<T>& a, const DataRef<T>& b)
 {
-    auto& properties = const_cast<DataRef<StyleCustomPropertyData>&>(m_rareInheritedData->customProperties);
-    auto& otherProperties = other.m_rareInheritedData->customProperties;
-    if (properties.ptr() != otherProperties.ptr() && *properties == *otherProperties)
-        properties = otherProperties;
+    if (a.ptr() != b.ptr() && *a == *b)
+        const_cast<DataRef<T>&>(a) = b;
+}
+
+void RenderStyle::deduplicateInheritedProperties(const RenderStyle& oldStyle)
+{
+    deduplicate(m_inheritedData->font, oldStyle.m_inheritedData->font);
+    deduplicate(m_rareInheritedData->customProperties, oldStyle.m_rareInheritedData->customProperties);
 }
 
 void RenderStyle::setInheritedCustomPropertyValue(const AtomString& name, Ref<CSSCustomPropertyValue>&& value)

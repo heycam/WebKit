@@ -271,7 +271,7 @@ void RenderText::styleDidChange(StyleDifference diff, const RenderStyle* oldStyl
         needsResetText = true;
     }
 
-    if (!oldStyle || oldStyle->fontCascade() != newStyle.fontCascade())
+    if (!oldStyle || !arePointingToEqualData(&oldStyle->fontCascade(), &newStyle.fontCascade()))
         m_canUseSimplifiedTextMeasuring = computeCanUseSimplifiedTextMeasuring();
 
     TextTransform oldTransform = oldStyle ? oldStyle->textTransform() : TextTransform::None;

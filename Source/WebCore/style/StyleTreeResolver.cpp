@@ -612,9 +612,8 @@ ElementUpdate TreeResolver::createAnimatedElementUpdate(std::unique_ptr<RenderSt
         styleable.setLastStyleChangeEventStyle(nullptr);
 
     // Deduplication speeds up equality comparisons as the properties inherit to descendants.
-    // FIXME: There should be a more general mechanism for this.
     if (oldStyle)
-        newStyle->deduplicateInheritedCustomProperties(*oldStyle);
+        newStyle->deduplicateInheritedProperties(*oldStyle);
 
     auto change = oldStyle ? determineChange(*oldStyle, *newStyle) : Change::Renderer;
 

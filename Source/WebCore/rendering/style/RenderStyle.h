@@ -190,7 +190,7 @@ public:
 
     const PseudoStyleCache* cachedPseudoStyles() const { return m_cachedPseudoStyles.get(); }
 
-    void deduplicateInheritedCustomProperties(const RenderStyle&);
+    void deduplicateInheritedProperties(const RenderStyle&);
     const CustomPropertyValueMap& inheritedCustomProperties() const { return m_rareInheritedData->customProperties->values; }
     const CustomPropertyValueMap& nonInheritedCustomProperties() const { return m_rareNonInheritedData->customProperties->values; }
     const CSSCustomPropertyValue* getCustomProperty(const AtomString&) const;

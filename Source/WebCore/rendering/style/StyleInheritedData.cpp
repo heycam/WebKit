@@ -35,6 +35,7 @@ StyleInheritedData::StyleInheritedData()
 #if ENABLE(TEXT_AUTOSIZING)
     , specifiedLineHeight(RenderStyle::initialLineHeight())
 #endif
+    , font(StyleFontData::create())
     , color(RenderStyle::initialColor())
     , visitedLinkColor(RenderStyle::initialColor())
 {
@@ -48,7 +49,7 @@ inline StyleInheritedData::StyleInheritedData(const StyleInheritedData& o)
 #if ENABLE(TEXT_AUTOSIZING)
     , specifiedLineHeight(o.specifiedLineHeight)
 #endif
-    , fontCascade(o.fontCascade)
+    , font(o.font)
     , color(o.color)
     , visitedLinkColor(o.visitedLinkColor)
 {
@@ -78,7 +79,7 @@ bool StyleInheritedData::nonFastPathInheritedEqual(const StyleInheritedData& oth
 #if ENABLE(TEXT_AUTOSIZING)
         && specifiedLineHeight == other.specifiedLineHeight
 #endif
-        && fontCascade == other.fontCascade
+        && font == other.font
         && horizontalBorderSpacing == other.horizontalBorderSpacing
         && verticalBorderSpacing == other.verticalBorderSpacing;
 }

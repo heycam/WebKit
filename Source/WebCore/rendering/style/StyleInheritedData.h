@@ -25,8 +25,8 @@
 #pragma once
 
 #include "Color.h"
-#include "FontCascade.h"
 #include "Length.h"
+#include "StyleFontData.h"
 
 namespace WebCore {
 
@@ -52,7 +52,7 @@ public:
     Length specifiedLineHeight;
 #endif
 
-    FontCascade fontCascade;
+    DataRef<StyleFontData> font;
     Color color;
     Color visitedLinkColor;
 
