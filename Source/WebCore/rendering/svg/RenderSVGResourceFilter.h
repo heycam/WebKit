@@ -40,18 +40,46 @@ struct FilterData {
     WTF_MAKE_ISO_ALLOCATED(FilterData);
     WTF_MAKE_NONCOPYABLE(FilterData);
 public:
-    enum FilterDataState { PaintingSource, Applying, Built, CycleDetected, MarkedForRemoval };
+    struct Inputs {
+        bool operator==(const Inputs& other)
+        {
+            return objectBoundingBox == other.objectBoundingBox && strokeBoundingBox == other.strokeBoundingBox && absoluteTransformScale == other.absoluteTransformScale;
+        }
+
+        FloatRect objectBoundingBox;
+        FloatRect strokeBoundingBox;
+        FloatSize absoluteTransformScale;
+    };
+
+    enum State { Empty, PaintingSource, Applying, Built, CycleDetected, MarkedForRemoval };
 
     FilterData() = default;
 
+    bool validate(const Inputs& inputs)
+    {
+        ASSERT(state == Empty || state == Built);
+        if (this->inputs != inputs) {
+            filter = nullptr;
+            results.clear();
+            sourceImageRect = FloatRect();
+            state = Empty;
+            this->inputs = inputs;
+        }
+        return filter;
+    }
+
+    // Cached data.
     RefPtr<SVGFilter> filter;
+    FloatSize filterScale;
     FilterResults results;
-
-    RefPtr<ImageBuffer> sourceImage;
     FloatRect sourceImageRect;
+    Inputs inputs;
 
+    // Used during painting.
+    RefPtr<ImageBuffer> sourceImage;
     GraphicsContext* savedContext { nullptr };
-    FilterDataState state { PaintingSource };
+
+    State state { Empty };
 };
 
 class RenderSVGResourceFilter final : public RenderSVGResourceContainer {
@@ -79,16 +107,18 @@ public:
     RenderSVGResourceType resourceType() const override { return FilterResourceType; }
 
     FloatRect drawingRegion(RenderObject*) const;
+
 private:
     void element() const = delete;
 
     ASCIILiteral renderName() const override { return "RenderSVGResourceFilter"_s; }
     bool isSVGResourceFilter() const override { return true; }
+    FilterData::Inputs computeInputs(RenderElement&);
 
-    HashMap<RenderObject*, std::unique_ptr<FilterData>> m_rendererFilterDataMap;
+    HashMap<RenderObject*, std::unique_ptr<FilterData>> m_filterMap;
 };
 
-WTF::TextStream& operator<<(WTF::TextStream&, FilterData::FilterDataState);
+WTF::TextStream& operator<<(WTF::TextStream&, FilterData::State);
 
 } // namespace WebCore
 

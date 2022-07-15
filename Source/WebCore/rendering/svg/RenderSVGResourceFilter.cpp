@@ -52,7 +52,7 @@ void RenderSVGResourceFilter::removeAllClientsFromCache(bool markForInvalidation
 {
     LOG(Filters, "RenderSVGResourceFilter %p removeAllClientsFromCache", this);
 
-    m_rendererFilterDataMap.clear();
+    m_filterMap.clear();
 
     markAllClientsForInvalidation(markForInvalidation ? LayoutAndBoundariesInvalidation : ParentOnlyInvalidation);
 }
@@ -61,16 +61,32 @@ void RenderSVGResourceFilter::removeClientFromCache(RenderElement& client, bool 
 {
     LOG(Filters, "RenderSVGResourceFilter %p removing client %p", this, &client);
     
-    auto findResult = m_rendererFilterDataMap.find(&client);
-    if (findResult != m_rendererFilterDataMap.end()) {
+    auto findResult = m_filterMap.find(&client);
+    if (findResult != m_filterMap.end()) {
         FilterData& filterData = *findResult->value;
         if (filterData.savedContext)
             filterData.state = FilterData::MarkedForRemoval;
         else
-            m_rendererFilterDataMap.remove(findResult);
+            m_filterMap.remove(findResult);
     }
 
     markClientForInvalidation(client, markForInvalidation ? BoundariesInvalidation : ParentOnlyInvalidation);
+}
+
+FilterData::Inputs RenderSVGResourceFilter::computeInputs(RenderElement& renderer)
+{
+    auto objectBoundingBox = renderer.objectBoundingBox();
+    auto strokeBoundingBox = renderer.strokeBoundingBox();
+    FloatSize absoluteTransformScale;
+
+    // Determine absolute transformation matrix for filter. 
+    auto absoluteTransform = SVGRenderingContext::calculateTransformationToOutermostCoordinateSystem(renderer);
+
+    // Eliminate shear of the absolute transformation matrix, to be able to produce unsheared tile images for feTile.
+    if (absoluteTransform.isInvertible())
+        absoluteTransformScale = FloatSize(absoluteTransform.xScale(), absoluteTransform.yScale());
+
+    return { objectBoundingBox, strokeBoundingBox, absoluteTransformScale };
 }
 
 bool RenderSVGResourceFilter::applyResource(RenderElement& renderer, const RenderStyle&, GraphicsContext*& context, OptionSet<RenderSVGResourceMode> resourceMode)
@@ -80,58 +96,56 @@ bool RenderSVGResourceFilter::applyResource(RenderElement& renderer, const Rende
 
     LOG(Filters, "RenderSVGResourceFilter %p applyResource renderer %p", this, &renderer);
 
-    if (m_rendererFilterDataMap.contains(&renderer)) {
-        FilterData* filterData = m_rendererFilterDataMap.get(&renderer);
-        if (filterData->state == FilterData::PaintingSource || filterData->state == FilterData::Applying)
-            filterData->state = FilterData::CycleDetected;
-        return false; // Already built, or we're in a cycle, or we're marked for removal. Regardless, just do nothing more now.
-    }
+    auto& filterData = *m_filterMap.ensure(&renderer, [&] {
+        return makeUnique<FilterData>();
+    }).iterator->value;
 
-    auto addResult = m_rendererFilterDataMap.set(&renderer, makeUnique<FilterData>());
-    auto filterData = addResult.iterator->value.get();
-    
-    auto targetBoundingBox = renderer.objectBoundingBox();
-    auto filterRegion = SVGLengthContext::resolveRectangle<SVGFilterElement>(&filterElement(), filterElement().filterUnits(), targetBoundingBox);
-    if (filterRegion.isEmpty()) {
-        m_rendererFilterDataMap.remove(&renderer);
+    switch (filterData.state) {
+    case FilterData::Empty:
+    case FilterData::Built:
+        break;
+    case FilterData::PaintingSource:
+    case FilterData::Applying:
+        filterData.state = FilterData::CycleDetected;
+        return false;
+    case FilterData::CycleDetected:
+    case FilterData::MarkedForRemoval:
         return false;
     }
+ 
+    if (!filterData.validate(computeInputs(renderer))) {
+        if (filterData.inputs.absoluteTransformScale.isZero())
+            return false;
 
-    // Determine absolute transformation matrix for filter. 
-    auto absoluteTransform = SVGRenderingContext::calculateTransformationToOutermostCoordinateSystem(renderer);
-    if (!absoluteTransform.isInvertible()) {
-        m_rendererFilterDataMap.remove(&renderer);
-        return false;
+        auto filterRegion = SVGLengthContext::resolveRectangle<SVGFilterElement>(&filterElement(), filterElement().filterUnits(), filterData.inputs.objectBoundingBox);
+        if (filterRegion.isEmpty())
+            return false;
+
+        // Determine absolute boundaries of the filter and the drawing region.
+        filterData.sourceImageRect = filterData.inputs.strokeBoundingBox;
+        filterData.sourceImageRect.intersect(filterRegion);
+
+        // Determine scale factor for filter. The size of intermediate ImageBuffers shouldn't be bigger than kMaxFilterSize.
+        filterData.filterScale = filterData.inputs.absoluteTransformScale;
+        ImageBuffer::sizeNeedsClamping(filterData.sourceImageRect.size(), filterData.filterScale);
+
+        // Set the rendering mode from the page's settings.
+        auto renderingMode = renderer.page().acceleratedFiltersEnabled() ? RenderingMode::Accelerated : RenderingMode::Unaccelerated;
+
+        // Create the SVGFilter object.
+        filterData.filter = SVGFilter::create(filterElement(), renderingMode, filterData.filterScale, Filter::ClipOperation::Intersect, filterRegion, filterData.inputs.objectBoundingBox, *context);
+        if (!filterData.filter)
+            return false;
+
+        if (filterData.filter->clampFilterRegionIfNeeded())
+            filterData.filterScale = filterData.filter->filterScale();
     }
 
-    // Eliminate shear of the absolute transformation matrix, to be able to produce unsheared tile images for feTile.
-    FloatSize filterScale(absoluteTransform.xScale(), absoluteTransform.yScale());
-
-    // Determine absolute boundaries of the filter and the drawing region.
-    filterData->sourceImageRect = renderer.strokeBoundingBox();
-    filterData->sourceImageRect.intersect(filterRegion);
-
-    // Determine scale factor for filter. The size of intermediate ImageBuffers shouldn't be bigger than kMaxFilterSize.
-    ImageBuffer::sizeNeedsClamping(filterData->sourceImageRect.size(), filterScale);
-
-    // Set the rendering mode from the page's settings.
-    auto renderingMode = renderer.page().acceleratedFiltersEnabled() ? RenderingMode::Accelerated : RenderingMode::Unaccelerated;
-
-    // Create the SVGFilter object.
-    filterData->filter = SVGFilter::create(filterElement(), renderingMode, filterScale, Filter::ClipOperation::Intersect, filterRegion, targetBoundingBox, *context);
-    if (!filterData->filter) {
-        m_rendererFilterDataMap.remove(&renderer);
-        return false;
-    }
-
-    if (filterData->filter->clampFilterRegionIfNeeded())
-        filterScale = filterData->filter->filterScale();
-    
     // If the sourceImageRect is empty, we have something like <g filter=".."/>.
     // Even if the target objectBoundingBox() is empty, we still have to draw the last effect result image in postApplyResource.
-    if (filterData->sourceImageRect.isEmpty()) {
-        ASSERT(m_rendererFilterDataMap.contains(&renderer));
-        filterData->savedContext = context;
+    if (filterData.sourceImageRect.isEmpty()) {
+        ASSERT(m_filterMap.contains(&renderer));
+        filterData.savedContext = context;
         return false;
     }
 
@@ -141,17 +155,17 @@ bool RenderSVGResourceFilter::applyResource(RenderElement& renderer, const Rende
     auto colorSpace = DestinationColorSpace::SRGB();
 #endif
 
-    filterData->sourceImage = context->createScaledImageBuffer(filterData->sourceImageRect, filterScale, colorSpace, filterData->filter->renderingMode());
-    if (!filterData->sourceImage) {
-        ASSERT(m_rendererFilterDataMap.contains(&renderer));
-        filterData->savedContext = context;
+    filterData.sourceImage = context->createScaledImageBuffer(filterData.sourceImageRect, filterData.filterScale, colorSpace, filterData.filter->renderingMode());
+    if (!filterData.sourceImage) {
+        ASSERT(m_filterMap.contains(&renderer));
+        filterData.savedContext = context;
         return false;
     }
 
-    filterData->savedContext = context;
-    context = &filterData->sourceImage->context();
+    filterData.savedContext = context;
+    context = &filterData.sourceImage->context();
 
-    ASSERT(m_rendererFilterDataMap.contains(&renderer));
+    ASSERT(m_filterMap.contains(&renderer));
     return true;
 }
 
@@ -160,8 +174,8 @@ void RenderSVGResourceFilter::postApplyResource(RenderElement& renderer, Graphic
     ASSERT(context);
     ASSERT_UNUSED(resourceMode, !resourceMode);
 
-    auto findResult = m_rendererFilterDataMap.find(&renderer);
-    if (findResult == m_rendererFilterDataMap.end())
+    auto findResult = m_filterMap.find(&renderer);
+    if (findResult == m_filterMap.end())
         return;
 
     FilterData& filterData = *findResult->value;
@@ -170,7 +184,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderElement& renderer, Graphic
 
     switch (filterData.state) {
     case FilterData::MarkedForRemoval:
-        m_rendererFilterDataMap.remove(findResult);
+        m_filterMap.remove(findResult);
         return;
 
     case FilterData::CycleDetected:
@@ -192,6 +206,7 @@ void RenderSVGResourceFilter::postApplyResource(RenderElement& renderer, Graphic
         filterData.savedContext = nullptr;
         break;
 
+    case FilterData::Empty:
     case FilterData::Built:
         break;
     }
@@ -213,7 +228,7 @@ void RenderSVGResourceFilter::markFilterForRepaint(FilterEffect& effect)
 {
     LOG(Filters, "RenderSVGResourceFilter %p markFilterForRepaint effect %p", this, &effect);
 
-    for (const auto& objectFilterDataPair : m_rendererFilterDataMap) {
+    for (const auto& objectFilterDataPair : m_filterMap) {
         const auto& filterData = objectFilterDataPair.value;
         if (filterData->state != FilterData::Built)
             continue;
@@ -234,13 +249,16 @@ void RenderSVGResourceFilter::markFilterForRebuild()
 
 FloatRect RenderSVGResourceFilter::drawingRegion(RenderObject* object) const
 {
-    FilterData* filterData = m_rendererFilterDataMap.get(object);
+    FilterData* filterData = m_filterMap.get(object);
     return filterData ? filterData->sourceImageRect : FloatRect();
 }
 
-TextStream& operator<<(TextStream& ts, FilterData::FilterDataState state)
+TextStream& operator<<(TextStream& ts, FilterData::State state)
 {
     switch (state) {
+    case FilterData::Empty:
+        ts << "empty";
+        break;
     case FilterData::PaintingSource:
         ts << "painting source";
         break;

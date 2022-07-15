@@ -45,6 +45,7 @@ public:
     FilterImage* effectResult(FilterEffect&) const;
     void setEffectResult(FilterEffect&, const FilterImageVector& inputs, Ref<FilterImage>&& result);
     void clearEffectResult(FilterEffect&);
+    void clear();
 
 private:
     HashMap<Ref<FilterEffect>, Ref<FilterImage>> m_results;

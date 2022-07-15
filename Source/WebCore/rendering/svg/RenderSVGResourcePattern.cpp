@@ -74,66 +74,90 @@ void RenderSVGResourcePattern::collectPatternAttributes(PatternAttributes& attri
     }
 }
 
-PatternData* RenderSVGResourcePattern::buildPattern(RenderElement& renderer, OptionSet<RenderSVGResourceMode> resourceMode, GraphicsContext& context)
+bool RenderSVGResourcePattern::updatePattern(PatternData& patternData, GraphicsContext& context)
 {
     ASSERT(!m_shouldCollectPatternAttributes);
 
-    PatternData* currentData = m_patternMap.get(&renderer);
-    if (currentData && currentData->pattern)
-        return currentData;
-
     // If we couldn't determine the pattern content element root, stop here.
     if (!m_attributes.patternContentElement())
-        return nullptr;
+        return false;
 
     // An empty viewBox disables rendering.
     if (m_attributes.hasViewBox() && m_attributes.viewBox().isEmpty())
-        return nullptr;
+        return false;
 
     // Compute all necessary transformations to build the tile image & the pattern.
     FloatRect tileBoundaries;
     AffineTransform tileImageTransform;
-    if (!buildTileImageTransform(renderer, m_attributes, patternElement(), tileBoundaries, tileImageTransform))
-        return nullptr;
-
-    auto absoluteTransform = SVGRenderingContext::calculateTransformationToOutermostCoordinateSystem(renderer);
-
-    // Ignore 2D rotation, as it doesn't affect the size of the tile.
-    FloatSize tileScale(absoluteTransform.xScale(), absoluteTransform.yScale());
+    if (!buildTileImageTransform(patternData.inputs.objectBoundingBox, m_attributes, patternElement(), tileBoundaries, tileImageTransform))
+        return false;
 
     // Scale the tile size to match the scale level of the patternTransform.
+    auto tileScale = patternData.inputs.absoluteTransformScale;
     tileScale.scale(static_cast<float>(m_attributes.patternTransform().xScale()), static_cast<float>(m_attributes.patternTransform().yScale()));
 
     // Build tile image.
     auto tileImage = createTileImage(context, tileBoundaries.size(), tileScale, tileImageTransform, m_attributes);
     if (!tileImage)
-        return nullptr;
+        return false;
 
     auto tileImageSize = tileImage->logicalSize();
 
     // Compute pattern space transformation.
-    auto patternData = makeUnique<PatternData>();
-    patternData->transform.translate(tileBoundaries.location());
-    patternData->transform.scale(tileBoundaries.size() / tileImageSize);
+    patternData.transform.translate(tileBoundaries.location());
+    patternData.transform.scale(tileBoundaries.size() / tileImageSize);
 
     AffineTransform patternTransform = m_attributes.patternTransform();
     if (!patternTransform.isIdentity())
-        patternData->transform = patternTransform * patternData->transform;
+        patternData.transform = patternTransform * patternData.transform;
 
     // Account for text drawing resetting the context to non-scaled, see SVGInlineTextBox::paintTextWithShadows.
-    if (resourceMode.contains(RenderSVGResourceMode::ApplyToText)) {
-        auto textScale = computeTextPaintingScale(renderer);
-        if (textScale != 1)
-            patternData->transform.scale(textScale);
-    }
+    if (patternData.inputs.textPaintingScale != 1)
+        patternData.transform.scale(patternData.inputs.textPaintingScale);
 
     // Build pattern.
-    patternData->pattern = Pattern::create({ tileImage.releaseNonNull() }, { true, true, patternData->transform });
+    patternData.pattern = Pattern::create({ tileImage.releaseNonNull() }, { true, true, patternData.transform });
+    return true;
+}
 
-    // Various calls above may trigger invalidations in some fringe cases (ImageBuffer allocation
-    // failures in the SVG image cache for example). To avoid having our PatternData deleted by
-    // removeAllClientsFromCache(), we only make it visible in the cache at the very end.
+PatternData* RenderSVGResourcePattern::buildPattern(RenderElement& renderer, GraphicsContext& context, const PatternData::Inputs& inputs)
+{
+    // Various calls in updatePattern may trigger invalidations in some fringe
+    // cases (ImageBuffer allocation failures in the SVG image cache for
+    // example). To avoid having our PatternData deleted by removeAllClientsFromCache(),
+    // we never call updatePattern while the PatternData is in m_patternMap.
+
+    auto iter = m_patternMap.find(&renderer);
+
+    if (iter == m_patternMap.end()) {
+        auto patternData = makeUnique<PatternData>();
+        patternData->inputs = inputs;
+        if (!updatePattern(*patternData, context))
+            return nullptr;
+        return m_patternMap.set(&renderer, WTFMove(patternData)).iterator->value.get();
+    }
+
+    if (iter->value->validate(inputs))
+        return iter->value.get();
+
+    auto patternData = WTFMove(iter->value);
+    if (!updatePattern(*patternData, context)) {
+        m_patternMap.remove(&renderer);
+        return nullptr;
+    }
     return m_patternMap.set(&renderer, WTFMove(patternData)).iterator->value.get();
+}
+
+PatternData::Inputs RenderSVGResourcePattern::computeInputs(RenderElement& renderer, OptionSet<RenderSVGResourceMode> resourceMode)
+{
+    auto objectBoundingBox = renderer.objectBoundingBox();
+
+    auto absoluteTransform = SVGRenderingContext::calculateTransformationToOutermostCoordinateSystem(renderer);
+    FloatSize absoluteTransformScale(absoluteTransform.xScale(), absoluteTransform.yScale());
+
+    float textPaintingScale = resourceMode.contains(RenderSVGResourceMode::ApplyToText) ? computeTextPaintingScale(renderer) : 1;
+
+    return { objectBoundingBox, absoluteTransformScale, textPaintingScale };
 }
 
 bool RenderSVGResourcePattern::applyResource(RenderElement& renderer, const RenderStyle& style, GraphicsContext*& context, OptionSet<RenderSVGResourceMode> resourceMode)
@@ -151,11 +175,11 @@ bool RenderSVGResourcePattern::applyResource(RenderElement& renderer, const Rend
     
     // Spec: When the geometry of the applicable element has no width or height and objectBoundingBox is specified,
     // then the given effect (e.g. a gradient or a filter) will be ignored.
-    FloatRect objectBoundingBox = renderer.objectBoundingBox();
-    if (m_attributes.patternUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX && objectBoundingBox.isEmpty())
+    auto inputs = computeInputs(renderer, resourceMode);
+    if (m_attributes.patternUnits() == SVGUnitTypes::SVG_UNIT_TYPE_OBJECTBOUNDINGBOX && inputs.objectBoundingBox.isEmpty())
         return false;
 
-    PatternData* patternData = buildPattern(renderer, resourceMode, *context);
+    auto patternData = buildPattern(renderer, *context, inputs);
     if (!patternData)
         return false;
 
@@ -210,13 +234,12 @@ static inline FloatRect calculatePatternBoundaries(const PatternAttributes& attr
     return SVGLengthContext::resolveRectangle(&patternElement, attributes.patternUnits(), objectBoundingBox, attributes.x(), attributes.y(), attributes.width(), attributes.height());
 }
 
-bool RenderSVGResourcePattern::buildTileImageTransform(RenderElement& renderer,
+bool RenderSVGResourcePattern::buildTileImageTransform(const FloatRect& objectBoundingBox,
                                                        const PatternAttributes& attributes,
                                                        const SVGPatternElement& patternElement,
                                                        FloatRect& patternBoundaries,
                                                        AffineTransform& tileImageTransform) const
 {
-    FloatRect objectBoundingBox = renderer.objectBoundingBox();
     patternBoundaries = calculatePatternBoundaries(attributes, objectBoundingBox, patternElement); 
     if (patternBoundaries.width() <= 0 || patternBoundaries.height() <= 0)
         return false;

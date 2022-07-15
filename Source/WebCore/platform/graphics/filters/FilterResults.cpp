@@ -63,4 +63,10 @@ void FilterResults::clearEffectResult(FilterEffect& effect)
     m_resultReferences.remove(result);
 }
 
+void FilterResults::clear()
+{
+    m_results.clear();
+    m_resultReferences.clear();
+}
+
 } // namespace WebCore

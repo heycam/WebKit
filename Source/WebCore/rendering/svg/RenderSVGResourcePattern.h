@@ -33,10 +33,31 @@
 namespace WebCore {
 
 struct PatternData {
-    WTF_MAKE_FAST_ALLOCATED;
-public:
+    WTF_MAKE_STRUCT_FAST_ALLOCATED;
+
+    struct Inputs {
+        bool operator==(const Inputs& other)
+        {
+            return objectBoundingBox == other.objectBoundingBox && absoluteTransformScale == other.absoluteTransformScale && textPaintingScale == other.textPaintingScale;
+        }
+
+        FloatRect objectBoundingBox;
+        FloatSize absoluteTransformScale;
+        float textPaintingScale = 1;
+    };
+
+    bool validate(const Inputs& inputs)
+    {
+        if (this->inputs != inputs) {
+            pattern = nullptr;
+            this->inputs = inputs;
+        }
+        return pattern;
+    }
+
     RefPtr<Pattern> pattern;
     AffineTransform transform;
+    Inputs inputs;
 };
 
 class RenderSVGResourcePattern final : public RenderSVGResourceContainer {
@@ -60,11 +81,13 @@ private:
     void element() const = delete;
     ASCIILiteral renderName() const override { return "RenderSVGResourcePattern"_s; }
 
-    bool buildTileImageTransform(RenderElement&, const PatternAttributes&, const SVGPatternElement&, FloatRect& patternBoundaries, AffineTransform& tileImageTransform) const;
+    bool buildTileImageTransform(const FloatRect& objectBoundingBox, const PatternAttributes&, const SVGPatternElement&, FloatRect& patternBoundaries, AffineTransform& tileImageTransform) const;
 
     RefPtr<ImageBuffer> createTileImage(GraphicsContext&, const FloatSize&, const FloatSize& scale, const AffineTransform& tileImageTransform, const PatternAttributes&) const;
 
-    PatternData* buildPattern(RenderElement&, OptionSet<RenderSVGResourceMode>, GraphicsContext&);
+    PatternData::Inputs computeInputs(RenderElement&, OptionSet<RenderSVGResourceMode>);
+    PatternData* buildPattern(RenderElement&, GraphicsContext&, const PatternData::Inputs&);
+    bool updatePattern(PatternData&, GraphicsContext&);
 
     PatternAttributes m_attributes;
     HashMap<RenderElement*, std::unique_ptr<PatternData>> m_patternMap;
