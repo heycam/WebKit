@@ -21,7 +21,7 @@ function formatTestName(suiteName, testName) {
     return suiteName + (testName ? '/' + testName : '');
 }
 
-function createUIForSuites(suites, onstep, onrun) {
+function createUIForSuites(suites, onstep, onrun, onrun100) {
     var control = document.createElement('nav');
     var ol = document.createElement('ol');
     var checkboxes = [];
@@ -69,6 +69,12 @@ function createUIForSuites(suites, onstep, onrun) {
     button.textContent = 'Run';
     button.id = 'runSuites';
     button.onclick = onrun;
+    control.appendChild(button);
+
+    var button = document.createElement('button');
+    button.textContent = 'Run 100';
+    button.id = 'runSuites100';
+    button.onclick = onrun100;
     control.appendChild(button);
 
     var button = document.createElement('button');
@@ -120,15 +126,23 @@ function startTest() {
         disableAllSuitesExcept(queryParam);
 
     var runner = new BenchmarkRunner(Suites, {
+        willStartFirstIteration: function (iterationCount) {
+        },
         willRunTest: function (suite, test) {
+            if (runner.runningMultiple)
+                return;
             test.anchor.classList.add('running');
         },
         didRunTest: function (suite, test) {
+            if (runner.runningMultiple)
+                return;
             var classList = test.anchor.classList;
             classList.remove('running');
             classList.add('ran');
         },
         didRunSuites: function (measuredValues) {
+            if (runner.runningMultiple)
+                return;
             var results = '';
             for (var suiteName in measuredValues.tests) {
                 var suiteResults = measuredValues.tests[suiteName];
@@ -152,6 +166,8 @@ function startTest() {
             var pre = document.createElement('pre');
             document.body.appendChild(pre);
             pre.textContent = results;
+        },
+        didFinishLastIteration: function () {
         }
     });
 
@@ -159,8 +175,9 @@ function startTest() {
 
     // Don't call step while step is already executing.
     document.body.appendChild(createUIForSuites(Suites,
-        function () { runner.step(currentState).then(function (state) { currentState = state; }); },
-        function () { runner.runAllSteps(currentState); currentState = null; }));
+        function () { runner.runningMultiple = true; runner.step(currentState).then(function (state) { currentState = state; }); },
+        function () { runner.runningMultiple = false; runner.runAllSteps(currentState); currentState = null; },
+        function () { runner.runningMultiple = true; runner.runMultipleIterations(100); currentState = null; }));
 
     if (parseQueryString['startAutomatically'] !== undefined)
         document.getElementById('runSuites').click();
