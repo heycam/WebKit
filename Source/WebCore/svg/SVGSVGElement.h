@@ -124,7 +124,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGSVGElement, SVGGraphicsElement, SVGFitToViewBox>;
     
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
     bool selfHasRelativeLengths() const override;
     bool isValid() const override;

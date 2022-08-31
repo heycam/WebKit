@@ -33,6 +33,7 @@
 #include "HTMLParserIdioms.h"
 #include "InputTypeNames.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "RenderImage.h"
 #include <wtf/NeverDestroyed.h>
 
@@ -112,15 +113,15 @@ RenderPtr<RenderElement> ImageInputType::createInputRenderer(RenderStyle&& style
     return createRenderer<RenderImage>(*element(), WTFMove(style));
 }
 
-void ImageInputType::attributeChanged(const QualifiedName& name)
+void ImageInputType::attributeChanged(NodeName name)
 {
-    if (name == altAttr) {
+    if (name == AttributeNames::alt) {
         if (auto* element = this->element()) {
             auto* renderer = element->renderer();
             if (is<RenderImage>(renderer))
                 downcast<RenderImage>(*renderer).updateAltText();
         }
-    } else if (name == srcAttr) {
+    } else if (name == AttributeNames::src) {
         if (auto* element = this->element()) {
             if (element->renderer())
                 element->ensureImageLoader().updateFromElementIgnoringPreviousError();

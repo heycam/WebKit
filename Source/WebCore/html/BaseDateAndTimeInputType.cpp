@@ -47,6 +47,7 @@
 #include "HTMLNames.h"
 #include "HTMLOptionElement.h"
 #include "KeyboardEvent.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "PlatformLocale.h"
 #include "ScriptDisallowedScope.h"
@@ -381,17 +382,17 @@ bool BaseDateAndTimeInputType::hasCustomFocusLogic() const
     return InputType::hasCustomFocusLogic();
 }
 
-void BaseDateAndTimeInputType::attributeChanged(const QualifiedName& name)
+void BaseDateAndTimeInputType::attributeChanged(NodeName name)
 {
-    if (name == maxAttr || name == minAttr) {
+    if (name == AttributeNames::max || name == AttributeNames::min) {
         if (auto* element = this->element())
             element->invalidateStyleForSubtree();
-    } else if (name == valueAttr) {
+    } else if (name == AttributeNames::value) {
         if (auto* element = this->element()) {
             if (!element->hasDirtyValue())
                 updateInnerTextValue();
         }
-    } else if (name == stepAttr && m_dateTimeEditElement)
+    } else if (name == AttributeNames::step && m_dateTimeEditElement)
         updateInnerTextValue();
 
     InputType::attributeChanged(name);

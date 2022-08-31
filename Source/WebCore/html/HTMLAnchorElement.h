@@ -83,7 +83,7 @@ public:
 protected:
     HTMLAnchorElement(const QualifiedName&, Document&);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
 
 private:
     bool supportsFocus() const override;

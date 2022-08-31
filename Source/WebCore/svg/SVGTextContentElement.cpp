@@ -27,6 +27,7 @@
 #include "DOMPoint.h"
 #include "Frame.h"
 #include "FrameSelection.h"
+#include "NodeName.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGText.h"
@@ -141,9 +142,9 @@ ExceptionOr<void> SVGTextContentElement::selectSubString(unsigned charnum, unsig
     return { };
 }
 
-bool SVGTextContentElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool SVGTextContentElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name.matches(XMLNames::spaceAttr))
+    if (name == AttributeNames::XML::space)
         return true;
     return SVGGraphicsElement::hasPresentationalHintsForAttribute(name);
 }
@@ -161,15 +162,15 @@ void SVGTextContentElement::collectPresentationalHintsForAttribute(const Qualifi
     SVGGraphicsElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void SVGTextContentElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGTextContentElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::lengthAdjustAttr) {
+    if (name == AttributeNames::lengthAdjust) {
         auto propertyValue = SVGPropertyTraits<SVGLengthAdjustType>::fromString(value);
         if (propertyValue > 0)
             m_lengthAdjust->setBaseValInternal<SVGLengthAdjustType>(propertyValue);
-    } else if (name == SVGNames::textLengthAttr)
+    } else if (name == AttributeNames::textLength)
         m_textLength->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Other, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

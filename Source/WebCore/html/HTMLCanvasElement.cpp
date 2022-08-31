@@ -56,6 +56,7 @@
 #include "JSNodeCustom.h"
 #include "Logging.h"
 #include "MIMETypeRegistry.h"
+#include "NodeName.h"
 #include "OffscreenCanvas.h"
 #include "PlaceholderRenderingContext.h"
 #include "RenderElement.h"
@@ -153,9 +154,9 @@ HTMLCanvasElement::~HTMLCanvasElement()
     setImageBuffer(nullptr);
 }
 
-bool HTMLCanvasElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLCanvasElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
@@ -170,9 +171,9 @@ void HTMLCanvasElement::collectPresentationalHintsForAttribute(const QualifiedNa
         HTMLElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLCanvasElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLCanvasElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == widthAttr || name == heightAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height)
         reset();
     HTMLElement::parseAttribute(name, value);
 }

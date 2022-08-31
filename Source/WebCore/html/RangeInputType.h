@@ -56,7 +56,7 @@ private:
     Decimal parseToNumber(const String&, const Decimal&) const final;
     String serialize(const Decimal&) const final;
     bool accessKeyAction(bool sendMouseEvents) final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     void setValue(const String&, bool valueChanged, TextFieldEventBehavior, TextControlSetValueSelection) final;
     String fallbackValue() const final;
     String sanitizeValue(const String& proposedValue) const final;

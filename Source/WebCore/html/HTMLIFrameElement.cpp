@@ -33,6 +33,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "LazyLoadFrameObserver.h"
+#include "NodeName.h"
 #include "RenderIFrame.h"
 #include "ScriptController.h"
 #include "ScriptableDocumentParser.h"
@@ -71,9 +72,9 @@ DOMTokenList& HTMLIFrameElement::sandbox()
     return *m_sandbox;
 }
 
-bool HTMLIFrameElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLIFrameElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == frameborderAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height || name == AttributeNames::frameborder)
         return true;
     return HTMLFrameElementBase::hasPresentationalHintsForAttribute(name);
 }
@@ -97,9 +98,9 @@ void HTMLIFrameElement::collectPresentationalHintsForAttribute(const QualifiedNa
         HTMLFrameElementBase::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLIFrameElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLIFrameElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == sandboxAttr) {
+    if (name == AttributeNames::sandbox) {
         if (m_sandbox)
             m_sandbox->associatedAttributeValueChanged(value);
 
@@ -107,9 +108,9 @@ void HTMLIFrameElement::parseAttribute(const QualifiedName& name, const AtomStri
         setSandboxFlags(value.isNull() ? SandboxNone : SecurityContext::parseSandboxPolicy(value, invalidTokens));
         if (!invalidTokens.isNull())
             document().addConsoleMessage(MessageSource::Other, MessageLevel::Error, "Error while parsing the 'sandbox' attribute: " + invalidTokens);
-    } else if (name == allowAttr || name == allowfullscreenAttr || name == webkitallowfullscreenAttr) {
+    } else if (name == AttributeNames::allow || name == AttributeNames::allowfullscreen || name == AttributeNames::webkitallowfullscreen) {
         m_featurePolicy = std::nullopt;
-    } else if (name == loadingAttr) {
+    } else if (name == AttributeNames::loading) {
         // Allow loading=eager to load the frame immediately if the lazy load was started, but
         // do not allow the reverse situation since the eager load is already started.
         if (m_lazyLoadFrameObserver && !equalLettersIgnoringASCIICase(value, "lazy"_s)) {

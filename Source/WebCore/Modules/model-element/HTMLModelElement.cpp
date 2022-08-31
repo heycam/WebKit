@@ -52,6 +52,7 @@
 #include "ModelPlayer.h"
 #include "ModelPlayerProvider.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "PlatformMouseEvent.h"
 #include "RenderLayer.h"
@@ -364,10 +365,10 @@ bool HTMLModelElement::isInteractive() const
     return hasAttributeWithoutSynchronization(HTMLNames::interactiveAttr);
 }
 
-void HTMLModelElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void HTMLModelElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
-    if (m_modelPlayer && name == HTMLNames::interactiveAttr)
+    HTMLElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
+    if (m_modelPlayer && attributeName == AttributeNames::interactive)
         m_modelPlayer->setInteractionEnabled(isInteractive());
 }
 

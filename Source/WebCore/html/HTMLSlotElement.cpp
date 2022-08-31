@@ -31,6 +31,7 @@
 #include "EventNames.h"
 #include "HTMLNames.h"
 #include "MutationObserver.h"
+#include "NodeName.h"
 #include "ShadowRoot.h"
 #include "SlotAssignment.h"
 #include "Text.h"
@@ -91,11 +92,11 @@ void HTMLSlotElement::childrenChanged(const ChildChange& childChange)
     }
 }
 
-void HTMLSlotElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void HTMLSlotElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
+    HTMLElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 
-    if (isInShadowTree() && name == nameAttr) {
+    if (isInShadowTree() && attributeName == AttributeNames::name) {
         if (RefPtr shadowRoot = containingShadowRoot())
             shadowRoot->renameSlotElement(*this, oldValue, newValue);
     }

@@ -27,6 +27,7 @@
 #include "ElementInlines.h"
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
+#include "NodeName.h"
 #include "TextResourceDecoder.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -47,9 +48,9 @@ Ref<HTMLBaseElement> HTMLBaseElement::create(const QualifiedName& tagName, Docum
     return adoptRef(*new HTMLBaseElement(tagName, document));
 }
 
-void HTMLBaseElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLBaseElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == hrefAttr || name == targetAttr)
+    if (name == AttributeNames::href || name == AttributeNames::target)
         document().processBaseElement();
     else
         HTMLElement::parseAttribute(name, value);

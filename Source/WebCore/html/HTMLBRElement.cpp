@@ -26,6 +26,7 @@
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "HTMLNames.h"
+#include "NodeName.h"
 #include "RenderLineBreak.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -51,9 +52,9 @@ Ref<HTMLBRElement> HTMLBRElement::create(const QualifiedName& tagName, Document&
     return adoptRef(*new HTMLBRElement(tagName, document));
 }
 
-bool HTMLBRElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLBRElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == clearAttr)
+    if (name == AttributeNames::clear)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

@@ -23,6 +23,7 @@
 #include "SVGEllipseElement.h"
 
 #include "LegacyRenderSVGEllipse.h"
+#include "NodeName.h"
 #include "RenderSVGEllipse.h"
 #include "RenderSVGResource.h"
 #include "SVGElementInlines.h"
@@ -51,17 +52,17 @@ Ref<SVGEllipseElement> SVGEllipseElement::create(const QualifiedName& tagName, D
     return adoptRef(*new SVGEllipseElement(tagName, document));
 }
 
-void SVGEllipseElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGEllipseElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::cxAttr)
+    if (name == AttributeNames::cx)
         m_cx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::cyAttr)
+    else if (name == AttributeNames::cy)
         m_cy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rxAttr)
+    else if (name == AttributeNames::rx)
         m_rx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::ryAttr)
+    else if (name == AttributeNames::ry)
         m_ry->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

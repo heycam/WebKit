@@ -41,7 +41,7 @@ private:
     HTMLDetailsElement(const QualifiedName&, Document&);
 
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
 
     void didAddUserAgentShadowRoot(ShadowRoot&) final;
     bool hasCustomFocusLogic() const final { return true; }

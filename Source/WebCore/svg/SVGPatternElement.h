@@ -62,7 +62,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGPatternElement, SVGElement, SVGFitToViewBox, SVGTests, SVGURIReference>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) final;
     void childrenChanged(const ChildChange&) final;
 

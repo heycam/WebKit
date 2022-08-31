@@ -65,7 +65,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGFEBlendElement, SVGFilterPrimitiveStandardAttributes>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
 
     bool setFilterEffectAttribute(FilterEffect&, const QualifiedName& attrName) override;

@@ -38,6 +38,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLNames.h"
 #include "MIMETypeRegistry.h"
+#include "NodeName.h"
 #include "RenderAttachment.h"
 #include "ShadowRoot.h"
 #include "SharedBuffer.h"
@@ -166,9 +167,9 @@ RefPtr<HTMLImageElement> HTMLAttachmentElement::enclosingImageElement() const
     return { };
 }
 
-void HTMLAttachmentElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLAttachmentElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == progressAttr || name == subtitleAttr || name == titleAttr || name == typeAttr) {
+    if (name == AttributeNames::progress || name == AttributeNames::subtitle || name == AttributeNames::title || name == AttributeNames::type) {
         if (auto* renderer = this->renderer())
             renderer->invalidate();
     }
@@ -176,7 +177,7 @@ void HTMLAttachmentElement::parseAttribute(const QualifiedName& name, const Atom
     HTMLElement::parseAttribute(name, value);
 
 #if ENABLE(SERVICE_CONTROLS)
-    if (name == typeAttr && attachmentType() == "application/pdf"_s) {
+    if (name == AttributeNames::type && attachmentType() == "application/pdf"_s) {
         setImageMenuEnabled(true);
         ImageControlsMac::updateImageControls(*this);
     }

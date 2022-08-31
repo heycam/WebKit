@@ -26,6 +26,7 @@
 #include "CachedResourceLoader.h"
 #include "CachedResourceRequest.h"
 #include "Document.h"
+#include "NodeName.h"
 #include "SVGElementInlines.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGFontFaceElement.h"
@@ -64,9 +65,9 @@ Ref<CSSFontFaceSrcValue> SVGFontFaceUriElement::srcValue() const
     return src;
 }
 
-void SVGFontFaceUriElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFontFaceUriElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::hrefAttr || name == XLinkNames::hrefAttr)
+    if (name == AttributeNames::href || name == AttributeNames::XLink::href)
         loadFont();
     else
         SVGElement::parseAttribute(name, value);

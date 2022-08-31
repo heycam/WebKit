@@ -41,7 +41,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGScriptElement, SVGElement, SVGURIReference>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) final;
 
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;

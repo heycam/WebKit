@@ -23,6 +23,7 @@
 #include "SVGFEOffsetElement.h"
 
 #include "FEOffset.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -48,19 +49,19 @@ Ref<SVGFEOffsetElement> SVGFEOffsetElement::create(const QualifiedName& tagName,
     return adoptRef(*new SVGFEOffsetElement(tagName, document));
 }
 
-void SVGFEOffsetElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEOffsetElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::dxAttr) {
+    if (name == AttributeNames::dx) {
         m_dx->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::dyAttr) {
+    if (name == AttributeNames::dy) {
         m_dy->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }

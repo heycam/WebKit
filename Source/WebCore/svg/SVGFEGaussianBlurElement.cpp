@@ -23,6 +23,7 @@
 #include "SVGFEGaussianBlurElement.h"
 
 #include "FEGaussianBlur.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include <wtf/IsoMallocInlines.h>
@@ -56,9 +57,9 @@ void SVGFEGaussianBlurElement::setStdDeviation(float x, float y)
     updateSVGRendererForElementChange();
 }
 
-void SVGFEGaussianBlurElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEGaussianBlurElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::stdDeviationAttr) {
+    if (name == AttributeNames::stdDeviation) {
         if (auto result = parseNumberOptionalNumber(value)) {
             m_stdDeviationX->setBaseValInternal(result->first);
             m_stdDeviationY->setBaseValInternal(result->second);
@@ -66,12 +67,12 @@ void SVGFEGaussianBlurElement::parseAttribute(const QualifiedName& name, const A
         return;
     }
 
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::edgeModeAttr) {
+    if (name == AttributeNames::edgeMode) {
         auto propertyValue = SVGPropertyTraits<EdgeModeType>::fromString(value);
         if (propertyValue != EdgeModeType::Unknown)
             m_edgeMode->setBaseValInternal<EdgeModeType>(propertyValue);

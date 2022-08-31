@@ -36,6 +36,7 @@
 #include "Document.h"
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
+#include "NodeName.h"
 #include <wtf/IsoMallocInlines.h>
 #include <wtf/NeverDestroyed.h>
 
@@ -69,9 +70,9 @@ bool HTMLOutputElement::supportsFocus() const
     return HTMLElement::supportsFocus();
 }
 
-void HTMLOutputElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLOutputElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == HTMLNames::forAttr && m_forTokens)
+    if (name == AttributeNames::for_ && m_forTokens)
         m_forTokens->associatedAttributeValueChanged(value);
     HTMLFormControlElement::parseAttribute(name, value);
 }

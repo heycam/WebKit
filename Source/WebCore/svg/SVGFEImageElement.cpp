@@ -29,6 +29,7 @@
 #include "Document.h"
 #include "FEImage.h"
 #include "Image.h"
+#include "NodeName.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
 #include "SVGElementInlines.h"
@@ -114,9 +115,9 @@ void SVGFEImageElement::buildPendingResource()
     updateSVGRendererForElementChange();
 }
 
-void SVGFEImageElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEImageElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::preserveAspectRatioAttr) {
+    if (name == AttributeNames::preserveAspectRatio) {
         m_preserveAspectRatio->setBaseValInternal(SVGPreserveAspectRatioValue { value });
         return;
     }

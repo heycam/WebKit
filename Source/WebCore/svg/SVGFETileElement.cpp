@@ -23,6 +23,7 @@
 #include "SVGFETileElement.h"
 
 #include "FETile.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -46,9 +47,9 @@ Ref<SVGFETileElement> SVGFETileElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new SVGFETileElement(tagName, document));
 }
 
-void SVGFETileElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFETileElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }

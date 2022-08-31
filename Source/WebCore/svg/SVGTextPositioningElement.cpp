@@ -23,6 +23,7 @@
 #include "config.h"
 #include "SVGTextPositioningElement.h"
 
+#include "NodeName.h"
 #include "RenderSVGInline.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGText.h"
@@ -51,29 +52,29 @@ SVGTextPositioningElement::SVGTextPositioningElement(const QualifiedName& tagNam
     });
 }
 
-void SVGTextPositioningElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGTextPositioningElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::xAttr) {
+    if (name == AttributeNames::x) {
         m_x->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::yAttr) {
+    if (name == AttributeNames::y) {
         m_y->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::dxAttr) {
+    if (name == AttributeNames::dx) {
         m_dx->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::dyAttr) {
+    if (name == AttributeNames::dy) {
         m_dy->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::rotateAttr) {
+    if (name == AttributeNames::rotate) {
         m_rotate->baseVal()->parse(value);
         return;
     }
@@ -88,9 +89,9 @@ void SVGTextPositioningElement::collectPresentationalHintsForAttribute(const Qua
     SVGTextContentElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool SVGTextPositioningElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool SVGTextPositioningElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == SVGNames::xAttr || name == SVGNames::yAttr)
+    if (name == AttributeNames::x || name == AttributeNames::y)
         return false;
     return SVGTextContentElement::hasPresentationalHintsForAttribute(name);
 }

@@ -40,6 +40,7 @@
 #include "InputTypeNames.h"
 #include "LocalizedStrings.h"
 #include "MIMETypeRegistry.h"
+#include "NodeName.h"
 #include "RenderFileUploadControl.h"
 #include "ScriptDisallowedScope.h"
 #include "Settings.h"
@@ -283,9 +284,9 @@ void FileInputType::disabledStateChanged()
         button->setBooleanAttribute(disabledAttr, element()->isDisabledFormControl());
 }
 
-void FileInputType::attributeChanged(const QualifiedName& name)
+void FileInputType::attributeChanged(NodeName name)
 {
-    if (name == multipleAttr) {
+    if (name == AttributeNames::multiple) {
         if (auto* element = this->element()) {
             if (auto root = element->userAgentShadowRoot()) {
                 if (RefPtr button = childrenOfType<UploadButtonElement>(*root).first())

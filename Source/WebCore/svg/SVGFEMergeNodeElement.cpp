@@ -22,6 +22,7 @@
 #include "config.h"
 #include "SVGFEMergeNodeElement.h"
 
+#include "NodeName.h"
 #include "RenderSVGResource.h"
 #include "SVGFilterElement.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -48,9 +49,9 @@ Ref<SVGFEMergeNodeElement> SVGFEMergeNodeElement::create(const QualifiedName& ta
     return adoptRef(*new SVGFEMergeNodeElement(tagName, document));
 }
 
-void SVGFEMergeNodeElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEMergeNodeElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }

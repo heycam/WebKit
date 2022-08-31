@@ -23,6 +23,7 @@
 #include "SVGGraphicsElement.h"
 
 #include "LegacyRenderSVGPath.h"
+#include "NodeName.h"
 #include "RenderAncestorIterator.h"
 #include "RenderLayer.h"
 #include "RenderSVGHiddenContainer.h"
@@ -129,9 +130,9 @@ AffineTransform* SVGGraphicsElement::supplementalTransform()
     return m_supplementalTransform.get();
 }
 
-void SVGGraphicsElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGGraphicsElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::transformAttr) {
+    if (name == AttributeNames::transform) {
         m_transform->baseVal()->parse(value);
         return;
     }

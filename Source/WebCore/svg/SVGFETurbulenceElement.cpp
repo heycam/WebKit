@@ -22,6 +22,7 @@
 #include "config.h"
 #include "SVGFETurbulenceElement.h"
 
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include <wtf/IsoMallocInlines.h>
@@ -51,23 +52,23 @@ Ref<SVGFETurbulenceElement> SVGFETurbulenceElement::create(const QualifiedName& 
     return adoptRef(*new SVGFETurbulenceElement(tagName, document));
 }
 
-void SVGFETurbulenceElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFETurbulenceElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::typeAttr) {
+    if (name == AttributeNames::type) {
         TurbulenceType propertyValue = SVGPropertyTraits<TurbulenceType>::fromString(value);
         if (propertyValue != TurbulenceType::Unknown)
             m_type->setBaseValInternal<TurbulenceType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::stitchTilesAttr) {
+    if (name == AttributeNames::stitchTiles) {
         SVGStitchOptions propertyValue = SVGPropertyTraits<SVGStitchOptions>::fromString(value);
         if (propertyValue > 0)
             m_stitchTiles->setBaseValInternal<SVGStitchOptions>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::baseFrequencyAttr) {
+    if (name == AttributeNames::baseFrequency) {
         if (auto result = parseNumberOptionalNumber(value)) {
             m_baseFrequencyX->setBaseValInternal(result->first);
             m_baseFrequencyY->setBaseValInternal(result->second);
@@ -75,12 +76,12 @@ void SVGFETurbulenceElement::parseAttribute(const QualifiedName& name, const Ato
         return;
     }
 
-    if (name == SVGNames::seedAttr) {
+    if (name == AttributeNames::seed) {
         m_seed->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::numOctavesAttr) {
+    if (name == AttributeNames::numOctaves) {
         m_numOctaves->setBaseValInternal(parseInteger<unsigned>(value).value_or(0));
         return;
     }

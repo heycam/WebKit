@@ -63,7 +63,7 @@ protected:
     static bool isKnownAttribute(const QualifiedName& attributeName) { return PropertyRegistry::isKnownAttribute(attributeName); }
 
     void reset();
-    bool parseAttribute(const QualifiedName&, const AtomString&);
+    bool parseAttribute(NodeName, const AtomString&);
     std::optional<FloatRect> parseViewBox(StringView);
     std::optional<FloatRect> parseViewBox(StringParsingBuffer<LChar>&, bool validate = true);
     std::optional<FloatRect> parseViewBox(StringParsingBuffer<UChar>&, bool validate = true);

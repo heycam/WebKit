@@ -24,6 +24,7 @@
 #include "SVGGradientElement.h"
 
 #include "ElementIterator.h"
+#include "NodeName.h"
 #include "RenderSVGResourceLinearGradient.h"
 #include "RenderSVGResourceRadialGradient.h"
 #include "SVGElementTypeHelpers.h"
@@ -49,21 +50,21 @@ SVGGradientElement::SVGGradientElement(const QualifiedName& tagName, Document& d
     });
 }
 
-void SVGGradientElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGGradientElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::gradientUnitsAttr) {
+    if (name == AttributeNames::gradientUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_gradientUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::gradientTransformAttr) {
+    if (name == AttributeNames::gradientTransform) {
         m_gradientTransform->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::spreadMethodAttr) {
+    if (name == AttributeNames::spreadMethod) {
         auto propertyValue = SVGPropertyTraits<SVGSpreadMethodType>::fromString(value);
         if (propertyValue > 0)
             m_spreadMethod->setBaseValInternal<SVGSpreadMethodType>(propertyValue);

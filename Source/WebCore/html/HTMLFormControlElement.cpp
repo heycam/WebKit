@@ -40,6 +40,7 @@
 #include "HTMLLegendElement.h"
 #include "HTMLParserIdioms.h"
 #include "HTMLTextAreaElement.h"
+#include "NodeName.h"
 #include "PseudoClassChangeInvalidation.h"
 #include "Quirks.h"
 #include "RenderBox.h"
@@ -153,11 +154,11 @@ void HTMLFormControlElement::setAncestorDisabled(bool isDisabled)
     disabledStateChanged();
 }
 
-void HTMLFormControlElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLFormControlElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == formAttr)
+    if (name == AttributeNames::form)
         formAttributeChanged();
-    else if (name == disabledAttr) {
+    else if (name == AttributeNames::disabled) {
         if (canBeActuallyDisabled()) {
             bool newDisabled = !value.isNull();
             if (m_disabled != newDisabled) {
@@ -166,7 +167,7 @@ void HTMLFormControlElement::parseAttribute(const QualifiedName& name, const Ato
                 disabledAttributeChanged();
             }
         }
-    } else if (name == readonlyAttr) {
+    } else if (name == AttributeNames::readonly) {
         bool newHasReadOnlyAttribute = !value.isNull();
         if (m_hasReadOnlyAttribute != newHasReadOnlyAttribute) {
             bool newMatchesReadWrite = supportsReadOnly() && !newHasReadOnlyAttribute;
@@ -174,7 +175,7 @@ void HTMLFormControlElement::parseAttribute(const QualifiedName& name, const Ato
             m_hasReadOnlyAttribute = newHasReadOnlyAttribute;
             readOnlyStateChanged();
         }
-    } else if (name == requiredAttr) {
+    } else if (name == AttributeNames::required) {
         bool newRequired = !value.isNull();
         if (m_isRequired != newRequired) {
             Style::PseudoClassChangeInvalidation requiredInvalidation(*this, { { CSSSelector::PseudoClassRequired, newRequired }, { CSSSelector::PseudoClassOptional, !newRequired } });

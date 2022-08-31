@@ -32,6 +32,7 @@
 #include "Document.h"
 #include "FloatConversion.h"
 #include "HTMLParserIdioms.h"
+#include "NodeName.h"
 #include "RenderObject.h"
 #include "SVGAnimateColorElement.h"
 #include "SVGAnimateElement.h"
@@ -163,9 +164,9 @@ bool SVGAnimationElement::attributeContainsJavaScriptURL(const Attribute& attrib
     return Element::attributeContainsJavaScriptURL(attribute);
 }
 
-void SVGAnimationElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGAnimationElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::valuesAttr) {
+    if (name == AttributeNames::values) {
         // Per the SMIL specification, leading and trailing white space,
         // and white space before and after semicolon separators, is allowed and will be ignored.
         // http://www.w3.org/TR/SVG11/animate.html#ValuesAttribute
@@ -178,12 +179,12 @@ void SVGAnimationElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == SVGNames::keyTimesAttr) {
+    if (name == AttributeNames::keyTimes) {
         parseKeyTimes(value, m_keyTimesFromAttribute, true);
         return;
     }
 
-    if (name == SVGNames::keyPointsAttr) {
+    if (name == AttributeNames::keyPoints) {
         if (hasTagName(SVGNames::animateMotionTag)) {
             // This is specified to be an animateMotion attribute only but it is simpler to put it here 
             // where the other timing calculatations are.
@@ -192,7 +193,7 @@ void SVGAnimationElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == SVGNames::keySplinesAttr) {
+    if (name == AttributeNames::keySplines) {
         if (auto keySplines = parseKeySplines(value))
             m_keySplines = WTFMove(*keySplines);
         else
@@ -200,17 +201,17 @@ void SVGAnimationElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == SVGNames::attributeTypeAttr) {
+    if (name == AttributeNames::attributeType) {
         setAttributeType(value);
         return;
     }
 
-    if (name == SVGNames::calcModeAttr) {
+    if (name == AttributeNames::calcMode) {
         setCalcMode(value);
         return;
     }
 
-    if (name == SVGNames::fromAttr || name == SVGNames::toAttr || name == SVGNames::byAttr) {
+    if (name == AttributeNames::from || name == AttributeNames::to || name == AttributeNames::by) {
         updateAnimationMode();
         return;
     }

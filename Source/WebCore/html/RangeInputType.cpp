@@ -44,6 +44,7 @@
 #include "InputTypeNames.h"
 #include "KeyboardEvent.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "PlatformMouseEvent.h"
 #include "RenderSlider.h"
 #include "ScopedEventQueue.h"
@@ -334,10 +335,10 @@ bool RangeInputType::accessKeyAction(bool sendMouseEvents)
     return InputType::accessKeyAction(sendMouseEvents) || (element && element->dispatchSimulatedClick(0, sendMouseEvents ? SendMouseUpDownEvents : SendNoEvents));
 }
 
-void RangeInputType::attributeChanged(const QualifiedName& name)
+void RangeInputType::attributeChanged(NodeName name)
 {
     // FIXME: Don't we need to do this work for precisionAttr too?
-    if (name == maxAttr || name == minAttr || name == valueAttr) {
+    if (name == AttributeNames::max || name == AttributeNames::min || name == AttributeNames::value) {
         // Sanitize the value.
         if (auto* element = this->element()) {
             if (element->hasDirtyValue())

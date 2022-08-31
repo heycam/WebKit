@@ -173,7 +173,7 @@ die "You must specify at least one of --elements <file> or --attrs <file>" unles
 die "You must not specify multiple --elements <file> arguments unless --domNames is also specified" if $printEnum eq "" && @elementsFiles > 1;
 die "You must not specify multiple --attrs <file> arguments unless --domNames is also specified" if $printEnum eq "" && @attrsFiles > 1;
 die "--enum must not be specified with --factory, --wrapperFactory, or --fonts" if $printEnum ne "" && ($printFactory || $printWrapperFactory || length($fontNamesIn));
-die "Unsupported value for --enum" if $printEnum !~ /^(:?TagName|ElementName|Namespace)?$/;
+die "Unsupported value for --enum" if $printEnum !~ /^(:?TagName|NodeName|Namespace)?$/;
 
 for my $elementsFile (@elementsFiles) {
     readElements(\%allElements, $elementsFile);
@@ -219,9 +219,9 @@ if ($printEnum eq "TagName") {
     printTagNameCppFile("$outputDir/TagName.cpp");
 }
 
-if ($printEnum eq "ElementName") {
-    printElementNameHeaderFile("$outputDir/ElementName.h");
-    printElementNameCppFile("$outputDir/ElementName.cpp");
+if ($printEnum eq "NodeName") {
+    printNodeNameHeaderFile("$outputDir/NodeName.h");
+    printNodeNameCppFile("$outputDir/NodeName.cpp");
 }
 
 if ($printEnum eq "Namespace") {
@@ -245,10 +245,11 @@ sub defaultElementPropertyHash
         localName => $localName,
         identifier => $identifier,
         tagEnumValue => $tagEnumValue,
-        elementEnumValue => "$parameters{namespace}_$identifier",
+        nodeNameEnumValue => "$parameters{namespace}_$identifier",
         unadjustedTagEnumValue => $requiresAdjustment ? lc($identifier) . "CaseUnadjusted" : "",
         parsedTagName => lc $localName,
         parsedTagEnumValue => $requiresAdjustment ? lc($identifier) . "CaseUnadjusted" : $tagEnumValue,
+        convenienceVariableName => $tagEnumValue,
         constructorNeedsCreatedByParser => 0,
         constructorNeedsFormElement => 0,
         noConstructor => 0,
@@ -268,12 +269,18 @@ sub defaultAttrPropertyHash
     my $localName = shift;
 
     my $identifier = $localName =~ s/^x-webkit-/webkit/r =~ s/-/_/gr;
+    my $namespace = $parameters{attrsNullNamespace} ? "" : $parameters{namespace};
+    my $prefix = $namespace eq "" ? "" : "${namespace}_";
+    my $nodeNameEnumValue = avoidConflictingName("$prefix$identifier");
+    my $convenienceVariableName = avoidConflictingName($identifier);
 
     return (
         cppNamespace => $parameters{namespace},
         namespace => $parameters{attrsNullNamespace} ? "" : $parameters{namespace},
         localName => $localName,
         identifier => $identifier,
+        nodeNameEnumValue => $nodeNameEnumValue,
+        convenienceVariableName => $convenienceVariableName,
     );
 }
 
@@ -305,7 +312,7 @@ sub avoidConflictingName
     my $name = shift;
 
     # C++ keywords that we know conflict with element names. Also "small", which is a macro defined in Windows headers.
-    my %namesToAvoid = map { $_ => 1 } qw(small switch template);
+    my %namesToAvoid = map { $_ => 1 } qw(char class default for operator small switch template);
     $name .= "_" if $namesToAvoid{$name};
 
     return $name;
@@ -836,7 +843,22 @@ END
 sub byElementNameOrder
 {
     elementCount($allElements{$a}{localName}) <=> elementCount($allElements{$b}{localName})
-        || $allElements{$a}{elementEnumValue} cmp $allElements{$b}{elementEnumValue}
+        || $allElements{$a}{nodeNameEnumValue} cmp $allElements{$b}{nodeNameEnumValue}
+}
+
+sub byAttrNameOrder
+{
+    $allAttrs{$a}{namespace} cmp $allAttrs{$b}{namespace}
+        || $allAttrs{$a}{localName} cmp $allAttrs{$b}{localName}
+}
+
+sub byElementThenAttrNameOrder
+{
+    return -1 if $allElements{$a} && !$allElements{$b};
+    return 1 if !$allElements{$a} && $allElements{$b};
+    return byElementNameOrder() if $allElements{$a} && $allElements{$b};
+    return byAttrNameOrder() if !$allElements{$a} && !$allElements{$b};
+    die "not found";
 }
 
 sub printTagNameHeaderFile
@@ -1013,7 +1035,7 @@ sub printTagNameCppFile
     close F;
 }
 
-sub printElementNameHeaderFile
+sub printNodeNameHeaderFile
 {
     my ($headerPath) = shift;
     my $F;
@@ -1030,10 +1052,25 @@ sub printElementNameHeaderFile
     print F "\n";
     print F "class QualifiedName;\n";
     print F "\n";
-    print F "enum class ElementName : uint16_t {\n";
+    print F "enum class NodeName : uint16_t {\n";
     print F "    Unknown,\n";
+    print F "\n";
+    print F "    // Elements\n";
     for my $elementKey (sort byElementNameOrder keys %allElements) {
-        print F "    $allElements{$elementKey}{elementEnumValue},\n";
+        print F "    $allElements{$elementKey}{nodeNameEnumValue},\n";
+    }
+    print F "\n";
+    print F "    // Attributes\n";
+    my %handledAttrs = ();
+    my $firstAttributeNodeName;
+    my $attributeNodeNameCount = 0;
+    for my $attrKey (sort byAttrNameOrder keys %allAttrs) {
+        my $enumValue = $allAttrs{$attrKey}{nodeNameEnumValue};
+        next if $handledAttrs{$enumValue};
+        print F "    $enumValue,\n";
+        $firstAttributeNodeName = $enumValue unless $firstAttributeNodeName;
+        ++$attributeNodeNameCount;
+        $handledAttrs{$enumValue} = 1;
     }
     print F "};\n";
     print F "\n";
@@ -1041,16 +1078,33 @@ sub printElementNameHeaderFile
     for my $namespace (sort keys %allElementsPerNamespace) {
         print F "namespace $namespace {\n";
         for my $elementKey (sort byElementNameOrder keys %{$allElementsPerNamespace{$namespace}}) {
-            print F "inline constexpr auto $allElements{$elementKey}{tagEnumValue} = ElementName::$allElements{$elementKey}{elementEnumValue};\n";
+            print F "inline constexpr auto $allElements{$elementKey}{convenienceVariableName} = NodeName::$allElements{$elementKey}{nodeNameEnumValue};\n";
         }
         print F "} // namespace $namespace\n";
     }
     print F "} // namespace ElementNames\n";
     print F "\n";
-    print F "ElementName findElementName(Namespace, const String&);\n";
-    print F "TagName tagNameForElement(ElementName);\n";
-    print F "ElementName elementNameForTag(Namespace, TagName);\n";
-    print F "const QualifiedName& qualifiedNameForElement(ElementName);\n";
+    print F "namespace AttributeNames {\n";
+    %handledAttrs = ();
+    for my $namespace (sort keys %allAttrsPerNamespace) {
+        print F "namespace $namespace {\n" unless $namespace eq "";
+        for my $attrKey (sort byAttrNameOrder keys %{$allAttrsPerNamespace{$namespace}}) {
+            my $enumValue = $allAttrs{$attrKey}{nodeNameEnumValue};
+            print F "inline constexpr auto $allAttrs{$attrKey}{convenienceVariableName} = NodeName::$enumValue;\n" unless $handledAttrs{$enumValue};
+            $handledAttrs{$enumValue} = 1;
+        }
+        print F "} // namespace $namespace\n" unless $namespace eq "";
+    }
+    print F "} // namespace AttributeNames\n";
+    print F "\n";
+    print F "inline constexpr auto firstAttributeNodeName = NodeName::$firstAttributeNodeName;\n";
+    print F "inline constexpr size_t attributeNodeNameCount = $attributeNodeNameCount;\n";
+    print F "\n";
+    print F "NodeName findNodeName(Namespace, const String&);\n";
+    print F "NodeName findNodeNameForParsedAttribute(Span<const UChar>);\n";
+    print F "TagName tagNameForNodeName(NodeName);\n";
+    print F "NodeName nodeNameForTag(Namespace, TagName);\n";
+    print F "const QualifiedName& qualifiedNameForNodeName(NodeName);\n";
     print F "\n";
 
     my $lastUniqueTagEnumValue;
@@ -1067,17 +1121,17 @@ sub printElementNameHeaderFile
         }
     }
 
-    print F "inline TagName tagNameForElement(ElementName elementName)\n";
+    print F "inline TagName tagNameForNodeName(NodeName nodeName)\n";
     print F "{\n";
     print F "    constexpr auto s_lastUniqueTagName = TagName::$lastUniqueTagEnumValue;\n";
     print F"\n";
-    print F "    if (LIKELY(static_cast<uint16_t>(elementName) <= static_cast<uint16_t>(s_lastUniqueTagName)))\n";
-    print F "        return static_cast<TagName>(elementName);\n";
+    print F "    if (LIKELY(static_cast<uint16_t>(nodeName) <= static_cast<uint16_t>(s_lastUniqueTagName)))\n";
+    print F "        return static_cast<TagName>(nodeName);\n";
     print F "\n";
-    print F "    switch (elementName) {\n";
+    print F "    switch (nodeName) {\n";
     for my $elementKey (sort byElementNameOrder keys %allElements) {
         next if elementCount($allElements{$elementKey}{localName}) == 1;
-        print F "    case ElementName::$allElements{$elementKey}{elementEnumValue}:\n";
+        print F "    case NodeName::$allElements{$elementKey}{nodeNameEnumValue}:\n";
         print F "        return TagName::$allElements{$elementKey}{tagEnumValue};\n";
     }
     print F "    default:\n";
@@ -1087,7 +1141,7 @@ sub printElementNameHeaderFile
     print F "    return TagName::Unknown;\n";
     print F "}\n";
     print F "\n";
-    print F "inline ElementName elementNameForTag(Namespace ns, TagName tagName)\n";
+    print F "inline NodeName nodeNameForTag(Namespace ns, TagName tagName)\n";
     print F "{\n";
     for my $namespace (sort keys %allCppNamespaces) {
         next unless grep { $allElements{$_}{cppNamespace} eq $namespace } keys %allElements;
@@ -1097,34 +1151,34 @@ sub printElementNameHeaderFile
         print F "        constexpr auto s_lastUnique${namespace}TagName = TagName::$lastUniqueTagEnumValueByNamespace{$namespace};\n";
         print F "\n";
         print F "        if (UNLIKELY(static_cast<uint16_t>(tagName) < static_cast<uint16_t>(s_firstUnique${namespace}TagName)))\n";
-        print F "            return ElementName::Unknown;\n";
+        print F "            return NodeName::Unknown;\n";
         print F "\n";
         print F "        if (LIKELY(static_cast<uint16_t>(tagName) <= static_cast<uint16_t>(s_lastUnique${namespace}TagName)))\n";
-        print F "            return static_cast<ElementName>(tagName);\n";
+        print F "            return static_cast<NodeName>(tagName);\n";
         print F "\n";
         my @tagKeysForNonUniqueTags = grep { elementCount($allElements{$_}{localName}) > 1 && $allElements{$_}{namespace} eq $namespace } sort byElementNameOrder keys %allElements;
         if (@tagKeysForNonUniqueTags) {
             print F "        switch (tagName) {\n";
             for my $elementKey (@tagKeysForNonUniqueTags) {
                 print F "        case TagName::$allElements{$elementKey}{tagEnumValue}:\n";
-                print F "            return ElementName::$allElements{$elementKey}{elementEnumValue};\n";
+                print F "            return NodeName::$allElements{$elementKey}{nodeNameEnumValue};\n";
             }
             print F "        default:\n";
             print F "            break;\n";
             print F "        }\n";
         }
-        print F "        return ElementName::Unknown;\n";
+        print F "        return NodeName::Unknown;\n";
         print F "    }\n";
         print F "\n";
     }
-    print F "    return ElementName::Unknown;\n";
+    print F "    return NodeName::Unknown;\n";
     print F "}\n";
     print F "\n";
     print F "} // namespace WebCore\n";
     close F;
 }
 
-sub printElementNameCppFile
+sub printNodeNameCppFile
 {
     my $cppPath = shift;
     my $F;
@@ -1132,7 +1186,7 @@ sub printElementNameCppFile
 
     printLicenseHeader($F);
     print F "#include \"config.h\"\n";
-    print F "#include \"ElementName.h\"\n";
+    print F "#include \"NodeName.h\"\n";
     print F "\n";
     for my $namespace (sort keys %allCppNamespaces) {
         print F "#include \"${namespace}Names.h\"\n";
@@ -1140,46 +1194,67 @@ sub printElementNameCppFile
     print F "\n";
     print F "namespace WebCore {\n";
     print F "\n";
-    for my $namespace (sort keys %allElementsPerNamespace) {
+    my @allNamespaces = sort (keys %allElementsPerNamespace, keys %allAttrsPerNamespace);
+    for my $namespace (@allNamespaces) {
         my $namespaceIdentifier = $namespace eq "" ? "NoNamespace" : $namespace;
         print F "template <typename characterType>\n";
-        print F "static inline ElementName find${namespaceIdentifier}Element(Span<const characterType> buffer)\n";
+        print F "static inline NodeName find${namespaceIdentifier}NodeName(Span<const characterType> buffer)\n";
         print F "{\n";
-        generateFindBody($allElementsPerNamespace{$namespace}, \&byElementNameOrder, "localName", "ElementName", "elementEnumValue");
+        my %allNodesInNamespace = ();
+        for my $elementTag (keys %{$allElementsPerNamespace{$namespace}}) {
+            $allNodesInNamespace{$elementTag} = $allElementsPerNamespace{$namespace}{$elementTag};
+        }
+        for my $attrTag (keys %{$allAttrsPerNamespace{$namespace}}) {
+            $allNodesInNamespace{$attrTag} = $allAttrsPerNamespace{$namespace}{$attrTag};
+        }
+        generateFindBody(\%allNodesInNamespace, \&byElementThenAttrNameOrder, "localName", "NodeName", "nodeNameEnumValue");
         print F "}\n";
         print F "\n";
     }
     print F "template <typename characterType>\n";
-    print F "static inline ElementName findElementFromBuffer(Namespace ns, Span<const characterType> buffer)\n";
+    print F "static inline NodeName findNodeNameFromBuffer(Namespace ns, Span<const characterType> buffer)\n";
     print F "{\n";
     print F "    switch (ns) {\n";
-    for my $namespace (sort keys %allElementsPerNamespace) {
+    for my $namespace (@allNamespaces) {
         my $namespaceEnumValue = $namespace eq "" ? "None" : $namespace;
         my $namespaceIdentifier = $namespace eq "" ? "NoNamespace" : $namespace;
         print F "    case Namespace::$namespaceEnumValue:\n";
-        print F "        return find${namespaceIdentifier}Element(buffer);\n";
+        print F "        return find${namespaceIdentifier}NodeName(buffer);\n";
     }
     print F "    default:\n";
-    print F "        return ElementName::Unknown;\n";
+    print F "        return NodeName::Unknown;\n";
     print F "    }\n";
     print F "}\n";
     print F "\n";
-    print F "ElementName findElementName(Namespace ns, const String& name)\n";
+    print F "NodeName findNodeName(Namespace ns, const String& name)\n";
     print F "{\n";
     print F "    if (name.is8Bit())\n";
-    print F "        return findElementFromBuffer(ns, Span(name.characters8(), name.length()));\n";
-    print F "    return findElementFromBuffer(ns, Span(name.characters16(), name.length()));\n";
+    print F "        return findNodeNameFromBuffer(ns, Span(name.characters8(), name.length()));\n";
+    print F "    return findNodeNameFromBuffer(ns, Span(name.characters16(), name.length()));\n";
     print F "}\n";
     print F "\n";
-    print F "const QualifiedName& qualifiedNameForElement(ElementName elementName)\n";
+    print F "NodeName findNodeNameForParsedAttribute(Span<const UChar> buffer)\n";
     print F "{\n";
-    print F "    ASSERT(elementName != ElementName::Unknown);\n";
-    print F "    switch (elementName) {\n";
-    print F "    case ElementName::Unknown:\n";
+    print F "    return findNoNamespaceNodeName(buffer);\n";
+    print F "}\n";
+    print F "\n";
+    print F "const QualifiedName& qualifiedNameForNodeName(NodeName nodeName)\n";
+    print F "{\n";
+    print F "    ASSERT(nodeName != NodeName::Unknown);\n";
+    print F "    switch (nodeName) {\n";
+    print F "    case NodeName::Unknown:\n";
     print F "        break;\n";
     for my $elementKey (sort byElementNameOrder keys %allElements) {
-        print F "    case ElementName::$allElements{$elementKey}{elementEnumValue}:\n";
+        print F "    case NodeName::$allElements{$elementKey}{nodeNameEnumValue}:\n";
         print F "        return $allElements{$elementKey}{cppNamespace}Names::$allElements{$elementKey}{identifier}Tag;\n";
+    }
+    my %handledAttrs = ();
+    for my $attrKey (sort byAttrNameOrder keys %allAttrs) {
+        my $enumValue = $allAttrs{$attrKey}{nodeNameEnumValue};
+        next if $handledAttrs{$enumValue};
+        print F "    case NodeName::$enumValue:\n";
+        print F "        return $allAttrs{$attrKey}{cppNamespace}Names::$allAttrs{$attrKey}{identifier}Attr;\n";
+        $handledAttrs{$enumValue} = 1;
     }
     print F "    }\n";
     print F "    return nullQName();\n";
@@ -1336,7 +1411,7 @@ sub printNamesCppFile
     
     printLicenseHeader($F);
     printCppHead($F, "DOM", $parameters{namespace}, <<END, "WebCore");
-#include "ElementName.h"
+#include "NodeName.h"
 #include "Namespace.h"
 END
     
@@ -1529,7 +1604,7 @@ sub printDefinitions
     my @tableEntryFields = (
         "LazyNeverDestroyed<const QualifiedName>* targetAddress",
         "const StaticStringImpl& name",
-        "ElementName elementName"
+        "NodeName nodeName"
     );
 
     my $cast = $type eq "tags" ? "(LazyNeverDestroyed<const QualifiedName>*)" : "";
@@ -1545,15 +1620,14 @@ sub printDefinitions
 
     for my $key (sort keys %$namesRef) {
         my $identifier = $namesRef->{$key}{identifier};
-        my $elementEnumValue = $namesRef->{$key}{elementEnumValue} || "Unknown";
-        # Attribute names never correspond to a recognized ElementName.
-        print F "        { $cast&$identifier$shortCamelType, *(&${identifier}Data), ElementName::$elementEnumValue },\n";
+        my $nodeNameEnumValue = $namesRef->{$key}{nodeNameEnumValue} || "Unknown";
+        print F "        { $cast&$identifier$shortCamelType, *(&${identifier}Data), NodeName::$nodeNameEnumValue },\n";
     }
 
     print F "    };\n";
     print F "\n";
     print F "    for (auto& entry : ${type}Table)\n";
-    print F "        entry.targetAddress->construct(nullAtom(), AtomString(&entry.name), $namespaceURI, Namespace::$namespaceEnumValue, entry.elementName);\n";
+    print F "        entry.targetAddress->construct(nullAtom(), AtomString(&entry.name), $namespaceURI, Namespace::$namespaceEnumValue, entry.nodeName);\n";
 }
 
 ## ElementFactory routines

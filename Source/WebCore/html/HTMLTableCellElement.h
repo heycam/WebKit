@@ -54,8 +54,8 @@ public:
 private:
     HTMLTableCellElement(const QualifiedName&, Document&);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    void parseAttribute(NodeName, const AtomString&) override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
     const StyleProperties* additionalPresentationalHintStyle() const override;
 

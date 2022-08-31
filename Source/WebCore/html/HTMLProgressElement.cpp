@@ -24,6 +24,7 @@
 #include "ElementIterator.h"
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
+#include "NodeName.h"
 #include "ProgressShadowElement.h"
 #include "PseudoClassChangeInvalidation.h"
 #include "RenderProgress.h"
@@ -77,12 +78,12 @@ RenderProgress* HTMLProgressElement::renderProgress() const
     return downcast<RenderProgress>(descendantsOfType<Element>(*userAgentShadowRoot()).first()->renderer());
 }
 
-void HTMLProgressElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLProgressElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == valueAttr) {
+    if (name == AttributeNames::value) {
         updateDeterminateState();
         didElementStateChange();
-    } else if (name == maxAttr)
+    } else if (name == AttributeNames::max)
         didElementStateChange();
     else
         LabelableElement::parseAttribute(name, value);

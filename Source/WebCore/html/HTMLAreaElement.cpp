@@ -29,6 +29,7 @@
 #include "HTMLMapElement.h"
 #include "HTMLParserIdioms.h"
 #include "HitTestResult.h"
+#include "NodeName.h"
 #include "Path.h"
 #include "RenderImage.h"
 #include "RenderView.h"
@@ -53,9 +54,9 @@ Ref<HTMLAreaElement> HTMLAreaElement::create(const QualifiedName& tagName, Docum
     return adoptRef(*new HTMLAreaElement(tagName, document));
 }
 
-void HTMLAreaElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLAreaElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == shapeAttr) {
+    if (name == AttributeNames::shape) {
         if (equalLettersIgnoringASCIICase(value, "default"_s))
             m_shape = Default;
         else if (equalLettersIgnoringASCIICase(value, "circle"_s) || equalLettersIgnoringASCIICase(value, "circ"_s))
@@ -67,10 +68,10 @@ void HTMLAreaElement::parseAttribute(const QualifiedName& name, const AtomString
             m_shape = Rect;
         }
         invalidateCachedRegion();
-    } else if (name == coordsAttr) {
+    } else if (name == AttributeNames::coords) {
         m_coords = parseHTMLListOfOfFloatingPointNumberValues(value.string());
         invalidateCachedRegion();
-    } else if (name == altAttr) {
+    } else if (name == AttributeNames::alt) {
         // Do nothing.
     } else
         HTMLAnchorElement::parseAttribute(name, value);

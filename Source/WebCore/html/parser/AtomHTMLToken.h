@@ -29,7 +29,9 @@
 #include "HTMLNameCache.h"
 #include "HTMLNames.h"
 #include "HTMLToken.h"
+#include "NodeName.h"
 #include "TagName.h"
+#include <bitset>
 #include <wtf/HashSet.h>
 #include <wtf/text/AtomStringHash.h>
 
@@ -213,25 +215,62 @@ inline bool hasAttribute(const Vector<Attribute>& attributes, const AtomString& 
     return false;
 }
 
+class AttributeNameSet
+{
+public:
+    bool contains(NodeName name)
+    {
+        return LIKELY(isAttribute(name)) ? m_bits[makeIndex(name)] : false;
+    }
+
+    void set(NodeName name)
+    {
+        if (LIKELY(isAttribute(name)))
+            m_bits[makeIndex(name)] = true;
+    }
+
+private:
+    static bool isAttribute(NodeName name) { return static_cast<uint16_t>(name) < static_cast<uint16_t>(firstAttributeNodeName); }
+    static size_t makeIndex(NodeName name) { return static_cast<uint16_t>(name) - static_cast<uint16_t>(firstAttributeNodeName); }
+
+    std::bitset<attributeNodeNameCount> m_bits;
+};
+
 inline void AtomHTMLToken::initializeAttributes(const HTMLToken::AttributeList& attributes)
 {
     unsigned size = attributes.size();
     if (!size)
         return;
 
-    HashSet<AtomString> addedAttributes;
-    addedAttributes.reserveInitialCapacity(size);
     m_attributes.reserveInitialCapacity(size);
+
+    AttributeNameSet addedAttributes;
+
     for (auto& attribute : attributes) {
         if (attribute.name.isEmpty())
             continue;
 
-        auto qualifiedName = HTMLNameCache::makeAttributeQualifiedName(attribute.name);
+        auto name = findNodeNameForParsedAttribute(attribute.name);
+        bool isDuplicate;
 
-        if (addedAttributes.add(qualifiedName.localName()).isNewEntry)
-            m_attributes.uncheckedAppend(Attribute(WTFMove(qualifiedName), HTMLNameCache::makeAttributeValue(attribute.value)));
-        else
+        auto makeAttributeQualifiedNameAndCheckForDuplicate = [&]() {
+            if (name == NodeName::Unknown) {
+                QualifiedName qualifiedName(nullAtom(), AtomString(attribute.name), nullAtom(), Namespace::None, name);
+                isDuplicate = m_attributes.containsIf([&](auto& attribute) { return attribute.name() == qualifiedName; });
+                return qualifiedName;
+            }
+
+            isDuplicate = addedAttributes.contains(name);
+            addedAttributes.set(name);
+            return qualifiedNameForNodeName(name);
+        };
+
+        auto qualifiedName = makeAttributeQualifiedNameAndCheckForDuplicate();
+
+        if (isDuplicate)
             m_hasDuplicateAttribute = true;
+        else
+            m_attributes.uncheckedAppend({ WTFMove(qualifiedName), HTMLNameCache::makeAttributeValue(attribute.value) });
     }
 }
 

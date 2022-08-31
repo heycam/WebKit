@@ -32,6 +32,7 @@
 #include "HTMLNames.h"
 #include "MediaList.h"
 #include "MediaQueryParser.h"
+#include "NodeName.h"
 #include "ScriptableDocumentParser.h"
 #include "ShadowRoot.h"
 #include "StyleScope.h"
@@ -75,11 +76,11 @@ Ref<HTMLStyleElement> HTMLStyleElement::create(Document& document)
     return adoptRef(*new HTMLStyleElement(styleTag, document, false));
 }
 
-void HTMLStyleElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLStyleElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == titleAttr && sheet() && !isInShadowTree())
+    if (name == AttributeNames::title && sheet() && !isInShadowTree())
         sheet()->setTitle(value);
-    else if (name == mediaAttr) {
+    else if (name == AttributeNames::media) {
         m_styleSheetOwner.setMedia(value);
         if (sheet()) {
             sheet()->setMediaQueries(MediaQuerySet::create(value, MediaQueryParserContext(document())));
@@ -87,7 +88,7 @@ void HTMLStyleElement::parseAttribute(const QualifiedName& name, const AtomStrin
                 scope->didChangeStyleSheetContents();
         } else
             m_styleSheetOwner.childrenChanged(*this);
-    } else if (name == typeAttr) {
+    } else if (name == AttributeNames::type) {
         m_styleSheetOwner.setContentType(value);
         m_styleSheetOwner.childrenChanged(*this);
         if (auto* scope = m_styleSheetOwner.styleScope())

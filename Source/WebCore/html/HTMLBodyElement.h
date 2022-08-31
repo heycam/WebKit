@@ -39,8 +39,8 @@ public:
 private:
     HTMLBodyElement(const QualifiedName&, Document&);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    void parseAttribute(NodeName, const AtomString&) final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
 
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;

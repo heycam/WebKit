@@ -54,7 +54,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGRadialGradientElement, SVGGradientElement>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
 
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) override;

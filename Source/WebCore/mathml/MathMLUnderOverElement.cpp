@@ -29,6 +29,7 @@
 
 #if ENABLE(MATHML)
 
+#include "NodeName.h"
 #include "RenderMathMLUnderOver.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -58,11 +59,11 @@ const MathMLElement::BooleanValue& MathMLUnderOverElement::accentUnder()
     return cachedBooleanAttribute(accentunderAttr, m_accentUnder);
 }
 
-void MathMLUnderOverElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLUnderOverElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == accentAttr)
+    if (name == AttributeNames::accent)
         m_accent = std::nullopt;
-    else if (name == accentunderAttr)
+    else if (name == AttributeNames::accentunder)
         m_accentUnder = std::nullopt;
 
     MathMLElement::parseAttribute(name, value);

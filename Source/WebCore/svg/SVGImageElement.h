@@ -52,7 +52,7 @@ private:
     
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGImageElement, SVGGraphicsElement, SVGURIReference>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) final;
 
     void didAttachRenderers() final;

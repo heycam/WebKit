@@ -34,7 +34,7 @@ class SVGURIReference {
 public:
     virtual ~SVGURIReference() = default;
 
-    void parseAttribute(const QualifiedName&, const AtomString&);
+    void parseAttribute(NodeName, const AtomString&);
 
     static AtomString fragmentIdentifierFromIRIString(const String&, const Document&);
 

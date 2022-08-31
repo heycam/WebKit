@@ -60,7 +60,7 @@ private:
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
     void removedFromAncestor(RemovalType, ContainerNode&) final;
     void childrenChanged(const ChildChange&) final;
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
+    void attributeChanged(const QualifiedName&, NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
 
     bool m_inSignalSlotList { false };
     bool m_isInInsertedIntoAncestor { false };

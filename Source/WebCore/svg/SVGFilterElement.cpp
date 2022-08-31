@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SVGFilterElement.h"
 
+#include "NodeName.h"
 #include "RenderSVGResourceFilter.h"
 #include "SVGElementInlines.h"
 #include "SVGFilterPrimitiveStandardAttributes.h"
@@ -62,25 +63,25 @@ Ref<SVGFilterElement> SVGFilterElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new SVGFilterElement(tagName, document));
 }
 
-void SVGFilterElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFilterElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::filterUnitsAttr) {
+    if (name == AttributeNames::filterUnits) {
         SVGUnitTypes::SVGUnitType propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_filterUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
-    } else if (name == SVGNames::primitiveUnitsAttr) {
+    } else if (name == AttributeNames::primitiveUnits) {
         SVGUnitTypes::SVGUnitType propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_primitiveUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
-    } else if (name == SVGNames::xAttr)
+    } else if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);

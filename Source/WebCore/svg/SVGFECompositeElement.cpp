@@ -23,6 +23,7 @@
 #include "SVGFECompositeElement.h"
 
 #include "FEComposite.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -52,41 +53,41 @@ Ref<SVGFECompositeElement> SVGFECompositeElement::create(const QualifiedName& ta
     return adoptRef(*new SVGFECompositeElement(tagName, document));
 }
 
-void SVGFECompositeElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFECompositeElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::operatorAttr) {
+    if (name == AttributeNames::operator_) {
         CompositeOperationType propertyValue = SVGPropertyTraits<CompositeOperationType>::fromString(value);
         if (propertyValue > 0)
             m_svgOperator->setBaseValInternal<CompositeOperationType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::in2Attr) {
+    if (name == AttributeNames::in2) {
         m_in2->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::k1Attr) {
+    if (name == AttributeNames::k1) {
         m_k1->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::k2Attr) {
+    if (name == AttributeNames::k2) {
         m_k2->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::k3Attr) {
+    if (name == AttributeNames::k3) {
         m_k3->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::k4Attr) {
+    if (name == AttributeNames::k4) {
         m_k4->setBaseValInternal(value.toFloat());
         return;
     }

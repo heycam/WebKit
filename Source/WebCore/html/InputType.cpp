@@ -55,6 +55,7 @@
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
 #include "MonthInputType.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "NumberInputType.h"
 #include "Page.h"

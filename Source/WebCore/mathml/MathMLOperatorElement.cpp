@@ -30,6 +30,7 @@
 #if ENABLE(MATHML)
 
 #include "ElementInlines.h"
+#include "NodeName.h"
 #include "RenderMathMLOperator.h"
 #include <wtf/IsoMallocInlines.h>
 #include <wtf/unicode/CharacterNames.h>
@@ -229,23 +230,23 @@ static std::optional<MathMLOperatorDictionary::Flag> attributeNameToPropertyFlag
     return std::nullopt;
 }
 
-void MathMLOperatorElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLOperatorElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == formAttr) {
+    if (name == AttributeNames::form) {
         m_dictionaryProperty = std::nullopt;
         m_properties.dirtyFlags = MathMLOperatorDictionary::allFlags;
-    } else if (auto flag = attributeNameToPropertyFlag(name))
+    } else if (auto flag = attributeNameToPropertyFlag(qualifiedNameForNodeName(name)))
         m_properties.dirtyFlags |= flag.value();
-    else if (name == lspaceAttr)
+    else if (name == AttributeNames::lspace)
         m_leadingSpace = std::nullopt;
-    else if (name == rspaceAttr)
+    else if (name == AttributeNames::rspace)
         m_trailingSpace = std::nullopt;
-    else if (name == minsizeAttr)
+    else if (name == AttributeNames::minsize)
         m_minSize = std::nullopt;
-    else if (name == maxsizeAttr)
+    else if (name == AttributeNames::maxsize)
         m_maxSize = std::nullopt;
 
-    if ((name == stretchyAttr || name == lspaceAttr || name == rspaceAttr || name == movablelimitsAttr) && renderer()) {
+    if ((name == AttributeNames::stretchy || name == AttributeNames::lspace || name == AttributeNames::rspace || name == AttributeNames::movablelimits) && renderer()) {
         downcast<RenderMathMLOperator>(*renderer()).updateFromElement();
         return;
     }

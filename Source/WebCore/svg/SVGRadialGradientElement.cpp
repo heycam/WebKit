@@ -27,6 +27,7 @@
 
 #include "FloatConversion.h"
 #include "FloatPoint.h"
+#include "NodeName.h"
 #include "RadialGradientAttributes.h"
 #include "RenderSVGResourceRadialGradient.h"
 #include "SVGElementTypeHelpers.h"
@@ -62,21 +63,21 @@ Ref<SVGRadialGradientElement> SVGRadialGradientElement::create(const QualifiedNa
     return adoptRef(*new SVGRadialGradientElement(tagName, document));
 }
 
-void SVGRadialGradientElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGRadialGradientElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::cxAttr)
+    if (name == AttributeNames::cx)
         m_cx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::cyAttr)
+    else if (name == AttributeNames::cy)
         m_cy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rAttr)
+    else if (name == AttributeNames::r)
         m_r->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Other, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::fxAttr)
+    else if (name == AttributeNames::fx)
         m_fx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::fyAttr)
+    else if (name == AttributeNames::fy)
         m_fy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::frAttr)
+    else if (name == AttributeNames::fr)
         m_fr->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Other, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

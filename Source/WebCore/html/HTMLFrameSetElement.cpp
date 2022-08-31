@@ -39,6 +39,7 @@
 #include "HTMLParserIdioms.h"
 #include "Length.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "RenderFrameSet.h"
 #include "Text.h"
 #include <wtf/IsoMallocInlines.h>
@@ -69,9 +70,9 @@ Ref<HTMLFrameSetElement> HTMLFrameSetElement::create(const QualifiedName& tagNam
     return adoptRef(*new HTMLFrameSetElement(tagName, document));
 }
 
-bool HTMLFrameSetElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLFrameSetElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == bordercolorAttr)
+    if (name == AttributeNames::bordercolor)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
@@ -84,9 +85,9 @@ void HTMLFrameSetElement::collectPresentationalHintsForAttribute(const Qualified
         HTMLElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLFrameSetElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLFrameSetElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == rowsAttr) {
+    if (name == AttributeNames::rows) {
         // FIXME: What is the right thing to do when removing this attribute?
         // Why not treat it the same way we treat setting it to the empty string?
         if (!value.isNull()) {
@@ -97,7 +98,7 @@ void HTMLFrameSetElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == colsAttr) {
+    if (name == AttributeNames::cols) {
         // FIXME: What is the right thing to do when removing this attribute?
         // Why not treat it the same way we treat setting it to the empty string?
         if (!value.isNull()) {
@@ -108,7 +109,7 @@ void HTMLFrameSetElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == frameborderAttr) {
+    if (name == AttributeNames::frameborder) {
         if (!value.isNull()) {
             if (equalLettersIgnoringASCIICase(value, "no"_s) || value == "0"_s) {
                 m_frameborder = false;
@@ -124,13 +125,13 @@ void HTMLFrameSetElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == noresizeAttr) {
+    if (name == AttributeNames::noresize) {
         // FIXME: This should set m_noresize to false if the value is null.
         m_noresize = true;
         return;
     }
 
-    if (name == borderAttr) {
+    if (name == AttributeNames::border) {
         if (!value.isNull()) {
             m_border = parseHTMLInteger(value).value_or(0);
             m_borderSet = true;
@@ -140,16 +141,16 @@ void HTMLFrameSetElement::parseAttribute(const QualifiedName& name, const AtomSt
         return;
     }
 
-    if (name == bordercolorAttr) {
+    if (name == AttributeNames::bordercolor) {
         m_borderColorSet = !value.isEmpty();
         // FIXME: Clearly wrong: This can overwrite the value inherited from the parent frameset.
         // FIXME: Do we need to trigger repainting?
         return;
     }
 
-    auto& eventName = HTMLBodyElement::eventNameForWindowEventHandlerAttribute(name);
+    auto& eventName = HTMLBodyElement::eventNameForWindowEventHandlerAttribute(qualifiedNameForNodeName(name));
     if (!eventName.isNull()) {
-        document().setWindowAttributeEventListener(eventName, name, value, mainThreadNormalWorld());
+        document().setWindowAttributeEventListener(eventName, qualifiedNameForNodeName(name), value, mainThreadNormalWorld());
         return;
     }
 

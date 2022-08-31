@@ -36,7 +36,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGSymbolElement, SVGGraphicsElement, SVGFitToViewBox>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) override;
 
     bool selfHasRelativeLengths() const override;

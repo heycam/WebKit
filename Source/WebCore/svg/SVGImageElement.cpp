@@ -26,6 +26,7 @@
 
 #include "CSSPropertyNames.h"
 #include "LegacyRenderSVGImage.h"
+#include "NodeName.h"
 #include "RenderImageResource.h"
 #include "RenderSVGImage.h"
 #include "RenderSVGResource.h"
@@ -78,22 +79,22 @@ bool SVGImageElement::hasSingleSecurityOrigin() const
     return !image || image->hasSingleSecurityOrigin();
 }
 
-void SVGImageElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGImageElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::preserveAspectRatioAttr) {
+    if (name == AttributeNames::preserveAspectRatio) {
         m_preserveAspectRatio->setBaseValInternal(SVGPreserveAspectRatioValue { value });
         return;
     }
 
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

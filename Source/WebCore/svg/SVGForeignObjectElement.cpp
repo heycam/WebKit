@@ -24,6 +24,7 @@
 
 #include "CSSPropertyNames.h"
 #include "LegacyRenderSVGForeignObject.h"
+#include "NodeName.h"
 #include "RenderSVGForeignObject.h"
 #include "RenderSVGResource.h"
 #include "SVGElementInlines.h"
@@ -55,17 +56,17 @@ Ref<SVGForeignObjectElement> SVGForeignObjectElement::create(const QualifiedName
     return adoptRef(*new SVGForeignObjectElement(tagName, document));
 }
 
-void SVGForeignObjectElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGForeignObjectElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);

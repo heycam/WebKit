@@ -25,6 +25,7 @@
 #include "AffineTransform.h"
 #include "Document.h"
 #include "FloatRect.h"
+#include "NodeName.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGElement.h"
 #include "SVGNames.h"
@@ -64,9 +65,9 @@ void SVGFitToViewBox::reset()
     resetPreserveAspectRatio();
 }
 
-bool SVGFitToViewBox::parseAttribute(const QualifiedName& name, const AtomString& value)
+bool SVGFitToViewBox::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::viewBoxAttr) {
+    if (name == AttributeNames::viewBox) {
         if (!value.isNull()) {
             if (auto result = parseViewBox(value)) {
                 setViewBox(WTFMove(*result));
@@ -77,7 +78,7 @@ bool SVGFitToViewBox::parseAttribute(const QualifiedName& name, const AtomString
         return true;
     }
 
-    if (name == SVGNames::preserveAspectRatioAttr) {
+    if (name == AttributeNames::preserveAspectRatio) {
         setPreserveAspectRatio(SVGPreserveAspectRatioValue { value });
         return true;
     }

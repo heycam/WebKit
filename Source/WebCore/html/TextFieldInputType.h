@@ -75,7 +75,7 @@ protected:
     virtual bool needsContainer() const;
     void createShadowSubtree() override;
     void destroyShadowSubtree() override;
-    void attributeChanged(const QualifiedName&) override;
+    void attributeChanged(NodeName) override;
     void disabledStateChanged() final;
     void readOnlyStateChanged() final;
     bool supportsReadOnly() const final;

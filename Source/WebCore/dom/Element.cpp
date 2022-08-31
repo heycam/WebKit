@@ -87,6 +87,7 @@
 #include "Logging.h"
 #include "MutationObserverInterestGroup.h"
 #include "MutationRecord.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformWheelEvent.h"
@@ -1949,16 +1950,19 @@ static inline bool isElementsArrayReflectionAttribute(const QualifiedName& name)
         || name == HTMLNames::aria_ownsAttr;
 }
 
-void Element::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason)
+void Element::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason)
 {
     bool valueIsSameAsBefore = oldValue == newValue;
 
     if (!valueIsSameAsBefore) {
-        if (name == HTMLNames::accesskeyAttr)
+        switch (attributeName) {
+        case AttributeNames::accesskey:
             document().invalidateAccessKeyCache();
-        else if (name == HTMLNames::classAttr)
+            break;
+        case AttributeNames::class_:
             classAttributeChanged(newValue);
-        else if (name == HTMLNames::idAttr) {
+            break;
+        case AttributeNames::id: {
             AtomString oldId = elementData()->idForStyleResolution();
             AtomString newId = makeIdForStyleResolution(newValue, document().inQuirksMode());
             if (newId != oldId) {
@@ -1970,30 +1974,49 @@ void Element::attributeChanged(const QualifiedName& name, const AtomString& oldV
                 treeScope().idTargetObserverRegistry().notifyObservers(*oldValue.impl());
             if (!newValue.isEmpty())
                 treeScope().idTargetObserverRegistry().notifyObservers(*newValue.impl());
-        } else if (name == HTMLNames::nameAttr)
+            break;
+        }
+        case AttributeNames::name:
             elementData()->setHasNameAttribute(!newValue.isNull());
-        else if (name == HTMLNames::nonceAttr) {
+            break;
+        case AttributeNames::nonce:
             if (is<HTMLElement>(*this) || is<SVGElement>(*this))
                 setNonce(newValue.isNull() ? emptyAtom() : newValue);
-        } else if (name == HTMLNames::pseudoAttr) {
+            break;
+        case AttributeNames::pseudo:
             if (needsStyleInvalidation() && isInShadowTree())
                 invalidateStyleForSubtree();
-        } else if (name == HTMLNames::slotAttr) {
+            break;
+        case AttributeNames::slot:
             if (auto* parent = parentElement()) {
                 if (auto* shadowRoot = parent->shadowRoot())
                     shadowRoot->hostChildElementDidChangeSlotAttribute(*this, oldValue, newValue);
             }
-        } else if (name == HTMLNames::partAttr)
+            break;
+        case AttributeNames::part:
             partAttributeChanged(newValue);
-        else if (document().settings().ariaReflectionForElementReferencesEnabled() && (isElementReflectionAttribute(name) || isElementsArrayReflectionAttribute(name))) {
-            if (auto* map = explicitlySetAttrElementsMapIfExists())
-                map->remove(name);
-        } else if (name == HTMLNames::exportpartsAttr) {
+            break;
+        case AttributeNames::aria_activedescendant:
+        case AttributeNames::aria_errormessage:
+        case AttributeNames::aria_controls:
+        case AttributeNames::aria_describedby:
+        case AttributeNames::aria_details:
+        case AttributeNames::aria_flowto:
+        case AttributeNames::aria_labelledby:
+        case AttributeNames::aria_owns:
+            if (document().settings().ariaReflectionForElementReferencesEnabled()) {
+                if (auto* map = explicitlySetAttrElementsMapIfExists())
+                    map->remove(name);
+            }
+            break;
+        case AttributeNames::exportparts:
             if (auto* shadowRoot = this->shadowRoot()) {
                 shadowRoot->invalidatePartMappings();
                 Style::Invalidator::invalidateShadowParts(*shadowRoot);
             }
-        } else if (name == HTMLNames::langAttr || name.matches(XMLNames::langAttr)) {
+            break;
+        case AttributeNames::lang:
+        case AttributeNames::XML::lang:
             if (document().documentElement() == this)
                 document().setDocumentElementLanguage(newValue);
             else {
@@ -2019,10 +2042,14 @@ void Element::attributeChanged(const QualifiedName& name, const AtomString& oldV
                     it.traverseNext();
                 }
             }
+            break;
+        default:
+            break;
         }
     }
 
-    parseAttribute(name, newValue);
+    if (attributeName != NodeName::Unknown)
+        parseAttribute(attributeName, newValue);
 
     document().incDOMTreeVersion();
 
@@ -2411,7 +2438,7 @@ void Element::parserSetAttributes(const Vector<Attribute>& attributeVector)
 
     // Use attributeVector instead of m_elementData because attributeChanged might modify m_elementData.
     for (const auto& attribute : attributeVector)
-        attributeChanged(attribute.name(), nullAtom(), attribute.value(), ModifiedDirectly);
+        attributeChanged(attribute.name(), attribute.name().nodeName(), nullAtom(), attribute.value(), ModifiedDirectly);
 }
 
 void Element::parserDidSetAttributes()
@@ -2426,9 +2453,9 @@ void Element::didMoveToNewDocument(Document& oldDocument, Document& newDocument)
         ensureUniqueElementData();
         // ElementData::m_classNames or ElementData::m_idForStyleResolution need to be updated with the right case.
         if (hasID())
-            attributeChanged(idAttr, nullAtom(), getIdAttribute());
+            attributeChanged(idAttr, AttributeNames::id, nullAtom(), getIdAttribute());
         if (hasClass())
-            attributeChanged(classAttr, nullAtom(), getAttribute(classAttr));
+            attributeChanged(classAttr, AttributeNames::class_, nullAtom(), getAttribute(classAttr));
     }
 
     if (UNLIKELY(isDefinedCustomElement()))
@@ -4512,21 +4539,21 @@ void Element::willModifyAttribute(const QualifiedName& name, const AtomString& o
 
 void Element::didAddAttribute(const QualifiedName& name, const AtomString& value)
 {
-    attributeChanged(name, nullAtom(), value);
+    attributeChanged(name, name.nodeName(), nullAtom(), value);
     InspectorInstrumentation::didModifyDOMAttr(document(), *this, name.toAtomString(), value);
     dispatchSubtreeModifiedEvent();
 }
 
 void Element::didModifyAttribute(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue)
 {
-    attributeChanged(name, oldValue, newValue);
+    attributeChanged(name, name.nodeName(), oldValue, newValue);
     InspectorInstrumentation::didModifyDOMAttr(document(), *this, name.toAtomString(), newValue);
     // Do not dispatch a DOMSubtreeModified event here; see bug 81141.
 }
 
 void Element::didRemoveAttribute(const QualifiedName& name, const AtomString& oldValue)
 {
-    attributeChanged(name, oldValue, nullAtom());
+    attributeChanged(name, name.nodeName(), oldValue, nullAtom());
     InspectorInstrumentation::didRemoveDOMAttr(document(), *this, name.toAtomString());
     dispatchSubtreeModifiedEvent();
 }
@@ -4734,7 +4761,7 @@ void Element::cloneAttributesFromElement(const Element& other)
         m_elementData = other.m_elementData->makeUniqueCopy();
 
     for (const Attribute& attribute : attributesIterator())
-        attributeChanged(attribute.name(), nullAtom(), attribute.value(), ModifiedByCloning);
+        attributeChanged(attribute.name(), attribute.name().nodeName(), nullAtom(), attribute.value(), ModifiedByCloning);
 
     setNonce(other.nonce());
 }

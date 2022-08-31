@@ -40,7 +40,7 @@ private:
     SVGAnimateTransformElement(const QualifiedName&, Document&);
     
     bool hasValidAttributeType() const final;
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     String animateRangeString(const String&) const final;
 
     SVGTransformValue::SVGTransformType m_type;

@@ -30,6 +30,7 @@
 #if ENABLE(MATHML)
 
 #include "ElementInlines.h"
+#include "NodeName.h"
 #include "RenderMathMLFraction.h"
 #include "Settings.h"
 #include <wtf/IsoMallocInlines.h>
@@ -104,13 +105,13 @@ MathMLFractionElement::FractionAlignment MathMLFractionElement::denominatorAlign
     return cachedFractionAlignment(denomalignAttr, m_denominatorAlignment);
 }
 
-void MathMLFractionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLFractionElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == linethicknessAttr)
+    if (name == AttributeNames::linethickness)
         m_lineThickness = std::nullopt;
-    else if (name == numalignAttr)
+    else if (name == AttributeNames::numalign)
         m_numeratorAlignment = std::nullopt;
-    else if (name == denomalignAttr)
+    else if (name == AttributeNames::denomalign)
         m_denominatorAlignment = std::nullopt;
 
     MathMLElement::parseAttribute(name, value);

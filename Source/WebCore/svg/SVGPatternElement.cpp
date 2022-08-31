@@ -29,6 +29,7 @@
 #include "FloatConversion.h"
 #include "GraphicsContext.h"
 #include "ImageBuffer.h"
+#include "NodeName.h"
 #include "PatternAttributes.h"
 #include "RenderSVGResourcePattern.h"
 #include "SVGElementInlines.h"
@@ -70,34 +71,34 @@ Ref<SVGPatternElement> SVGPatternElement::create(const QualifiedName& tagName, D
     return adoptRef(*new SVGPatternElement(tagName, document));
 }
 
-void SVGPatternElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGPatternElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::patternUnitsAttr) {
+    if (name == AttributeNames::patternUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_patternUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
         return;
     }
-    if (name == SVGNames::patternContentUnitsAttr) {
+    if (name == AttributeNames::patternContentUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_patternContentUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
         return;
     }
-    if (name == SVGNames::patternTransformAttr) {
+    if (name == AttributeNames::patternTransform) {
         m_patternTransform->baseVal()->parse(value);
         return;
     }
 
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

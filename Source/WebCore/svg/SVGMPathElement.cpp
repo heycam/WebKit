@@ -22,6 +22,7 @@
 #include "SVGMPathElement.h"
 
 #include "Document.h"
+#include "NodeName.h"
 #include "SVGAnimateMotionElement.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGElementTypeHelpers.h"
@@ -98,7 +99,7 @@ void SVGMPathElement::removedFromAncestor(RemovalType removalType, ContainerNode
         clearResourceReferences();
 }
 
-void SVGMPathElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGMPathElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGElement::parseAttribute(name, value);
     SVGURIReference::parseAttribute(name, value);

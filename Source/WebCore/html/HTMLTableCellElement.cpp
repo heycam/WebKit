@@ -31,6 +31,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "HTMLTableElement.h"
+#include "NodeName.h"
 #include "RenderTableCell.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -91,9 +92,9 @@ int HTMLTableCellElement::cellIndex() const
     return index;
 }
 
-bool HTMLTableCellElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableCellElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == nowrapAttr || name == widthAttr || name == heightAttr)
+    if (name == AttributeNames::nowrap || name == AttributeNames::width || name == AttributeNames::height)
         return true;
     return HTMLTablePartElement::hasPresentationalHintsForAttribute(name);
 }
@@ -112,12 +113,12 @@ void HTMLTableCellElement::collectPresentationalHintsForAttribute(const Qualifie
         HTMLTablePartElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLTableCellElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLTableCellElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == rowspanAttr) {
+    if (name == AttributeNames::rowspan) {
         if (is<RenderTableCell>(renderer()))
             downcast<RenderTableCell>(*renderer()).colSpanOrRowSpanChanged();
-    } else if (name == colspanAttr) {
+    } else if (name == AttributeNames::colspan) {
         if (is<RenderTableCell>(renderer()))
             downcast<RenderTableCell>(*renderer()).colSpanOrRowSpanChanged();
     } else

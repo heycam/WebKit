@@ -132,8 +132,8 @@ private:
     FormControlState saveFormControlState() const final;
     void restoreFormControlState(const FormControlState&) final;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    void parseAttribute(NodeName, const AtomString&) final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
 
     bool childShouldCreateRenderer(const Node&) const final;
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;

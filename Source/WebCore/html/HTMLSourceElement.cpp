@@ -35,6 +35,7 @@
 #include "Logging.h"
 #include "MediaList.h"
 #include "MediaQueryParser.h"
+#include "NodeName.h"
 #include <wtf/IsoMallocInlines.h>
 
 #if ENABLE(VIDEO)
@@ -151,18 +152,18 @@ void HTMLSourceElement::stop()
     cancelPendingErrorEvent();
 }
 
-void HTMLSourceElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLSourceElement::parseAttribute(NodeName name, const AtomString& value)
 {
     HTMLElement::parseAttribute(name, value);
-    if (name == srcsetAttr || name == sizesAttr || name == mediaAttr || name == typeAttr) {
-        if (name == mediaAttr)
+    if (name == AttributeNames::srcset || name == AttributeNames::sizes || name == AttributeNames::media || name == AttributeNames::type) {
+        if (name == AttributeNames::media)
             m_cachedParsedMediaAttribute = std::nullopt;
         RefPtr parent = parentNode();
         if (m_shouldCallSourcesChanged)
             downcast<HTMLPictureElement>(*parent).sourcesChanged();
     }
 #if ENABLE(MODEL_ELEMENT)
-    if (name == srcAttr ||  name == typeAttr) {
+    if (name == AttributeNames::src ||  name == AttributeNames::type) {
         RefPtr<Element> parent = parentElement();
         if (is<HTMLModelElement>(parent))
             downcast<HTMLModelElement>(*parent).sourcesChanged();
@@ -182,13 +183,13 @@ const MediaQuerySet* HTMLSourceElement::parsedMediaAttribute(Document& document)
     return m_cachedParsedMediaAttribute.value().get();
 }
 
-void HTMLSourceElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void HTMLSourceElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    if (name == widthAttr || name == heightAttr) {
+    if (attributeName == AttributeNames::width || attributeName == AttributeNames::height) {
         if (RefPtr parent = parentNode(); is<HTMLPictureElement>(parent))
             downcast<HTMLPictureElement>(*parent).sourceDimensionAttributesChanged(*this);
     }
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
+    HTMLElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 }
 
 }

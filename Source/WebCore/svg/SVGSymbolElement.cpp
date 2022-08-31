@@ -44,7 +44,7 @@ Ref<SVGSymbolElement> SVGSymbolElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new SVGSymbolElement(tagName, document));
 }
 
-void SVGSymbolElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGSymbolElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGGraphicsElement::parseAttribute(name, value);
     SVGFitToViewBox::parseAttribute(name, value);

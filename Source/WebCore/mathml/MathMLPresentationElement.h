@@ -40,7 +40,7 @@ public:
 
 protected:
     MathMLPresentationElement(const QualifiedName& tagName, Document&);
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
 
     static bool isPhrasingContent(const Node&);
     static bool isFlowContent(const Node&);

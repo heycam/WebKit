@@ -82,6 +82,7 @@ enum class AnimationImpact;
 enum class EventHandling : uint8_t;
 enum class EventProcessing : uint8_t;
 enum class IsSyntheticClick : bool { No, Yes };
+enum class NodeName : uint16_t;
 enum class ResolveURLs : uint8_t { No, NoExcludingURLsForPrivacy, Yes, YesExcludingURLsForPrivacy };
 enum class SelectionRestorationMode : uint8_t;
 
@@ -94,6 +95,7 @@ struct ScrollToOptions;
 struct SecurityPolicyViolationEventInit;
 struct ShadowRootInit;
 
+using ElementName = NodeName;
 using ExplicitlySetAttrElementsMap = HashMap<QualifiedName, Vector<WeakPtr<Element>>>;
 
 namespace Style {
@@ -271,7 +273,7 @@ public:
     const AtomString& prefix() const final { return m_tagName.prefix(); }
     const AtomString& namespaceURI() const final { return m_tagName.namespaceURI(); }
 
-    ElementName elementName() const { return m_tagName.elementName(); }
+    ElementName elementName() const { return m_tagName.nodeName(); }
     Namespace nodeNamespace() const { return m_tagName.nodeNamespace(); }
 
     ExceptionOr<void> setPrefix(const AtomString&) final;
@@ -295,8 +297,8 @@ public:
     };
 
     // These functions are called whenever an attribute is added, changed or removed.
-    virtual void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly);
-    virtual void parseAttribute(const QualifiedName&, const AtomString&) { }
+    virtual void attributeChanged(const QualifiedName&, NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly);
+    virtual void parseAttribute(NodeName, const AtomString&) { }
 
     // Only called by the parser immediately after element construction.
     void parserSetAttributes(const Vector<Attribute>&);

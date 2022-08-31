@@ -24,6 +24,7 @@
 
 #include "Document.h"
 #include "Element.h"
+#include "NodeName.h"
 #include "SVGElement.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGUseElement.h"
@@ -52,11 +53,11 @@ SVGElement& SVGURIReference::contextElement() const
     return *m_href->contextElement();
 }
 
-void SVGURIReference::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGURIReference::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name.matches(SVGNames::hrefAttr))
+    if (name == AttributeNames::href)
         m_href->setBaseValInternal(value.isNull() ? contextElement().getAttribute(XLinkNames::hrefAttr) : value);
-    else if (name.matches(XLinkNames::hrefAttr) && !contextElement().hasAttribute(SVGNames::hrefAttr))
+    else if (name == AttributeNames::XLink::href && !contextElement().hasAttribute(SVGNames::hrefAttr))
         m_href->setBaseValInternal(value);
 }
 

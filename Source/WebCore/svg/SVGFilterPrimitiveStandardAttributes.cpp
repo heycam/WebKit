@@ -24,6 +24,7 @@
 #include "SVGFilterPrimitiveStandardAttributes.h"
 
 #include "FilterEffect.h"
+#include "NodeName.h"
 #include "RenderSVGResourceFilterPrimitive.h"
 #include "SVGElementInlines.h"
 #include <wtf/IsoMallocInlines.h>
@@ -46,19 +47,19 @@ SVGFilterPrimitiveStandardAttributes::SVGFilterPrimitiveStandardAttributes(const
     });
 }
 
-void SVGFilterPrimitiveStandardAttributes::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFilterPrimitiveStandardAttributes::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::resultAttr)
+    else if (name == AttributeNames::result)
         m_result->setBaseValInternal(value);
 
     reportAttributeParsingError(parseError, name, value);

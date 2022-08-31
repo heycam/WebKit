@@ -26,6 +26,7 @@
 #include "CSSStyleSheet.h"
 #include "CommonAtomStrings.h"
 #include "Document.h"
+#include "NodeName.h"
 #include "SVGElementInlines.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
@@ -92,18 +93,18 @@ String SVGStyleElement::title() const
     return attributeWithoutSynchronization(SVGNames::titleAttr);
 }
 
-void SVGStyleElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGStyleElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::titleAttr) {
+    if (name == AttributeNames::title) {
         if (sheet() && !isInShadowTree())
             sheet()->setTitle(value);
         return;
     }
-    if (name == SVGNames::typeAttr) {
+    if (name == AttributeNames::type) {
         m_styleSheetOwner.setContentType(value);
         return;
     }
-    if (name == SVGNames::mediaAttr) {
+    if (name == AttributeNames::media) {
         m_styleSheetOwner.setMedia(value);
         return;
     }

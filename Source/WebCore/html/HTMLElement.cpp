@@ -67,6 +67,7 @@
 #include "ImageOverlay.h"
 #include "JSHTMLElement.h"
 #include "MediaControlsHost.h"
+#include "NodeName.h"
 #include "NodeTraversal.h"
 #include "PseudoClassChangeInvalidation.h"
 #include "RenderElement.h"
@@ -147,9 +148,9 @@ void HTMLElement::mapLanguageAttributeToLocale(const AtomString& value, MutableS
     }
 }
 
-bool HTMLElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr || name == contenteditableAttr || name == hiddenAttr || name == langAttr || name.matches(XMLNames::langAttr) || name == draggableAttr || name == dirAttr)
+    if (name == AttributeNames::align || name == AttributeNames::contenteditable || name == AttributeNames::hidden || name == AttributeNames::lang || name == AttributeNames::XML::lang || name == AttributeNames::draggable || name == AttributeNames::dir)
         return true;
     return StyledElement::hasPresentationalHintsForAttribute(name);
 }
@@ -361,35 +362,59 @@ bool HTMLElement::matchesReadWritePseudoClass() const
     return editabilityFromContentEditableAttr(*this, PageIsEditable::No) != Editability::ReadOnly;
 }
 
-void HTMLElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == dirAttr) {
+    switch (name) {
+    case AttributeNames::dir:
         dirAttributeChanged(value);
-        return;
-    }
-
-    if (name == tabindexAttr) {
+        break;
+    case AttributeNames::tabindex:
         if (auto optionalTabIndex = parseHTMLInteger(value))
             setTabIndexExplicitly(optionalTabIndex.value());
         else
             setTabIndexExplicitly(std::nullopt);
-        return;
-    }
-
-    if (document().settings().inertAttributeEnabled() && name == inertAttr)
-        invalidateStyleInternal();
-
-    if (name == inputmodeAttr) {
+        break;
+    case AttributeNames::inert:
+        if (document().settings().inertAttributeEnabled())
+            invalidateStyleInternal();
+        break;
+    case AttributeNames::inputmode: {
         auto& document = this->document();
         if (this == document.focusedElement()) {
             if (auto* page = document.page())
                 page->chrome().client().focusedElementDidChangeInputMode(*this, canonicalInputMode());
         }
+        break;
     }
-
-    auto& eventName = eventNameForEventHandlerAttribute(name);
-    if (!eventName.isNull())
-        setAttributeEventListener(eventName, name, value);
+    default:
+        if (!JSHTMLElement::isEventHandlerContentAttribute(name))
+            return;
+        FALLTHROUGH;
+    case AttributeNames::onautocomplete:
+    case AttributeNames::onautocompleteerror:
+    case AttributeNames::onbeforeload:
+    case AttributeNames::onfocusin:
+    case AttributeNames::onfocusout:
+    case AttributeNames::ongesturechange:
+    case AttributeNames::ongestureend:
+    case AttributeNames::ongesturestart:
+    case AttributeNames::onwebkitbeginfullscreen:
+    case AttributeNames::onwebkitcurrentplaybacktargetiswirelesschanged:
+    case AttributeNames::onwebkitendfullscreen:
+    case AttributeNames::onwebkitfullscreenchange:
+    case AttributeNames::onwebkitfullscreenerror:
+    case AttributeNames::onwebkitkeyadded:
+    case AttributeNames::onwebkitkeyerror:
+    case AttributeNames::onwebkitkeymessage:
+    case AttributeNames::onwebkitneedkey:
+    case AttributeNames::onwebkitplaybacktargetavailabilitychanged:
+    case AttributeNames::onwebkitpresentationmodechanged: {
+        auto& eventName = eventNameForEventHandlerAttribute(qualifiedNameForNodeName(name));
+        if (!eventName.isNull())
+            setAttributeEventListener(eventName, qualifiedNameForNodeName(name), value);
+        break;
+    }
+    }
 }
 
 Node::InsertedIntoAncestorResult HTMLElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)

@@ -31,6 +31,7 @@
 #include "HTMLOListElement.h"
 #include "HTMLParserIdioms.h"
 #include "HTMLUListElement.h"
+#include "NodeName.h"
 #include "RenderListItem.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -57,9 +58,9 @@ Ref<HTMLLIElement> HTMLLIElement::create(const QualifiedName& tagName, Document&
     return adoptRef(*new HTMLLIElement(tagName, document));
 }
 
-bool HTMLLIElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLLIElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == typeAttr)
+    if (name == AttributeNames::type)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
@@ -83,9 +84,9 @@ void HTMLLIElement::collectPresentationalHintsForAttribute(const QualifiedName& 
         HTMLElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLLIElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLLIElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == valueAttr) {
+    if (name == AttributeNames::value) {
         if (renderer() && renderer()->isListItem())
             parseValue(value);
     } else

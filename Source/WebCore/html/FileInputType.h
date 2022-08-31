@@ -81,7 +81,7 @@ private:
     Icon* icon() const final;
     void createShadowSubtree() final;
     void disabledStateChanged() final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     String defaultToolTip() const final;
 
     void filesChosen(const Vector<FileChooserFileInfo>&, const String& displayString = { }, Icon* = nullptr) final;

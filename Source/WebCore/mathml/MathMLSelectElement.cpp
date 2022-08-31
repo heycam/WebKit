@@ -34,6 +34,7 @@
 #include "HTMLElement.h"
 #include "HTMLNames.h"
 #include "MathMLNames.h"
+#include "NodeName.h"
 #include "RenderMathMLRow.h"
 #include "RenderTreeUpdater.h"
 #include "SVGElement.h"
@@ -101,12 +102,12 @@ void MathMLSelectElement::childrenChanged(const ChildChange& change)
     MathMLRowElement::childrenChanged(change);
 }
 
-void MathMLSelectElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void MathMLSelectElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    if (hasTagName(mactionTag) && (name == MathMLNames::actiontypeAttr || name == MathMLNames::selectionAttr))
+    if (hasTagName(mactionTag) && (attributeName == AttributeNames::actiontype || attributeName == AttributeNames::selection))
         updateSelectedChild();
 
-    MathMLRowElement::attributeChanged(name, oldValue, newValue, reason);
+    MathMLRowElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 }
 
 int MathMLSelectElement::getSelectedActionChildAndIndex(Element*& selectedChild)

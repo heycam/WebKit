@@ -42,6 +42,7 @@
 #include "KeyboardEvent.h"
 #include "LoaderStrategy.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "PingLoader.h"
 #include "PlatformMouseEvent.h"
 #include "PlatformStrategies.h"
@@ -237,9 +238,9 @@ void HTMLAnchorElement::setActive(bool down, Style::InvalidationScope invalidati
     HTMLElement::setActive(down, invalidationScope);
 }
 
-void HTMLAnchorElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLAnchorElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == hrefAttr) {
+    if (name == AttributeNames::href) {
         bool wasLink = isLink();
         setIsLink(!value.isNull() && !shouldProhibitLinks(this));
         if (wasLink != isLink())
@@ -251,9 +252,9 @@ void HTMLAnchorElement::parseAttribute(const QualifiedName& name, const AtomStri
                     document().frame()->loader().client().prefetchDNS(document().completeURL(parsedURL).host().toString());
             }
         }
-    } else if (name == nameAttr || name == titleAttr) {
+    } else if (name == AttributeNames::name || name == AttributeNames::title) {
         // Do nothing.
-    } else if (name == relAttr) {
+    } else if (name == AttributeNames::rel) {
         // Update HTMLAnchorElement::relList() if more rel attributes values are supported.
         static MainThreadNeverDestroyed<const AtomString> noReferrer("noreferrer"_s);
         static MainThreadNeverDestroyed<const AtomString> noOpener("noopener"_s);

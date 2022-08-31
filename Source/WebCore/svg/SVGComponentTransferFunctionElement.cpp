@@ -22,6 +22,7 @@
 #include "config.h"
 #include "SVGComponentTransferFunctionElement.h"
 
+#include "NodeName.h"
 #include "SVGFEComponentTransferElement.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
@@ -46,41 +47,41 @@ SVGComponentTransferFunctionElement::SVGComponentTransferFunctionElement(const Q
     });
 }
 
-void SVGComponentTransferFunctionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGComponentTransferFunctionElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::typeAttr) {
+    if (name == AttributeNames::type) {
         ComponentTransferType propertyValue = SVGPropertyTraits<ComponentTransferType>::fromString(value);
         if (propertyValue > 0)
             m_type->setBaseValInternal<ComponentTransferType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::tableValuesAttr) {
+    if (name == AttributeNames::tableValues) {
         m_tableValues->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::slopeAttr) {
+    if (name == AttributeNames::slope) {
         m_slope->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::interceptAttr) {
+    if (name == AttributeNames::intercept) {
         m_intercept->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::amplitudeAttr) {
+    if (name == AttributeNames::amplitude) {
         m_amplitude->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::exponentAttr) {
+    if (name == AttributeNames::exponent) {
         m_exponent->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::offsetAttr) {
+    if (name == AttributeNames::offset) {
         m_offset->setBaseValInternal(value.toFloat());
         return;
     }

@@ -46,6 +46,7 @@
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "NodeRareData.h"
 #include "Page.h"
 #include "PlatformMouseEvent.h"
@@ -274,9 +275,9 @@ void HTMLSelectElement::setValue(const String& value)
     setSelectedIndex(-1);
 }
 
-bool HTMLSelectElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLSelectElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
+    if (name == AttributeNames::align) {
         // Don't map 'align' attribute. This matches what Firefox, Opera and IE do.
         // See http://bugs.webkit.org/show_bug.cgi?id=12072
         return false;
@@ -285,9 +286,9 @@ bool HTMLSelectElement::hasPresentationalHintsForAttribute(const QualifiedName& 
     return HTMLFormControlElementWithState::hasPresentationalHintsForAttribute(name);
 }
 
-void HTMLSelectElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLSelectElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == sizeAttr) {
+    if (name == AttributeNames::size) {
         unsigned oldSize = m_size;
         unsigned size = limitToOnlyHTMLNonNegative(value);
 
@@ -302,7 +303,7 @@ void HTMLSelectElement::parseAttribute(const QualifiedName& name, const AtomStri
             setRecalcListItems();
             updateValidity();
         }
-    } else if (name == multipleAttr)
+    } else if (name == AttributeNames::multiple)
         parseMultipleAttribute(value);
     else
         HTMLFormControlElementWithState::parseAttribute(name, value);

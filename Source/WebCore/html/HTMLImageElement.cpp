@@ -51,6 +51,7 @@
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "NodeTraversal.h"
 #include "PlatformMouseEvent.h"
 #include "RenderImage.h"
@@ -118,9 +119,9 @@ Ref<HTMLImageElement> HTMLImageElement::createForLegacyFactoryFunction(Document&
     return image;
 }
 
-bool HTMLImageElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLImageElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == borderAttr || name == vspaceAttr || name == hspaceAttr || name == valignAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height || name == AttributeNames::border || name == AttributeNames::vspace || name == AttributeNames::hspace || name == AttributeNames::valign)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
@@ -291,29 +292,29 @@ static CrossOriginState parseCrossoriginState(const AtomString& crossoriginValue
     return equalLettersIgnoringASCIICase(crossoriginValue, "use-credentials"_s) ? UseCredentials : Anonymous;
 }
 
-void HTMLImageElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void HTMLImageElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
+    HTMLElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 
-    if (name == referrerpolicyAttr && document().settings().referrerPolicyAttributeEnabled()) {
+    if (attributeName == AttributeNames::referrerpolicy && document().settings().referrerPolicyAttributeEnabled()) {
         auto oldReferrerPolicy = parseReferrerPolicy(oldValue, ReferrerPolicySource::ReferrerPolicyAttribute).value_or(ReferrerPolicy::EmptyString);
         auto newReferrerPolicy = parseReferrerPolicy(newValue, ReferrerPolicySource::ReferrerPolicyAttribute).value_or(ReferrerPolicy::EmptyString);
         if (oldReferrerPolicy != newReferrerPolicy)
             m_imageLoader->updateFromElementIgnoringPreviousError(RelevantMutation::Yes);
-    } else if (name == crossoriginAttr) {
+    } else if (attributeName == AttributeNames::crossorigin) {
         if (parseCrossoriginState(oldValue) != parseCrossoriginState(newValue))
             m_imageLoader->updateFromElementIgnoringPreviousError(RelevantMutation::Yes);
     }
 }
 
-void HTMLImageElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLImageElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == altAttr) {
+    if (name == AttributeNames::alt) {
         if (is<RenderImage>(renderer()))
             downcast<RenderImage>(*renderer()).updateAltText();
-    } else if (name == srcAttr || name == srcsetAttr || name == sizesAttr)
+    } else if (name == AttributeNames::src || name == AttributeNames::srcset || name == AttributeNames::sizes)
         selectImageSource(RelevantMutation::Yes);
-    else if (name == usemapAttr) {
+    else if (name == AttributeNames::usemap) {
         if (isInTreeScope() && !m_parsedUsemap.isNull())
             treeScope().removeImageElementByUsemap(*m_parsedUsemap.impl(), *this);
 
@@ -321,7 +322,7 @@ void HTMLImageElement::parseAttribute(const QualifiedName& name, const AtomStrin
 
         if (isInTreeScope() && !m_parsedUsemap.isNull())
             treeScope().addImageElementByUsemap(*m_parsedUsemap.impl(), *this);
-    } else if (name == compositeAttr) {
+    } else if (name == AttributeNames::composite) {
         // FIXME: images don't support blend modes in their compositing attribute.
         BlendMode blendOp = BlendMode::Normal;
         if (!parseCompositeAndBlendOperator(value, m_compositeOperator, blendOp))
@@ -330,12 +331,12 @@ void HTMLImageElement::parseAttribute(const QualifiedName& name, const AtomStrin
     } else if (isImageMenuEnabled()) {
         ImageControlsMac::updateImageControls(*this);
 #endif
-    } else if (name == loadingAttr) {
+    } else if (name == AttributeNames::loading) {
         // No action needed for eager to lazy transition.
         if (!hasLazyLoadableAttributeValue(value))
             loadDeferredImage();
     } else {
-        if (name == nameAttr) {
+        if (name == AttributeNames::name) {
             bool willHaveName = !value.isEmpty();
             if (m_hadNameBeforeAttributeChanged != willHaveName && isConnected() && !isInShadowTree() && is<HTMLDocument>(document())) {
                 HTMLDocument& document = downcast<HTMLDocument>(this->document());

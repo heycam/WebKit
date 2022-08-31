@@ -23,6 +23,7 @@
 #include "SVGStopElement.h"
 
 #include "Document.h"
+#include "NodeName.h"
 #include "RenderSVGGradientStop.h"
 #include "RenderSVGResource.h"
 #include "SVGGradientElement.h"
@@ -49,9 +50,9 @@ Ref<SVGStopElement> SVGStopElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGStopElement(tagName, document));
 }
 
-void SVGStopElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGStopElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::offsetAttr) {
+    if (name == AttributeNames::offset) {
         if (value.endsWith('%'))
             m_offset->setBaseValInternal(value.string().left(value.length() - 1).toFloat() / 100.0f);
         else

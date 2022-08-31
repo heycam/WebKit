@@ -47,7 +47,7 @@ public:
 
 private:
     void addSearchResult() final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     RenderPtr<RenderElement> createInputRenderer(RenderStyle&&) final;
     const AtomString& formControlType() const final;
     bool needsContainer() const final;

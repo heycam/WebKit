@@ -32,6 +32,7 @@
 #include "ElementInlines.h"
 #include "HTMLParserIdioms.h"
 #include "MathMLNames.h"
+#include "NodeName.h"
 #include "RenderMathMLMenclose.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -133,9 +134,9 @@ bool MathMLMencloseElement::hasNotation(MencloseNotationFlag notationFlag)
     return m_notationFlags.value() & notationFlag;
 }
 
-void MathMLMencloseElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLMencloseElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == notationAttr)
+    if (name == AttributeNames::notation)
         m_notationFlags = std::nullopt;
 
     MathMLRowElement::parseAttribute(name, value);

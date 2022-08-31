@@ -35,7 +35,7 @@ public:
 private:
     HTMLHRElement(const QualifiedName&, Document&);
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
     bool canContainRangeEndPoint() const final;
 };

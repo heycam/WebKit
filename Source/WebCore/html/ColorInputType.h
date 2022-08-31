@@ -70,7 +70,7 @@ private:
     String sanitizeValue(const String&) const final;
     void createShadowSubtree() final;
     void setValue(const String&, bool valueChanged, TextFieldEventBehavior, TextControlSetValueSelection) final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     void handleDOMActivateEvent(Event&) final;
     void showPicker() final;
     bool allowsShowPickerAcrossFrames() final;

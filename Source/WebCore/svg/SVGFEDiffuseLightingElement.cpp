@@ -23,6 +23,7 @@
 
 #include "FEDiffuseLighting.h"
 #include "RenderStyle.h"
+#include "NodeName.h"
 #include "SVGFELightElement.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
@@ -51,24 +52,24 @@ Ref<SVGFEDiffuseLightingElement> SVGFEDiffuseLightingElement::create(const Quali
     return adoptRef(*new SVGFEDiffuseLightingElement(tagName, document));
 }
 
-void SVGFEDiffuseLightingElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEDiffuseLightingElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::surfaceScaleAttr) {
+    if (name == AttributeNames::surfaceScale) {
         m_surfaceScale->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::diffuseConstantAttr) {
+    if (name == AttributeNames::diffuseConstant) {
         m_diffuseConstant->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::kernelUnitLengthAttr) {
+    if (name == AttributeNames::kernelUnitLength) {
         if (auto result = parseNumberOptionalNumber(value)) {
             m_kernelUnitLengthX->setBaseValInternal(result->first);
             m_kernelUnitLengthY->setBaseValInternal(result->second);

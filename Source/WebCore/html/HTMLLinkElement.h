@@ -91,7 +91,7 @@ public:
     ReferrerPolicy referrerPolicy() const;
 
 private:
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
 
     bool shouldLoadLink() final;
     void process();

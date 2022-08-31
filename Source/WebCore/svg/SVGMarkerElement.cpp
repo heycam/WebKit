@@ -23,6 +23,7 @@
 #include "config.h"
 #include "SVGMarkerElement.h"
 
+#include "NodeName.h"
 #include "RenderSVGResourceMarker.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
@@ -59,16 +60,16 @@ AffineTransform SVGMarkerElement::viewBoxToViewTransform(float viewWidth, float 
     return SVGFitToViewBox::viewBoxToViewTransform(viewBox(), preserveAspectRatio(), viewWidth, viewHeight);
 }
 
-void SVGMarkerElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGMarkerElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::markerUnitsAttr) {
+    if (name == AttributeNames::markerUnits) {
         auto propertyValue = SVGPropertyTraits<SVGMarkerUnitsType>::fromString(value);
         if (propertyValue > 0)
             m_markerUnits->setBaseValInternal<SVGMarkerUnitsType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::orientAttr) {
+    if (name == AttributeNames::orient) {
         auto pair = SVGPropertyTraits<std::pair<SVGAngleValue, SVGMarkerOrientType>>::fromString(value);
         m_orientAngle->setBaseValInternal(pair.first);
         m_orientType->setBaseValInternal(pair.second);
@@ -77,13 +78,13 @@ void SVGMarkerElement::parseAttribute(const QualifiedName& name, const AtomStrin
 
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::refXAttr)
+    if (name == AttributeNames::refX)
         m_refX->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::refYAttr)
+    else if (name == AttributeNames::refY)
         m_refY->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::markerWidthAttr)
+    else if (name == AttributeNames::markerWidth)
         m_markerWidth->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::markerHeightAttr)
+    else if (name == AttributeNames::markerHeight)
         m_markerHeight->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);

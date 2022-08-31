@@ -24,6 +24,7 @@
 
 #include "ElementIterator.h"
 #include "FEComponentTransfer.h"
+#include "NodeName.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGFEFuncAElement.h"
 #include "SVGFEFuncBElement.h"
@@ -52,9 +53,9 @@ Ref<SVGFEComponentTransferElement> SVGFEComponentTransferElement::create(const Q
     return adoptRef(*new SVGFEComponentTransferElement(tagName, document));
 }
 
-void SVGFEComponentTransferElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEComponentTransferElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }

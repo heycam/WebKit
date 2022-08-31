@@ -23,6 +23,7 @@
 #include "config.h"
 #include "SVGAnimateTransformElement.h"
 
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGTransformable.h"
 #include <wtf/IsoMallocInlines.h>
@@ -54,9 +55,9 @@ bool SVGAnimateTransformElement::hasValidAttributeType() const
     return SVGAnimateElementBase::hasValidAttributeType();
 }
 
-void SVGAnimateTransformElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGAnimateTransformElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::typeAttr) {
+    if (name == AttributeNames::type) {
         m_type = SVGTransformable::parseTransformType(value).value_or(SVGTransformValue::SVG_TRANSFORM_UNKNOWN);
         if (m_type == SVGTransformValue::SVG_TRANSFORM_MATRIX)
             m_type = SVGTransformValue::SVG_TRANSFORM_UNKNOWN;

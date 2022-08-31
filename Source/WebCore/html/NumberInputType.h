@@ -64,7 +64,7 @@ private:
     bool hasBadInput() const final;
     String badInputText() const final;
     bool supportsPlaceholder() const final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
 };
 
 } // namespace WebCore

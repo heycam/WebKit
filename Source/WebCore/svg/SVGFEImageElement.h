@@ -45,7 +45,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGFEImageElement, SVGFilterPrimitiveStandardAttributes, SVGURIReference>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
 
     void notifyFinished(CachedResource&, const NetworkLoadMetrics&) final;

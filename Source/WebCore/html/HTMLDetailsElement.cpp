@@ -32,6 +32,7 @@
 #include "HTMLSummaryElement.h"
 #include "LocalizedStrings.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "RenderBlockFlow.h"
 #include "ShadowRoot.h"
 #include "SlotAssignment.h"
@@ -130,9 +131,9 @@ bool HTMLDetailsElement::isActiveSummary(const HTMLSummaryElement& summary) cons
     return slot == m_summarySlot.get();
 }
 
-void HTMLDetailsElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLDetailsElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == openAttr) {
+    if (name == AttributeNames::open) {
         bool oldValue = m_isOpen;
         m_isOpen = !value.isNull();
         if (oldValue != m_isOpen) {

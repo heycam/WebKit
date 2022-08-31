@@ -46,7 +46,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGGlyphRefElement, SVGElement, SVGURIReference>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     bool rendererIsNeeded(const RenderStyle&) final { return false; }
 
     float m_x { 0 };

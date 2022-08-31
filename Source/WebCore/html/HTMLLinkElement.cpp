@@ -53,6 +53,7 @@
 #include "MediaQueryEvaluator.h"
 #include "MediaQueryParser.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "ParsedContentType.h"
 #include "RenderStyle.h"
 #include "SecurityOrigin.h"
@@ -163,9 +164,9 @@ void HTMLLinkElement::setDisabledState(bool disabled)
     }
 }
 
-void HTMLLinkElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLLinkElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == relAttr) {
+    if (name == AttributeNames::rel) {
         auto parsedRel = LinkRelAttribute(document(), value);
         auto didMutateRel = parsedRel != m_relAttribute;
         m_relAttribute = parsedRel;
@@ -175,33 +176,33 @@ void HTMLLinkElement::parseAttribute(const QualifiedName& name, const AtomString
             process();
         return;
     }
-    if (name == hrefAttr) {
+    if (name == AttributeNames::href) {
         process();
         return;
     }
-    if (name == typeAttr) {
+    if (name == AttributeNames::type) {
         m_type = value;
         process();
         return;
     }
-    if (name == sizesAttr) {
+    if (name == AttributeNames::sizes) {
         if (m_sizes)
             m_sizes->associatedAttributeValueChanged(value);
         process();
         return;
     }
-    if (name == mediaAttr) {
+    if (name == AttributeNames::media) {
         m_media = value.string().convertToASCIILowercase();
         process();
         if (m_sheet && !isDisabled())
             m_styleScope->didChangeActiveStyleSheetCandidates();
         return;
     }
-    if (name == disabledAttr) {
+    if (name == AttributeNames::disabled) {
         setDisabledState(!value.isNull());
         return;
     }
-    if (name == titleAttr) {
+    if (name == AttributeNames::title) {
         if (m_sheet && !isInShadowTree())
             m_sheet->setTitle(value);
         return;

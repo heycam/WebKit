@@ -33,6 +33,7 @@
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
 #include "KeyboardEvent.h"
+#include "NodeName.h"
 #include "RenderButton.h"
 #include <wtf/IsoMallocInlines.h>
 #include <wtf/SetForScope.h>
@@ -95,9 +96,9 @@ const AtomString& HTMLButtonElement::formControlType() const
     return emptyAtom();
 }
 
-bool HTMLButtonElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLButtonElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
+    if (name == AttributeNames::align) {
         // Don't map 'align' attribute.  This matches what Firefox and IE do, but not Opera.
         // See http://bugs.webkit.org/show_bug.cgi?id=12071
         return false;
@@ -106,9 +107,9 @@ bool HTMLButtonElement::hasPresentationalHintsForAttribute(const QualifiedName& 
     return HTMLFormControlElement::hasPresentationalHintsForAttribute(name);
 }
 
-void HTMLButtonElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLButtonElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == typeAttr) {
+    if (name == AttributeNames::type) {
         Type oldType = m_type;
         if (equalLettersIgnoringASCIICase(value, "reset"_s))
             m_type = RESET;

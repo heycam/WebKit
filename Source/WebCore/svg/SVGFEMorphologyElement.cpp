@@ -22,6 +22,7 @@
 #include "SVGFEMorphologyElement.h"
 
 #include "FEMorphology.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include <wtf/IsoMallocInlines.h>
@@ -55,21 +56,21 @@ void SVGFEMorphologyElement::setRadius(float x, float y)
     updateSVGRendererForElementChange();
 }
 
-void SVGFEMorphologyElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEMorphologyElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::operatorAttr) {
+    if (name == AttributeNames::operator_) {
         MorphologyOperatorType propertyValue = SVGPropertyTraits<MorphologyOperatorType>::fromString(value);
         if (propertyValue != MorphologyOperatorType::Unknown)
             m_svgOperator->setBaseValInternal<MorphologyOperatorType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::radiusAttr) {
+    if (name == AttributeNames::radius) {
         if (auto result = parseNumberOptionalNumber(value)) {
             m_radiusX->setBaseValInternal(result->first);
             m_radiusY->setBaseValInternal(result->second);

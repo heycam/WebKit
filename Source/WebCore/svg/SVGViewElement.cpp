@@ -45,7 +45,7 @@ Ref<SVGViewElement> SVGViewElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGViewElement(tagName, document));
 }
 
-void SVGViewElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGViewElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGElement::parseAttribute(name, value);
     SVGFitToViewBox::parseAttribute(name, value);

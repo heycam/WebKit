@@ -49,7 +49,7 @@ protected:
 
     bool canLoad() const;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
     void didFinishInsertingNode() final;
     void didAttachRenderers() override;

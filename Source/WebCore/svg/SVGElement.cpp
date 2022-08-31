@@ -37,6 +37,8 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "JSEventListener.h"
+#include "JSHTMLElement.h"
+#include "NodeName.h"
 #include "RenderAncestorIterator.h"
 #include "RenderSVGResourceFilter.h"
 #include "RenderSVGResourceMasker.h"
@@ -236,12 +238,12 @@ bool SVGElement::isOutermostSVGSVGElement() const
     return !is<SVGElement>(parentNode());
 }
 
-void SVGElement::reportAttributeParsingError(SVGParsingError error, const QualifiedName& name, const AtomString& value)
+void SVGElement::reportAttributeParsingError(SVGParsingError error, NodeName name, const AtomString& value)
 {
     if (error == NoError)
         return;
 
-    String errorString = "<" + tagName() + "> attribute " + name.toString() + "=\"" + value + "\"";
+    String errorString = "<" + tagName() + "> attribute " + qualifiedNameForNodeName(name).toString() + "=\"" + value + "\"";
     SVGDocumentExtensions& extensions = document().accessSVGExtensions();
 
     if (error == NegativeValueForbiddenError) {
@@ -408,25 +410,46 @@ void SVGElement::setCorrespondingElement(SVGElement* correspondingElement)
         correspondingElement->ensureSVGRareData().addInstance(*this);
 }
 
-void SVGElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == HTMLNames::classAttr) {
+    switch (name) {
+    case AttributeNames::class_:
         m_className->setBaseValInternal(value);
-        return;
-    }
-
-    if (name == HTMLNames::tabindexAttr) {
+        break;
+    case AttributeNames::tabindex:
         if (value.isEmpty())
             setTabIndexExplicitly(std::nullopt);
         else if (auto optionalTabIndex = parseHTMLInteger(value))
             setTabIndexExplicitly(optionalTabIndex.value());
-        return;
+        break;
+    default:
+        if (!JSHTMLElement::isEventHandlerContentAttribute(name))
+            return;
+        FALLTHROUGH;
+    case AttributeNames::onautocomplete:
+    case AttributeNames::onautocompleteerror:
+    case AttributeNames::onbeforeload:
+    case AttributeNames::onfocusin:
+    case AttributeNames::onfocusout:
+    case AttributeNames::ongesturechange:
+    case AttributeNames::ongestureend:
+    case AttributeNames::ongesturestart:
+    case AttributeNames::onwebkitbeginfullscreen:
+    case AttributeNames::onwebkitcurrentplaybacktargetiswirelesschanged:
+    case AttributeNames::onwebkitendfullscreen:
+    case AttributeNames::onwebkitfullscreenchange:
+    case AttributeNames::onwebkitfullscreenerror:
+    case AttributeNames::onwebkitkeyadded:
+    case AttributeNames::onwebkitkeyerror:
+    case AttributeNames::onwebkitkeymessage:
+    case AttributeNames::onwebkitneedkey:
+    case AttributeNames::onwebkitplaybacktargetavailabilitychanged:
+    case AttributeNames::onwebkitpresentationmodechanged: {
+        auto& eventName = HTMLElement::eventNameForEventHandlerAttribute(qualifiedNameForNodeName(name));
+        if (!eventName.isNull())
+            setAttributeEventListener(eventName, qualifiedNameForNodeName(name), value);
+        break;
     }
-
-    auto& eventName = HTMLElement::eventNameForEventHandlerAttribute(name);
-    if (!eventName.isNull()) {
-        setAttributeEventListener(eventName, name, value);
-        return;
     }
 }
 
@@ -619,16 +642,16 @@ bool SVGElement::childShouldCreateRenderer(const Node& child) const
     return svgChild.isValid();
 }
 
-void SVGElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason)
+void SVGElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason)
 {
-    StyledElement::attributeChanged(name, oldValue, newValue);
+    StyledElement::attributeChanged(name, attributeName, oldValue, newValue);
 
-    if (name == HTMLNames::idAttr)
+    if (attributeName == AttributeNames::id)
         document().accessSVGExtensions().rebuildAllElementReferencesForTarget(*this);
 
     // Changes to the style attribute are processed lazily (see Element::getAttribute() and related methods),
     // so we don't want changes to the style attribute to result in extra work here except invalidateInstances().
-    if (name == HTMLNames::styleAttr)
+    if (attributeName == AttributeNames::style)
         invalidateInstances();
     else
         svgAttributeChanged(name);
@@ -930,9 +953,9 @@ CSSPropertyID SVGElement::cssPropertyIdForSVGAttributeName(const QualifiedName& 
     return properties.get().get(attrName.localName());
 }
 
-bool SVGElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool SVGElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (cssPropertyIdForSVGAttributeName(name) > 0)
+    if (cssPropertyIdForSVGAttributeName(qualifiedNameForNodeName(name)) > 0)
         return true;
     return StyledElement::hasPresentationalHintsForAttribute(name);
 }

@@ -29,6 +29,7 @@
 #include "HTMLFrameSetElement.h"
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
+#include "NodeName.h"
 #include "RenderFrame.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -81,13 +82,13 @@ int HTMLFrameElement::defaultTabIndex() const
     return 0;
 }
 
-void HTMLFrameElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLFrameElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == frameborderAttr) {
+    if (name == AttributeNames::frameborder) {
         m_frameBorder = parseHTMLInteger(value).value_or(0);
         m_frameBorderSet = !value.isNull();
         // FIXME: If we are already attached, this has no effect.
-    } else if (name == noresizeAttr) {
+    } else if (name == AttributeNames::noresize) {
         if (auto* renderer = this->renderer())
             renderer->updateFromElement();
     } else

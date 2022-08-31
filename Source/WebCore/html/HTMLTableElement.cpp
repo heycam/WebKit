@@ -37,6 +37,7 @@
 #include "HTMLTableRowElement.h"
 #include "HTMLTableRowsCollection.h"
 #include "HTMLTableSectionElement.h"
+#include "NodeName.h"
 #include "NodeRareData.h"
 #include "RenderTable.h"
 #include "StyleProperties.h"
@@ -355,31 +356,31 @@ void HTMLTableElement::collectPresentationalHintsForAttribute(const QualifiedNam
         HTMLElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool HTMLTableElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == bgcolorAttr || name == backgroundAttr || name == valignAttr || name == vspaceAttr || name == hspaceAttr || name == cellspacingAttr || name == borderAttr || name == bordercolorAttr || name == frameAttr || name == rulesAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height || name == AttributeNames::bgcolor || name == AttributeNames::background || name == AttributeNames::valign || name == AttributeNames::vspace || name == AttributeNames::hspace || name == AttributeNames::cellspacing || name == AttributeNames::border || name == AttributeNames::bordercolor || name == AttributeNames::frame || name == AttributeNames::rules)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
 
-void HTMLTableElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLTableElement::parseAttribute(NodeName name, const AtomString& value)
 {
     CellBorders bordersBefore = cellBorders();
     unsigned short oldPadding = m_padding;
 
-    if (name == borderAttr)  {
+    if (name == AttributeNames::border)  {
         // FIXME: This attribute is a mess.
         m_borderAttr = parseBorderWidthAttribute(value);
-    } else if (name == bordercolorAttr) {
+    } else if (name == AttributeNames::bordercolor) {
         m_borderColorAttr = !value.isEmpty();
-    } else if (name == frameAttr) {
+    } else if (name == AttributeNames::frame) {
         // FIXME: This attribute is a mess.
         bool borderTop;
         bool borderRight;
         bool borderBottom;
         bool borderLeft;
         m_frameAttr = getBordersFromFrameAttributeValue(value, borderTop, borderRight, borderBottom, borderLeft);
-    } else if (name == rulesAttr) {
+    } else if (name == AttributeNames::rules) {
         m_rulesAttr = UnsetRules;
         if (equalLettersIgnoringASCIICase(value, "none"_s))
             m_rulesAttr = NoneRules;
@@ -391,12 +392,12 @@ void HTMLTableElement::parseAttribute(const QualifiedName& name, const AtomStrin
             m_rulesAttr = ColsRules;
         else if (equalLettersIgnoringASCIICase(value, "all"_s))
             m_rulesAttr = AllRules;
-    } else if (name == cellpaddingAttr) {
+    } else if (name == AttributeNames::cellpadding) {
         if (!value.isEmpty())
             m_padding = std::max(0, parseHTMLInteger(value).value_or(0));
         else
             m_padding = 1;
-    } else if (name == colsAttr) {
+    } else if (name == AttributeNames::cols) {
         // ###
     } else
         HTMLElement::parseAttribute(name, value);

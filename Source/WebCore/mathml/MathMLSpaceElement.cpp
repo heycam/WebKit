@@ -29,6 +29,7 @@
 
 #if ENABLE(MATHML)
 
+#include "NodeName.h"
 #include "RenderMathMLSpace.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -63,13 +64,13 @@ const MathMLElement::Length& MathMLSpaceElement::depth()
     return cachedMathMLLength(MathMLNames::depthAttr, m_depth);
 }
 
-void MathMLSpaceElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLSpaceElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == widthAttr)
+    if (name == AttributeNames::width)
         m_width = std::nullopt;
-    else if (name == heightAttr)
+    else if (name == AttributeNames::height)
         m_height = std::nullopt;
-    else if (name == depthAttr)
+    else if (name == AttributeNames::depth)
         m_depth = std::nullopt;
 
     MathMLPresentationElement::parseAttribute(name, value);

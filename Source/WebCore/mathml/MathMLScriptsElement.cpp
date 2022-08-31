@@ -29,6 +29,7 @@
 
 #if ENABLE(MATHML)
 
+#include "NodeName.h"
 #include "RenderMathMLScripts.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -77,11 +78,11 @@ const MathMLElement::Length& MathMLScriptsElement::superscriptShift()
     return cachedMathMLLength(superscriptshiftAttr, m_superscriptShift);
 }
 
-void MathMLScriptsElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLScriptsElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == subscriptshiftAttr)
+    if (name == AttributeNames::subscriptshift)
         m_subscriptShift = std::nullopt;
-    else if (name == superscriptshiftAttr)
+    else if (name == AttributeNames::superscriptshift)
         m_superscriptShift = std::nullopt;
 
     MathMLElement::parseAttribute(name, value);

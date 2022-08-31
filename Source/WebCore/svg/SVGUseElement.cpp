@@ -32,6 +32,7 @@
 #include "Event.h"
 #include "EventNames.h"
 #include "LegacyRenderSVGTransformableContainer.h"
+#include "NodeName.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGTransformableContainer.h"
 #include "SVGDocumentExtensions.h"
@@ -77,17 +78,17 @@ SVGUseElement::~SVGUseElement()
         m_externalDocument->removeClient(*this);
 }
 
-void SVGUseElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGUseElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

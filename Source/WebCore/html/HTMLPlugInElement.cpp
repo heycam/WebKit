@@ -35,6 +35,7 @@
 #include "HitTestResult.h"
 #include "Logging.h"
 #include "MIMETypeRegistry.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "PluginData.h"
 #include "PluginReplacement.h"
@@ -133,9 +134,9 @@ RenderWidget* HTMLPlugInElement::renderWidgetLoadingPlugin() const
     return renderWidget(); // This will return nullptr if the renderer is not a RenderWidget.
 }
 
-bool HTMLPlugInElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLPlugInElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == vspaceAttr || name == hspaceAttr || name == alignAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height || name == AttributeNames::vspace || name == AttributeNames::hspace || name == AttributeNames::align)
         return true;
     return HTMLFrameOwnerElement::hasPresentationalHintsForAttribute(name);
 }

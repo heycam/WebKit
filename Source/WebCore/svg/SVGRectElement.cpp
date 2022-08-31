@@ -24,6 +24,7 @@
 #include "SVGRectElement.h"
 
 #include "LegacyRenderSVGRect.h"
+#include "NodeName.h"
 #include "RenderSVGRect.h"
 #include "RenderSVGResource.h"
 #include "SVGElementInlines.h"
@@ -54,21 +55,21 @@ Ref<SVGRectElement> SVGRectElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGRectElement(tagName, document));
 }
 
-void SVGRectElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGRectElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rxAttr)
+    else if (name == AttributeNames::rx)
         m_rx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::ryAttr)
+    else if (name == AttributeNames::ry)
         m_ry->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

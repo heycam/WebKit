@@ -23,6 +23,7 @@
 
 #include "CommonAtomStrings.h"
 #include "FEConvolveMatrix.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGParserUtilities.h"
 #include <wtf/IsoMallocInlines.h>
@@ -57,14 +58,14 @@ Ref<SVGFEConvolveMatrixElement> SVGFEConvolveMatrixElement::create(const Qualifi
     return adoptRef(*new SVGFEConvolveMatrixElement(tagName, document));
 }
 
-void SVGFEConvolveMatrixElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEConvolveMatrixElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::orderAttr) {
+    if (name == AttributeNames::order) {
         auto result = parseNumberOptionalNumber(value);
         if (result && result->first >= 1 && result->second >= 1) {
             m_orderX->setBaseValInternal(result->first);
@@ -74,7 +75,7 @@ void SVGFEConvolveMatrixElement::parseAttribute(const QualifiedName& name, const
         return;
     }
 
-    if (name == SVGNames::edgeModeAttr) {
+    if (name == AttributeNames::edgeMode) {
         EdgeModeType propertyValue = SVGPropertyTraits<EdgeModeType>::fromString(value);
         if (propertyValue != EdgeModeType::Unknown)
             m_edgeMode->setBaseValInternal<EdgeModeType>(propertyValue);
@@ -83,12 +84,12 @@ void SVGFEConvolveMatrixElement::parseAttribute(const QualifiedName& name, const
         return;
     }
 
-    if (name == SVGNames::kernelMatrixAttr) {
+    if (name == AttributeNames::kernelMatrix) {
         m_kernelMatrix->baseVal()->parse(value);
         return;
     }
 
-    if (name == SVGNames::divisorAttr) {
+    if (name == AttributeNames::divisor) {
         float divisor = value.toFloat();
         if (divisor)
             m_divisor->setBaseValInternal(divisor);
@@ -97,22 +98,22 @@ void SVGFEConvolveMatrixElement::parseAttribute(const QualifiedName& name, const
         return;
     }
     
-    if (name == SVGNames::biasAttr) {
+    if (name == AttributeNames::bias) {
         m_bias->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::targetXAttr) {
+    if (name == AttributeNames::targetX) {
         m_targetX->setBaseValInternal(parseInteger<unsigned>(value).value_or(0));
         return;
     }
 
-    if (name == SVGNames::targetYAttr) {
+    if (name == AttributeNames::targetY) {
         m_targetY->setBaseValInternal(parseInteger<unsigned>(value).value_or(0));
         return;
     }
 
-    if (name == SVGNames::kernelUnitLengthAttr) {
+    if (name == AttributeNames::kernelUnitLength) {
         auto result = parseNumberOptionalNumber(value);
         if (result && result->first > 0 && result->second > 0) {
             m_kernelUnitLengthX->setBaseValInternal(result->first);
@@ -122,7 +123,7 @@ void SVGFEConvolveMatrixElement::parseAttribute(const QualifiedName& name, const
         return;
     }
 
-    if (name == SVGNames::preserveAlphaAttr) {
+    if (name == AttributeNames::preserveAlpha) {
         if (value == trueAtom())
             m_preserveAlpha->setBaseValInternal(true);
         else if (value == falseAtom())

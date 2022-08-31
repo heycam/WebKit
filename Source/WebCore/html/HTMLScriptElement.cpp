@@ -29,6 +29,7 @@
 #include "EventNames.h"
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
+#include "NodeName.h"
 #include "Settings.h"
 #include "Text.h"
 #include <wtf/IsoMallocInlines.h>
@@ -63,11 +64,11 @@ void HTMLScriptElement::childrenChanged(const ChildChange& change)
     ScriptElement::childrenChanged(change);
 }
 
-void HTMLScriptElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLScriptElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == srcAttr)
+    if (name == AttributeNames::src)
         handleSourceAttribute(value);
-    else if (name == asyncAttr)
+    else if (name == AttributeNames::async)
         handleAsyncAttribute();
     else
         HTMLElement::parseAttribute(name, value);

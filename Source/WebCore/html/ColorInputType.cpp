@@ -47,6 +47,7 @@
 #include "HTMLInputElement.h"
 #include "HTMLOptionElement.h"
 #include "InputTypeNames.h"
+#include "NodeName.h"
 #include "RenderView.h"
 #include "ScopedEventQueue.h"
 #include "ScriptDisallowedScope.h"
@@ -167,9 +168,9 @@ void ColorInputType::setValue(const String& value, bool valueChanged, TextFieldE
         m_chooser->setSelectedColor(valueAsColor());
 }
 
-void ColorInputType::attributeChanged(const QualifiedName& name)
+void ColorInputType::attributeChanged(NodeName name)
 {
-    if (name == valueAttr)
+    if (name == AttributeNames::value)
         updateColorSwatch();
 
     InputType::attributeChanged(name);

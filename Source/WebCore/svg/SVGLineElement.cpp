@@ -23,6 +23,7 @@
 #include "SVGLineElement.h"
 
 #include "LegacyRenderSVGShape.h"
+#include "NodeName.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGShape.h"
 #include "SVGLengthValue.h"
@@ -51,17 +52,17 @@ Ref<SVGLineElement> SVGLineElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGLineElement(tagName, document));
 }
 
-void SVGLineElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGLineElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::x1Attr)
+    if (name == AttributeNames::x1)
         m_x1->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::y1Attr)
+    else if (name == AttributeNames::y1)
         m_y1->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::x2Attr)
+    else if (name == AttributeNames::x2)
         m_x2->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::y2Attr)
+    else if (name == AttributeNames::y2)
         m_y2->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);

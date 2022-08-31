@@ -25,6 +25,7 @@
 
 #include "Document.h"
 #include "ImageBuffer.h"
+#include "NodeName.h"
 #include "RenderSVGResourceClipper.h"
 #include "SVGNames.h"
 #include "StyleResolver.h"
@@ -50,9 +51,9 @@ Ref<SVGClipPathElement> SVGClipPathElement::create(const QualifiedName& tagName,
     return adoptRef(*new SVGClipPathElement(tagName, document));
 }
 
-void SVGClipPathElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGClipPathElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::clipPathUnitsAttr) {
+    if (name == AttributeNames::clipPathUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_clipPathUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);

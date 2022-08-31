@@ -21,6 +21,7 @@
 #include "config.h"
 #include "SVGGlyphRefElement.h"
 
+#include "NodeName.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGGlyphElement.h"
 #include "SVGNames.h"
@@ -60,16 +61,16 @@ static float parseFloat(const AtomString& value)
     return parseNumber(value).value_or(0);
 }
 
-void SVGGlyphRefElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGGlyphRefElement::parseAttribute(NodeName name, const AtomString& value)
 {
     // FIXME: Is the error handling in parseFloat correct for these attributes?
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x = parseFloat(value);
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y = parseFloat(value);
-    else if (name == SVGNames::dxAttr)
+    else if (name == AttributeNames::dx)
         m_dx = parseFloat(value);
-    else if (name == SVGNames::dyAttr)
+    else if (name == AttributeNames::dy)
         m_dy = parseFloat(value);
     else {
         SVGURIReference::parseAttribute(name, value);

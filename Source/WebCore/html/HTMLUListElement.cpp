@@ -49,9 +49,9 @@ Ref<HTMLUListElement> HTMLUListElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new HTMLUListElement(tagName, document));
 }
 
-bool HTMLUListElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLUListElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == typeAttr)
+    if (name == AttributeNames::type)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

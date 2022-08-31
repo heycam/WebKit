@@ -35,6 +35,7 @@
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
 #include "MediaQueryParser.h"
+#include "NodeName.h"
 #include "RenderStyle.h"
 #include "Settings.h"
 #include "StyleResolveForDocument.h"
@@ -89,39 +90,39 @@ const Color& HTMLMetaElement::contentColor()
     return *m_contentColor;
 }
 
-void HTMLMetaElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void HTMLMetaElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
+    HTMLElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 
     if (!isInDocumentTree())
         return;
 
-    if (name == nameAttr) {
+    if (attributeName == AttributeNames::name) {
         if (equalLettersIgnoringASCIICase(oldValue, "theme-color"_s) && !equalLettersIgnoringASCIICase(newValue, "theme-color"_s))
             document().metaElementThemeColorChanged(*this);
         return;
     }
 }
 
-void HTMLMetaElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLMetaElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == nameAttr) {
+    if (name == AttributeNames::name) {
         process();
         return;
     }
 
-    if (name == contentAttr) {
+    if (name == AttributeNames::content) {
         m_contentColor = std::nullopt;
         process();
         return;
     }
 
-    if (name == http_equivAttr) {
+    if (name == AttributeNames::http_equiv) {
         process();
         return;
     }
 
-    if (name == mediaAttr) {
+    if (name == AttributeNames::media) {
         m_media = nullptr;
         process();
         return;

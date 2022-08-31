@@ -47,6 +47,7 @@
 #include "InlineIteratorLineBox.h"
 #include "LayoutDisallowedScope.h"
 #include "Logging.h"
+#include "NodeName.h"
 #include "NodeTraversal.h"
 #include "Page.h"
 #include "PseudoClassChangeInvalidation.h"
@@ -554,9 +555,9 @@ void HTMLTextFormControlElement::scheduleSelectEvent()
     queueTaskToDispatchEvent(TaskSource::UserInteraction, Event::create(eventNames().selectEvent, Event::CanBubble::Yes, Event::IsCancelable::No));
 } 
 
-void HTMLTextFormControlElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLTextFormControlElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == placeholderAttr) {
+    if (name == AttributeNames::placeholder) {
         updatePlaceholderText();
         updatePlaceholderVisibility();
     } else

@@ -40,6 +40,7 @@
 #include "HTMLParserIdioms.h"
 #include "MathMLNames.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "RenderTableCell.h"
 #include "Settings.h"
 #include <wtf/IsoMallocInlines.h>
@@ -78,28 +79,28 @@ unsigned MathMLElement::rowSpan() const
     return std::max(1u, std::min(limitToOnlyHTMLNonNegative(rowSpanValue, 1u), maxRowspan));
 }
 
-void MathMLElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == hrefAttr) {
+    if (name == AttributeNames::href) {
         bool wasLink = isLink();
         setIsLink(!value.isNull() && !shouldProhibitLinks(this));
         if (wasLink != isLink())
             invalidateStyleForSubtree();
-    } else if (name == rowspanAttr) {
+    } else if (name == AttributeNames::rowspan) {
         if (is<RenderTableCell>(renderer()) && hasTagName(mtdTag))
             downcast<RenderTableCell>(*renderer()).colSpanOrRowSpanChanged();
-    } else if (name == columnspanAttr) {
+    } else if (name == AttributeNames::columnspan) {
         if (is<RenderTableCell>(renderer()) && hasTagName(mtdTag))
             downcast<RenderTableCell>(renderer())->colSpanOrRowSpanChanged();
-    } else if (name == HTMLNames::tabindexAttr) {
+    } else if (name == AttributeNames::tabindex) {
         if (value.isEmpty())
             setTabIndexExplicitly(std::nullopt);
         else if (auto optionalTabIndex = parseHTMLInteger(value))
             setTabIndexExplicitly(optionalTabIndex.value());
     } else {
-        auto& eventName = HTMLElement::eventNameForEventHandlerAttribute(name);
+        auto& eventName = HTMLElement::eventNameForEventHandlerAttribute(qualifiedNameForNodeName(name));
         if (!eventName.isNull()) {
-            setAttributeEventListener(eventName, name, value);
+            setAttributeEventListener(eventName, qualifiedNameForNodeName(name), value);
             return;
         }
 
@@ -107,9 +108,9 @@ void MathMLElement::parseAttribute(const QualifiedName& name, const AtomString& 
     }
 }
 
-bool MathMLElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool MathMLElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == backgroundAttr || name == colorAttr || name == dirAttr || name == fontfamilyAttr || name == fontsizeAttr || name == fontstyleAttr || name == fontweightAttr || name == mathbackgroundAttr || name == mathcolorAttr || name == mathsizeAttr || name == displaystyleAttr)
+    if (name == AttributeNames::background || name == AttributeNames::color || name == AttributeNames::dir || name == AttributeNames::fontfamily || name == AttributeNames::fontsize || name == AttributeNames::fontstyle || name == AttributeNames::fontweight || name == AttributeNames::mathbackground || name == AttributeNames::mathcolor || name == AttributeNames::mathsize || name == AttributeNames::displaystyle)
         return true;
     return StyledElement::hasPresentationalHintsForAttribute(name);
 }

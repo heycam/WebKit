@@ -56,20 +56,20 @@ Ref<QualifiedName::QualifiedNameImpl> QualifiedNameCache::getOrCreate(const Qual
     if (addResult.isNewEntry) {
         auto nodeNamespace = findNamespace(components.m_namespaceURI);
         (*addResult.iterator)->m_namespace = nodeNamespace;
-        (*addResult.iterator)->m_elementName = findElementName(nodeNamespace, components.m_localName);
+        (*addResult.iterator)->m_nodeName = findNodeName(nodeNamespace, components.m_localName);
         return adoptRef(**addResult.iterator);
     }
 
     return Ref { **addResult.iterator };
 }
 
-Ref<QualifiedName::QualifiedNameImpl> QualifiedNameCache::getOrCreate(const QualifiedNameComponents& components, Namespace nodeNamespace, ElementName elementName)
+Ref<QualifiedName::QualifiedNameImpl> QualifiedNameCache::getOrCreate(const QualifiedNameComponents& components, Namespace nodeNamespace, NodeName nodeName)
 {
     auto addResult = m_cache.add<QNameComponentsTranslator>(components);
 
     if (addResult.isNewEntry) {
         (*addResult.iterator)->m_namespace = nodeNamespace;
-        (*addResult.iterator)->m_elementName = elementName;
+        (*addResult.iterator)->m_nodeName = nodeName;
         return adoptRef(**addResult.iterator);
     }
 

@@ -23,6 +23,7 @@
 #include "SVGFEColorMatrixElement.h"
 
 #include "FEColorMatrix.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -58,21 +59,21 @@ bool SVGFEColorMatrixElement::isInvalidValuesLength() const
         || (filterType == FECOLORMATRIX_TYPE_SATURATE  && size != 1);
 }
 
-void SVGFEColorMatrixElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFEColorMatrixElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::typeAttr) {
+    if (name == AttributeNames::type) {
         auto propertyValue = SVGPropertyTraits<ColorMatrixType>::fromString(value);
         if (propertyValue > 0)
             m_type->setBaseValInternal<ColorMatrixType>(propertyValue);
         return;
     }
 
-    if (name == SVGNames::inAttr) {
+    if (name == AttributeNames::in) {
         m_in1->setBaseValInternal(value);
         return;
     }
 
-    if (name == SVGNames::valuesAttr) {
+    if (name == AttributeNames::values) {
         m_values->baseVal()->parse(value);
         return;
     }

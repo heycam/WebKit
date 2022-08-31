@@ -42,6 +42,7 @@
 #include "HTMLImageElement.h"
 #include "HTMLParserIdioms.h"
 #include "InspectorInstrumentation.h"
+#include "NodeName.h"
 #include "PropertySetCSSStyleDeclaration.h"
 #include "ScriptableDocumentParser.h"
 #include "StyleProperties.h"
@@ -174,18 +175,18 @@ MutableStyleProperties& StyledElement::ensureMutableInlineStyle()
     return downcast<MutableStyleProperties>(*inlineStyle);
 }
 
-void StyledElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void StyledElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
     if (oldValue != newValue) {
-        if (name == styleAttr)
+        if (attributeName == AttributeNames::style)
             styleAttributeChanged(newValue, reason);
-        else if (hasPresentationalHintsForAttribute(name)) {
+        else if (hasPresentationalHintsForAttribute(attributeName)) {
             elementData()->setPresentationalHintStyleIsDirty(true);
             invalidateStyle();
         }
     }
 
-    Element::attributeChanged(name, oldValue, newValue, reason);
+    Element::attributeChanged(name, attributeName, oldValue, newValue, reason);
 }
 
 PropertySetCSSStyleDeclaration* StyledElement::inlineStyleCSSOMWrapper()

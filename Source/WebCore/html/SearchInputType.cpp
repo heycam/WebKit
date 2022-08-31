@@ -38,6 +38,7 @@
 #include "HTMLParserIdioms.h"
 #include "InputTypeNames.h"
 #include "KeyboardEvent.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "RenderSearchField.h"
 #include "ScriptDisallowedScope.h"
@@ -78,9 +79,9 @@ static void updateResultButtonPseudoType(SearchFieldResultsButtonElement& result
         resultButton.setPseudo(ShadowPseudoIds::webkitSearchResultsButton());
 }
 
-void SearchInputType::attributeChanged(const QualifiedName& name)
+void SearchInputType::attributeChanged(NodeName name)
 {
-    if (name == resultsAttr) {
+    if (name == AttributeNames::results) {
         if (m_resultsButton) {
             if (auto* element = this->element())
                 updateResultButtonPseudoType(*m_resultsButton, element->maxResults());

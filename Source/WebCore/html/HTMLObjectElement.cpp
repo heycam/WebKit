@@ -40,6 +40,7 @@
 #include "HTMLParserIdioms.h"
 #include "MIMETypeRegistry.h"
 #include "NodeList.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "RenderEmbeddedObject.h"
 #include "RenderImage.h"
@@ -84,9 +85,9 @@ int HTMLObjectElement::defaultTabIndex() const
     return 0;
 }
 
-bool HTMLObjectElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLObjectElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == borderAttr)
+    if (name == AttributeNames::border)
         return true;
     return HTMLPlugInImageElement::hasPresentationalHintsForAttribute(name);
 }
@@ -99,23 +100,23 @@ void HTMLObjectElement::collectPresentationalHintsForAttribute(const QualifiedNa
         HTMLPlugInImageElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLObjectElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLObjectElement::parseAttribute(NodeName name, const AtomString& value)
 {
     bool invalidateRenderer = false;
     bool needsWidgetUpdate = false;
 
-    if (name == formAttr)
+    if (name == AttributeNames::form)
         formAttributeChanged();
-    else if (name == typeAttr) {
+    else if (name == AttributeNames::type) {
         m_serviceType = value.string().left(value.find(';')).convertToASCIILowercase();
         invalidateRenderer = !hasAttributeWithoutSynchronization(classidAttr);
         needsWidgetUpdate = true;
-    } else if (name == dataAttr) {
+    } else if (name == AttributeNames::data) {
         m_url = stripLeadingAndTrailingHTMLSpaces(value);
         invalidateRenderer = !hasAttributeWithoutSynchronization(classidAttr);
         needsWidgetUpdate = true;
         updateImageLoaderWithNewURLSoon();
-    } else if (name == classidAttr) {
+    } else if (name == AttributeNames::classid) {
         invalidateRenderer = true;
         needsWidgetUpdate = true;
     } else

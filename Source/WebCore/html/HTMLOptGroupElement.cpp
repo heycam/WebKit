@@ -33,6 +33,7 @@
 #include "HTMLSelectElement.h"
 #include "PseudoClassChangeInvalidation.h"
 #include "RenderMenuList.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "StyleResolver.h"
 #include <wtf/IsoMallocInlines.h>
@@ -90,12 +91,12 @@ void HTMLOptGroupElement::childrenChanged(const ChildChange& change)
     HTMLElement::childrenChanged(change);
 }
 
-void HTMLOptGroupElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLOptGroupElement::parseAttribute(NodeName name, const AtomString& value)
 {
     HTMLElement::parseAttribute(name, value);
     recalcSelectOptions();
 
-    if (name == disabledAttr) {
+    if (name == AttributeNames::disabled) {
         bool newDisabled = !value.isNull();
         if (m_isDisabled != newDisabled) {
             Style::PseudoClassChangeInvalidation disabledInvalidation(*this, { { CSSSelector::PseudoClassDisabled, newDisabled }, { CSSSelector::PseudoClassEnabled, !newDisabled } });

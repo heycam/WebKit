@@ -33,6 +33,7 @@
 #include "ElementIterator.h"
 #include "FontCascade.h"
 #include "Logging.h"
+#include "NodeName.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGFontElement.h"
@@ -70,9 +71,9 @@ Ref<SVGFontFaceElement> SVGFontFaceElement::create(const QualifiedName& tagName,
     return adoptRef(*new SVGFontFaceElement(tagName, document));
 }
 
-void SVGFontFaceElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFontFaceElement::parseAttribute(NodeName name, const AtomString& value)
 {    
-    CSSPropertyID propertyId = cssPropertyIdForSVGAttributeName(name);
+    CSSPropertyID propertyId = cssPropertyIdForSVGAttributeName(qualifiedNameForNodeName(name));
     if (propertyId > 0) {
         // FIXME: Parse using the @font-face descriptor grammars, not the property grammars.
         auto& properties = m_fontFaceRule->mutableProperties();

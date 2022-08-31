@@ -48,6 +48,7 @@
 #include "HTMLParserIdioms.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "Page.h"
 #include "PlatformKeyboardEvent.h"
@@ -439,9 +440,9 @@ void TextFieldInputType::destroyShadowSubtree()
     m_container = nullptr;
 }
 
-void TextFieldInputType::attributeChanged(const QualifiedName& name)
+void TextFieldInputType::attributeChanged(NodeName name)
 {
-    if (name == valueAttr || name == placeholderAttr) {
+    if (name == AttributeNames::value || name == AttributeNames::placeholder) {
         if (element())
             updateInnerTextValue();
     }

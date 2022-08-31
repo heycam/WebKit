@@ -351,7 +351,7 @@ public:
     virtual bool supportsReadOnly() const;
     virtual void updateInnerTextValue();
     virtual void updatePlaceholderText();
-    virtual void attributeChanged(const QualifiedName&) { }
+    virtual void attributeChanged(NodeName) { }
     virtual void disabledStateChanged() { }
     virtual void readOnlyStateChanged() { }
     virtual void requiredStateChanged() { }

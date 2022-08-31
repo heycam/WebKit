@@ -74,7 +74,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGMarkerElement, SVGElement, SVGFitToViewBox>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
     void childrenChanged(const ChildChange&) override;
 

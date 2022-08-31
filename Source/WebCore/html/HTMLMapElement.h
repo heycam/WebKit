@@ -46,7 +46,7 @@ public:
 private:
     HTMLMapElement(const QualifiedName&, Document&);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
 
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
     void removedFromAncestor(RemovalType, ContainerNode&) final;

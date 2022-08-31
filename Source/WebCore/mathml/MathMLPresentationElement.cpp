@@ -39,6 +39,7 @@
 #include "HTTPParsers.h"
 #include "MathMLMathElement.h"
 #include "MathMLNames.h"
+#include "NodeName.h"
 #include "RenderMathMLBlock.h"
 #include "RenderTableCell.h"
 #include "SVGElementTypeHelpers.h"
@@ -357,9 +358,9 @@ std::optional<MathMLElement::MathVariant> MathMLPresentationElement::specifiedMa
     return m_mathVariant.value() == MathVariant::None ? std::nullopt : m_mathVariant;
 }
 
-void MathMLPresentationElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLPresentationElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    bool mathVariantAttribute = name == mathvariantAttr && acceptsMathVariantAttribute();
+    bool mathVariantAttribute = name == AttributeNames::mathvariant && acceptsMathVariantAttribute();
     if (mathVariantAttribute)
         m_mathVariant = std::nullopt;
     if ((mathVariantAttribute) && renderer())

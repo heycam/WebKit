@@ -34,6 +34,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "JSDOMBindingSecurity.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "RenderWidget.h"
 #include "ScriptController.h"
@@ -107,14 +108,14 @@ void HTMLFrameElementBase::openURL(LockHistory lockHistory, LockBackForwardList 
     parentFrame->loader().subframeLoader().requestFrame(*this, m_frameURL, frameName, lockHistory, lockBackForwardList);
 }
 
-void HTMLFrameElementBase::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLFrameElementBase::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == srcdocAttr) {
+    if (name == AttributeNames::srcdoc) {
         if (value.isNull())
             setLocation(stripLeadingAndTrailingHTMLSpaces(attributeWithoutSynchronization(srcAttr)));
         else
             setLocation("about:srcdoc"_s);
-    } else if (name == srcAttr && !hasAttributeWithoutSynchronization(srcdocAttr))
+    } else if (name == AttributeNames::src && !hasAttributeWithoutSynchronization(srcdocAttr))
         setLocation(stripLeadingAndTrailingHTMLSpaces(value));
     else
         HTMLFrameOwnerElement::parseAttribute(name, value);

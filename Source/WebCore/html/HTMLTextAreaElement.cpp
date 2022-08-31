@@ -40,6 +40,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "LocalizedStrings.h"
+#include "NodeName.h"
 #include "RenderTextControlMultiLine.h"
 #include "ShadowRoot.h"
 #include "Text.h"
@@ -139,15 +140,15 @@ void HTMLTextAreaElement::childrenChanged(const ChildChange& change)
         setNonDirtyValue(defaultValue(), TextControlSetValueSelection::Clamp);
 }
 
-bool HTMLTextAreaElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTextAreaElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
+    if (name == AttributeNames::align) {
         // Don't map 'align' attribute.  This matches what Firefox, Opera and IE do.
         // See http://bugs.webkit.org/show_bug.cgi?id=7075
         return false;
     }
 
-    if (name == wrapAttr)
+    if (name == AttributeNames::wrap)
         return true;
     return HTMLTextFormControlElement::hasPresentationalHintsForAttribute(name);
 }
@@ -166,23 +167,23 @@ void HTMLTextAreaElement::collectPresentationalHintsForAttribute(const Qualified
         HTMLTextFormControlElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLTextAreaElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLTextAreaElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == rowsAttr) {
+    if (name == AttributeNames::rows) {
         unsigned rows = limitToOnlyHTMLNonNegativeNumbersGreaterThanZero(value, defaultRows);
         if (m_rows != rows) {
             m_rows = rows;
             if (renderer())
                 renderer()->setNeedsLayoutAndPrefWidthsRecalc();
         }
-    } else if (name == colsAttr) {
+    } else if (name == AttributeNames::cols) {
         unsigned cols = limitToOnlyHTMLNonNegativeNumbersGreaterThanZero(value, defaultCols);
         if (m_cols != cols) {
             m_cols = cols;
             if (renderer())
                 renderer()->setNeedsLayoutAndPrefWidthsRecalc();
         }
-    } else if (name == wrapAttr) {
+    } else if (name == AttributeNames::wrap) {
         // The virtual/physical values were a Netscape extension of HTML 3.0, now deprecated.
         // The soft/hard /off values are a recommendation for HTML 4 extension by IE and NS 4.
         WrapMethod wrap;
@@ -197,9 +198,9 @@ void HTMLTextAreaElement::parseAttribute(const QualifiedName& name, const AtomSt
             if (renderer())
                 renderer()->setNeedsLayoutAndPrefWidthsRecalc();
         }
-    } else if (name == maxlengthAttr)
+    } else if (name == AttributeNames::maxlength)
         maxLengthAttributeChanged(value);
-    else if (name == minlengthAttr)
+    else if (name == AttributeNames::minlength)
         minLengthAttributeChanged(value);
     else
         HTMLTextFormControlElement::parseAttribute(name, value);

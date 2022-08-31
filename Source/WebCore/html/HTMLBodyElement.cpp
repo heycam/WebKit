@@ -36,6 +36,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "JSHTMLBodyElement.h"
+#include "NodeName.h"
 #include "StyleProperties.h"
 #include <wtf/IsoMallocInlines.h>
 #include <wtf/NeverDestroyed.h>
@@ -64,9 +65,9 @@ Ref<HTMLBodyElement> HTMLBodyElement::create(const QualifiedName& tagName, Docum
 
 HTMLBodyElement::~HTMLBodyElement() = default;
 
-bool HTMLBodyElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLBodyElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == backgroundAttr || name == marginwidthAttr || name == leftmarginAttr || name == marginheightAttr || name == topmarginAttr || name == bgcolorAttr || name == textAttr || name == bgpropertiesAttr)
+    if (name == AttributeNames::background || name == AttributeNames::marginwidth || name == AttributeNames::leftmargin || name == AttributeNames::marginheight || name == AttributeNames::topmargin || name == AttributeNames::bgcolor || name == AttributeNames::text || name == AttributeNames::bgproperties)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }
@@ -112,22 +113,22 @@ const AtomString& HTMLBodyElement::eventNameForWindowEventHandlerAttribute(const
     return eventNameForEventHandlerAttribute(attributeName, map);
 }
 
-void HTMLBodyElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLBodyElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == vlinkAttr || name == alinkAttr || name == linkAttr) {
+    if (name == AttributeNames::vlink || name == AttributeNames::alink || name == AttributeNames::link) {
         auto parsedColor = parseLegacyColorValue(value);
-        if (name == linkAttr) {
+        if (name == AttributeNames::link) {
             if (parsedColor)
                 document().setLinkColor(*parsedColor);
             else
                 document().resetLinkColor();
-        } else if (name == vlinkAttr) {
+        } else if (name == AttributeNames::vlink) {
             if (parsedColor)
                 document().setVisitedLinkColor(*parsedColor);
             else
                 document().resetVisitedLinkColor();
         } else {
-            ASSERT(name == alinkAttr);
+            ASSERT(name == AttributeNames::alink);
             if (parsedColor)
                 document().setActiveLinkColor(*parsedColor);
             else
@@ -139,14 +140,14 @@ void HTMLBodyElement::parseAttribute(const QualifiedName& name, const AtomString
 
     // FIXME: Emit "selectionchange" event at <input> / <textarea> elements and remove this special-case.
     // https://bugs.webkit.org/show_bug.cgi?id=234348
-    if (name == onselectionchangeAttr) {
-        document().setAttributeEventListener(eventNames().selectionchangeEvent, name, value, mainThreadNormalWorld());
+    if (name == AttributeNames::onselectionchange) {
+        document().setAttributeEventListener(eventNames().selectionchangeEvent, qualifiedNameForNodeName(name), value, mainThreadNormalWorld());
         return;
     }
 
-    auto& eventName = eventNameForWindowEventHandlerAttribute(name);
+    auto& eventName = eventNameForWindowEventHandlerAttribute(qualifiedNameForNodeName(name));
     if (!eventName.isNull()) {
-        document().setWindowAttributeEventListener(eventName, name, value, mainThreadNormalWorld());
+        document().setWindowAttributeEventListener(eventName, qualifiedNameForNodeName(name), value, mainThreadNormalWorld());
         return;
     }
 

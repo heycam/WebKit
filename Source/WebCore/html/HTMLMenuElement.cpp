@@ -30,6 +30,7 @@
 #include "ElementChildIterator.h"
 #include "HTMLMenuItemElement.h"
 #include "HTMLNames.h"
+#include "NodeName.h"
 #include "Page.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -64,9 +65,9 @@ void HTMLMenuElement::removedFromAncestor(RemovalType type, ContainerNode& ances
     }
 }
 
-void HTMLMenuElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLMenuElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name != typeAttr || !DeprecatedGlobalSettings::menuItemElementEnabled()) {
+    if (name != AttributeNames::type || !DeprecatedGlobalSettings::menuItemElementEnabled()) {
         HTMLElement::parseAttribute(name, value);
         return;
     }

@@ -31,6 +31,7 @@
 #if ENABLE(MATHML)
 
 #include "MathMLNames.h"
+#include "NodeName.h"
 #include "RenderMathMLMath.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -56,9 +57,9 @@ RenderPtr<RenderElement> MathMLMathElement::createElementRenderer(RenderStyle&& 
     return createRenderer<RenderMathMLMath>(*this, WTFMove(style));
 }
 
-void MathMLMathElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void MathMLMathElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    bool mathVariantAttribute = name == mathvariantAttr;
+    bool mathVariantAttribute = name == AttributeNames::mathvariant;
     if (mathVariantAttribute)
         m_mathVariant = std::nullopt;
     if ((mathVariantAttribute) && renderer())

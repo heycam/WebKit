@@ -161,9 +161,9 @@ protected:
     void didMoveToNewDocument(Document& oldDocument, Document& newDocument) override;
 
 private:
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    void attributeChanged(const QualifiedName&, NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
+    void parseAttribute(NodeName, const AtomString&) override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
     void collectExtraStyleForPresentationalHints(MutableStyleProperties&) override;
     void invalidateAttributeMapping();

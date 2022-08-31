@@ -137,7 +137,7 @@ private:
     void removedFromAncestor(RemovalType, ContainerNode&) final;
     void finishParsingChildren() final;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     bool isURLAttribute(const Attribute&) const final;
 
     void resumeFromDocumentSuspension() final;

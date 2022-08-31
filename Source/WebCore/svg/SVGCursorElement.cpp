@@ -24,6 +24,7 @@
 
 #include "CSSCursorImageValue.h"
 #include "Document.h"
+#include "NodeName.h"
 #include "SVGNames.h"
 #include "SVGStringList.h"
 #include <wtf/IsoMallocInlines.h>
@@ -58,13 +59,13 @@ SVGCursorElement::~SVGCursorElement()
         client->cursorElementRemoved(*this);
 }
 
-void SVGCursorElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGCursorElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);

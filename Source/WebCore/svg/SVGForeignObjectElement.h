@@ -45,7 +45,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGForeignObjectElement, SVGGraphicsElement>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) final;
 
     bool rendererIsNeeded(const RenderStyle&) final;

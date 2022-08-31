@@ -34,6 +34,7 @@
 #include "MathMLMathElement.h"
 #include "MathMLNames.h"
 #include "MathMLSelectElement.h"
+#include "NodeName.h"
 #include "RenderMathMLBlock.h"
 #include "SVGElementTypeHelpers.h"
 #include "SVGSVGElement.h"
@@ -97,14 +98,14 @@ bool MathMLAnnotationElement::childShouldCreateRenderer(const Node& child) const
     return false;
 }
 
-void MathMLAnnotationElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void MathMLAnnotationElement::attributeChanged(const QualifiedName& name, NodeName attributeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
-    if (name == MathMLNames::srcAttr || name == MathMLNames::encodingAttr) {
+    if (attributeName == AttributeNames::src || attributeName == AttributeNames::encoding) {
         auto* parent = parentElement();
         if (is<MathMLElement>(parent) && parent->hasTagName(semanticsTag))
             downcast<MathMLElement>(*parent).updateSelectedChild();
     }
-    MathMLPresentationElement::attributeChanged(name, oldValue, newValue, reason);
+    MathMLPresentationElement::attributeChanged(name, attributeName, oldValue, newValue, reason);
 }
 
 }

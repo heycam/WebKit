@@ -35,6 +35,7 @@
 #include "EventSender.h"
 #include "FloatConversion.h"
 #include "FrameView.h"
+#include "NodeName.h"
 #include "SMILTimeContainer.h"
 #include "SVGDocumentExtensions.h"
 #include "SVGElementInlines.h"
@@ -480,9 +481,9 @@ bool SVGSMILElement::isSupportedAttribute(const QualifiedName& attrName)
     return supportedAttributes.get().contains<SVGAttributeHashTranslator>(attrName);
 }
 
-void SVGSMILElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGSMILElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::beginAttr) {
+    if (name == AttributeNames::begin) {
         if (!m_conditions.isEmpty()) {
             disconnectConditions();
             m_conditions.clear();
@@ -491,7 +492,7 @@ void SVGSMILElement::parseAttribute(const QualifiedName& name, const AtomString&
         parseBeginOrEnd(value, Begin);
         if (isConnected())
             connectConditions();
-    } else if (name == SVGNames::endAttr) {
+    } else if (name == AttributeNames::end) {
         if (!m_conditions.isEmpty()) {
             disconnectConditions();
             m_conditions.clear();
@@ -500,10 +501,10 @@ void SVGSMILElement::parseAttribute(const QualifiedName& name, const AtomString&
         parseBeginOrEnd(value, End);
         if (isConnected())
             connectConditions();
-    } else if (name == SVGNames::onendAttr)
-        setAttributeEventListener(eventNames().endEventEvent, name, value);
-    else if (name == SVGNames::onbeginAttr)
-        setAttributeEventListener(eventNames().beginEventEvent, name, value);
+    } else if (name == AttributeNames::onend)
+        setAttributeEventListener(eventNames().endEventEvent, qualifiedNameForNodeName(name), value);
+    else if (name == AttributeNames::onbegin)
+        setAttributeEventListener(eventNames().beginEventEvent, qualifiedNameForNodeName(name), value);
     else
         SVGElement::parseAttribute(name, value);
 }

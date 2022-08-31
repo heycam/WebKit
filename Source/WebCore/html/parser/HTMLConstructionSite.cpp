@@ -702,17 +702,17 @@ void HTMLConstructionSite::takeAllChildrenAndReparent(HTMLStackItem& newParent, 
 static inline QualifiedName qualifiedNameForTag(AtomHTMLToken& token, const AtomString& namespaceURI)
 {
     auto nodeNamespace = findNamespace(namespaceURI);
-    auto elementName = elementNameForTag(nodeNamespace, token.tagName());
-    if (LIKELY(elementName != ElementName::Unknown))
-        return qualifiedNameForElement(elementName);
+    auto elementName = nodeNameForTag(nodeNamespace, token.tagName());
+    if (LIKELY(elementName != NodeName::Unknown))
+        return qualifiedNameForNodeName(elementName);
     return { nullAtom(), token.name(), namespaceURI, nodeNamespace, elementName };
 }
 
 static inline QualifiedName qualifiedNameForHTMLTag(const AtomHTMLToken& token)
 {
-    auto elementName = elementNameForTag(Namespace::HTML, token.tagName());
-    if (LIKELY(elementName != ElementName::Unknown))
-        return qualifiedNameForElement(elementName);
+    auto elementName = nodeNameForTag(Namespace::HTML, token.tagName());
+    if (LIKELY(elementName != NodeName::Unknown))
+        return qualifiedNameForNodeName(elementName);
     return { nullAtom(), token.name(), xhtmlNamespaceURI, Namespace::HTML, elementName };
 }
 
@@ -794,7 +794,7 @@ Ref<HTMLElement> HTMLConstructionSite::createHTMLElement(AtomHTMLToken& token)
 HTMLStackItem HTMLConstructionSite::createElementFromSavedToken(const HTMLStackItem& item)
 {
     // NOTE: Moving from item -> token -> item copies the Attribute vector twice!
-    auto tagName = tagNameForElement(item.elementName());
+    auto tagName = tagNameForNodeName(item.elementName());
     AtomHTMLToken fakeToken(HTMLToken::Type::StartTag, tagName, item.localName(), Vector<Attribute>(item.attributes()));
     ASSERT(item.namespaceURI() == HTMLNames::xhtmlNamespaceURI);
     ASSERT(isFormattingTag(tagName));
@@ -837,7 +837,7 @@ void HTMLConstructionSite::reconstructTheActiveFormattingElements()
 
 void HTMLConstructionSite::generateImpliedEndTagsWithExclusion(ElementName elementName)
 {
-    ASSERT(elementName != ElementName::Unknown);
+    ASSERT(elementName != NodeName::Unknown);
     while (hasImpliedEndTag(currentStackItem()) && currentStackItem().elementName() != elementName)
         m_openElements.pop();
 }

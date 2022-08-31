@@ -79,7 +79,7 @@ protected:
 
     bool canContainRangeEndPoint() const override { return false; }
     void willDetachRenderers() override;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
 
     virtual bool useFallbackContent() const { return false; }

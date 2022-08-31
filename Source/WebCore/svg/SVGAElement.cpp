@@ -34,6 +34,7 @@
 #include "KeyboardEvent.h"
 #include "LegacyRenderSVGTransformableContainer.h"
 #include "MouseEvent.h"
+#include "NodeName.h"
 #include "PlatformMouseEvent.h"
 #include "RenderSVGInline.h"
 #include "RenderSVGText.h"
@@ -78,12 +79,12 @@ String SVGAElement::title() const
     return SVGElement::title();
 }
 
-void SVGAElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGAElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::targetAttr) {
+    if (name == AttributeNames::target) {
         m_target->setBaseValInternal(value);
         return;
-    } else if (name == SVGNames::relAttr) {
+    } else if (name == AttributeNames::rel) {
         if (m_relList)
             m_relList->associatedAttributeValueChanged(value);
     }

@@ -41,7 +41,7 @@ public:
 private:
     MathMLSpaceElement(const QualifiedName& tagName, Document&);
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
 
     std::optional<Length> m_width;
     std::optional<Length> m_height;

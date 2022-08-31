@@ -26,6 +26,7 @@
 #include "CSSPropertyNames.h"
 #include "CSSValueKeywords.h"
 #include "HTMLNames.h"
+#include "NodeName.h"
 #include "StyleProperties.h"
 #include <wtf/IsoMallocInlines.h>
 
@@ -45,9 +46,9 @@ Ref<HTMLPreElement> HTMLPreElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new HTMLPreElement(tagName, document));
 }
 
-bool HTMLPreElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLPreElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == wrapAttr)
+    if (name == AttributeNames::wrap)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

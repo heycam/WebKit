@@ -47,7 +47,7 @@ public:
 private:
     SVGStyleElement(const QualifiedName&, Document&, bool createdByParser);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
     void removedFromAncestor(RemovalType, ContainerNode&) final;
     void childrenChanged(const ChildChange&) final;

@@ -46,7 +46,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGLineElement, SVGGeometryElement>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) final;
 
     bool isValid() const final { return SVGTests::isValid(); }

@@ -25,6 +25,7 @@
 #include "AffineTransform.h"
 #include "CommonAtomStrings.h"
 #include "ElementIterator.h"
+#include "NodeName.h"
 #include "PathTraversalState.h"
 #include "RenderElement.h"
 #include "RenderSVGResource.h"
@@ -98,9 +99,9 @@ bool SVGAnimateMotionElement::hasValidAttributeName() const
     return true;
 }
 
-void SVGAnimateMotionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGAnimateMotionElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::pathAttr) {
+    if (name == AttributeNames::path) {
         m_path = buildPathFromString(value);
         updateAnimationPath();
         return;

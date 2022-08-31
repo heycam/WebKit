@@ -48,7 +48,7 @@ private:
     bool appendFormData(DOMFormData&) const final;
     RenderPtr<RenderElement> createInputRenderer(RenderStyle&&) final;
     void handleDOMActivateEvent(Event&) final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     void attach() final;
     bool shouldRespectAlignAttribute() final;
     bool canBeSuccessfulSubmitButton() final;

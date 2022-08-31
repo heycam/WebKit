@@ -40,6 +40,7 @@
 #include "InputTypeNames.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
+#include "NodeName.h"
 #include "PlatformLocale.h"
 #include "RenderTextControl.h"
 #include "StepRange.h"
@@ -291,16 +292,16 @@ bool NumberInputType::supportsPlaceholder() const
     return true;
 }
 
-void NumberInputType::attributeChanged(const QualifiedName& name)
+void NumberInputType::attributeChanged(NodeName name)
 {
     ASSERT(element());
-    if (name == maxAttr || name == minAttr) {
+    if (name == AttributeNames::max || name == AttributeNames::min) {
         if (auto* element = this->element()) {
             element->invalidateStyleForSubtree();
             if (auto* renderer = element->renderer())
                 renderer->setNeedsLayoutAndPrefWidthsRecalc();
         }
-    } else if (name == stepAttr) {
+    } else if (name == AttributeNames::step) {
         if (auto* element = this->element()) {
             if (auto* renderer = element->renderer())
                 renderer->setNeedsLayoutAndPrefWidthsRecalc();

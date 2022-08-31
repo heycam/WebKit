@@ -25,6 +25,7 @@
 
 #include "DOMPoint.h"
 #include "LegacyRenderSVGShape.h"
+#include "NodeName.h"
 #include "RenderSVGResource.h"
 #include "RenderSVGShape.h"
 #include "SVGDocumentExtensions.h"
@@ -133,9 +134,9 @@ bool SVGGeometryElement::isPointInStroke(DOMPointInit&& pointInit)
     return false;
 }
 
-void SVGGeometryElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGGeometryElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::pathLengthAttr) {
+    if (name == AttributeNames::pathLength) {
         m_pathLength->setBaseValInternal(value.toFloat());
         if (m_pathLength->baseVal() < 0)
             document().accessSVGExtensions().reportError("A negative value for path attribute <pathLength> is not allowed"_s);

@@ -22,6 +22,7 @@
 #include "config.h"
 #include "SVGZoomAndPan.h"
 
+#include "NodeName.h"
 #include <wtf/text/StringConcatenateNumbers.h>
 #include <wtf/text/StringParsingBuffer.h>
 
@@ -51,9 +52,9 @@ std::optional<SVGZoomAndPanType> SVGZoomAndPan::parseZoomAndPan(StringParsingBuf
     return parseZoomAndPanGeneric(buffer);
 }
 
-void SVGZoomAndPan::parseAttribute(const QualifiedName& attributeName, const AtomString& value)
+void SVGZoomAndPan::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (attributeName != SVGNames::zoomAndPanAttr)
+    if (name != AttributeNames::zoomAndPan)
         return;
     m_zoomAndPan = SVGPropertyTraits<SVGZoomAndPanType>::fromString(value);
 }

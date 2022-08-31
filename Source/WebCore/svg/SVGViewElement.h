@@ -46,7 +46,7 @@ private:
 
     using PropertyRegistry = SVGPropertyOwnerRegistry<SVGViewElement, SVGElement, SVGFitToViewBox>;
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
+    void parseAttribute(NodeName, const AtomString&) final;
     void svgAttributeChanged(const QualifiedName&) override;
 
     bool rendererIsNeeded(const RenderStyle&) final { return false; }

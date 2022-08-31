@@ -42,9 +42,9 @@ WTF_MAKE_ISO_ALLOCATED_IMPL(HTMLTablePartElement);
 
 using namespace HTMLNames;
 
-bool HTMLTablePartElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTablePartElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == bgcolorAttr || name == backgroundAttr || name == valignAttr || name == heightAttr)
+    if (name == AttributeNames::bgcolor || name == AttributeNames::background || name == AttributeNames::valign || name == AttributeNames::height)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

@@ -121,7 +121,7 @@ private:
     void destroyShadowSubtree() final;
     void updateInnerTextValue() final;
     bool hasCustomFocusLogic() const final;
-    void attributeChanged(const QualifiedName&) final;
+    void attributeChanged(NodeName) final;
     bool isPresentingAttachedView() const final;
     void elementDidBlur() final;
     void detach() final;

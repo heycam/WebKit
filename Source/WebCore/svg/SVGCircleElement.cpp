@@ -23,6 +23,7 @@
 #include "SVGCircleElement.h"
 
 #include "LegacyRenderSVGEllipse.h"
+#include "NodeName.h"
 #include "RenderSVGEllipse.h"
 #include "RenderSVGResource.h"
 #include "SVGElementInlines.h"
@@ -50,15 +51,15 @@ Ref<SVGCircleElement> SVGCircleElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new SVGCircleElement(tagName, document));
 }
 
-void SVGCircleElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGCircleElement::parseAttribute(NodeName name, const AtomString& value)
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::cxAttr)
+    if (name == AttributeNames::cx)
         m_cx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::cyAttr)
+    else if (name == AttributeNames::cy)
         m_cy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rAttr)
+    else if (name == AttributeNames::r)
         m_r->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Other, value, parseError, SVGLengthNegativeValuesMode::Forbid));
 
     reportAttributeParsingError(parseError, name, value);

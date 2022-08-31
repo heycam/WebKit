@@ -51,6 +51,7 @@
 #include "HTMLTableElement.h"
 #include "InputTypeNames.h"
 #include "MixedContentChecker.h"
+#include "NodeName.h"
 #include "NodeRareData.h"
 #include "Page.h"
 #include "PseudoClassChangeInvalidation.h"
@@ -524,9 +525,9 @@ bool HTMLFormElement::shouldAutocorrect() const
 
 #endif
 
-void HTMLFormElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLFormElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == actionAttr) {
+    if (name == AttributeNames::action) {
         m_attributes.parseAction(value);
         
         if (!m_attributes.action().isEmpty()) {
@@ -535,20 +536,20 @@ void HTMLFormElement::parseAttribute(const QualifiedName& name, const AtomString
                 MixedContentChecker::checkFormForMixedContent(topFrame, topFrame.document()->securityOrigin(), document().completeURL(m_attributes.action()));
             }
         }
-    } else if (name == targetAttr)
+    } else if (name == AttributeNames::target)
         m_attributes.setTarget(value);
-    else if (name == methodAttr)
+    else if (name == AttributeNames::method)
         m_attributes.updateMethodType(value, document().settings().dialogElementEnabled());
-    else if (name == enctypeAttr)
+    else if (name == AttributeNames::enctype)
         m_attributes.updateEncodingType(value);
-    else if (name == accept_charsetAttr)
+    else if (name == AttributeNames::accept_charset)
         m_attributes.setAcceptCharset(value);
-    else if (name == autocompleteAttr) {
+    else if (name == AttributeNames::autocomplete) {
         if (!shouldAutocomplete())
             document().registerForDocumentSuspensionCallbacks(*this);
         else
             document().unregisterForDocumentSuspensionCallbacks(*this);
-    } else if (name == relAttr) {
+    } else if (name == AttributeNames::rel) {
         if (m_relList)
             m_relList->associatedAttributeValueChanged(value);
     } else

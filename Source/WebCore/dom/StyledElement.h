@@ -73,9 +73,9 @@ protected:
     {
     }
 
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
+    void attributeChanged(const QualifiedName&, NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
 
-    virtual bool hasPresentationalHintsForAttribute(const QualifiedName&) const { return false; }
+    virtual bool hasPresentationalHintsForAttribute(NodeName) const { return false; }
 
     void addPropertyToPresentationalHintStyle(MutableStyleProperties&, CSSPropertyID, CSSValueID identifier);
     void addPropertyToPresentationalHintStyle(MutableStyleProperties&, CSSPropertyID, double value, CSSUnitType);

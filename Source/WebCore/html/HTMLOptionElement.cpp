@@ -36,6 +36,7 @@
 #include "HTMLOptGroupElement.h"
 #include "HTMLParserIdioms.h"
 #include "HTMLSelectElement.h"
+#include "NodeName.h"
 #include "NodeRenderStyle.h"
 #include "NodeTraversal.h"
 #include "PseudoClassChangeInvalidation.h"
@@ -167,15 +168,15 @@ int HTMLOptionElement::index() const
     return 0;
 }
 
-void HTMLOptionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLOptionElement::parseAttribute(NodeName name, const AtomString& value)
 {
 #if ENABLE(DATALIST_ELEMENT)
-    if (name == valueAttr) {
+    if (name == AttributeNames::value) {
         for (auto& dataList : ancestorsOfType<HTMLDataListElement>(*this))
             dataList.optionElementChildrenChanged();
     } else
 #endif
-    if (name == disabledAttr) {
+    if (name == AttributeNames::disabled) {
         bool newDisabled = !value.isNull();
         if (m_disabled != newDisabled) {
             Style::PseudoClassChangeInvalidation disabledInvalidation(*this, { { CSSSelector::PseudoClassDisabled, newDisabled },  { CSSSelector::PseudoClassEnabled, !newDisabled } });
@@ -183,7 +184,7 @@ void HTMLOptionElement::parseAttribute(const QualifiedName& name, const AtomStri
             if (renderer() && renderer()->style().hasEffectiveAppearance())
                 renderer()->theme().stateChanged(*renderer(), ControlStates::States::Enabled);
         }
-    } else if (name == selectedAttr) {
+    } else if (name == AttributeNames::selected) {
         // FIXME: Use PseudoClassChangeInvalidation in other elements that implement matchesDefaultPseudoClass().
         Style::PseudoClassChangeInvalidation defaultInvalidation(*this, CSSSelector::PseudoClassDefault, !value.isNull());
         m_isDefault = !value.isNull();

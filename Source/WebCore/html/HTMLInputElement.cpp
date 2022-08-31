@@ -58,6 +58,7 @@
 #include "IdTargetObserver.h"
 #include "KeyboardEvent.h"
 #include "LocalizedStrings.h"
+#include "NodeName.h"
 #include "MouseEvent.h"
 #include "NodeRenderStyle.h"
 #include "Page.h"
@@ -568,11 +569,11 @@ void HTMLInputElement::updateType()
         ASSERT(elementData());
         // FIXME: We don't have the old attribute values so we pretend that we didn't have the old values.
         if (const Attribute* height = findAttributeByName(heightAttr))
-            attributeChanged(heightAttr, nullAtom(), height->value());
+            attributeChanged(heightAttr, AttributeNames::height, nullAtom(), height->value());
         if (const Attribute* width = findAttributeByName(widthAttr))
-            attributeChanged(widthAttr, nullAtom(), width->value());
+            attributeChanged(widthAttr, AttributeNames::width, nullAtom(), width->value());
         if (const Attribute* align = findAttributeByName(alignAttr))
-            attributeChanged(alignAttr, nullAtom(), align->value());
+            attributeChanged(alignAttr, AttributeNames::align, nullAtom(), align->value());
     }
 
     if (auto* form = this->form(); form && wasSuccessfulSubmitButtonCandidate != m_inputType->canBeSuccessfulSubmitButton())
@@ -669,9 +670,11 @@ bool HTMLInputElement::accessKeyAction(bool sendMouseEvents)
     return Ref { *m_inputType }->accessKeyAction(sendMouseEvents);
 }
 
-bool HTMLInputElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLInputElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == vspaceAttr || name == hspaceAttr || name == widthAttr || name == heightAttr || (name == borderAttr && isImageButton()))
+    if (name == AttributeNames::border)
+        return isImageButton();
+    if (name == AttributeNames::vspace || name == AttributeNames::hspace || name == AttributeNames::width || name == AttributeNames::height)
         return true;
     return HTMLTextFormControlElement::hasPresentationalHintsForAttribute(name);
 }
@@ -723,17 +726,17 @@ inline void HTMLInputElement::initializeInputType()
     updateValidity();
 }
 
-void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLInputElement::parseAttribute(NodeName name, const AtomString& value)
 {
     ASSERT(m_inputType);
     Ref protectedInputType { *m_inputType };
 
-    if (name == nameAttr) {
+    if (name == AttributeNames::name) {
         removeFromRadioButtonGroup();
         m_name = value;
         addToRadioButtonGroup();
         HTMLTextFormControlElement::parseAttribute(name, value);
-    } else if (name == autocompleteAttr) {
+    } else if (name == AttributeNames::autocomplete) {
         if (equalLettersIgnoringASCIICase(value, "off"_s)) {
             m_autocomplete = Off;
             registerForSuspensionCallbackIfNeeded();
@@ -748,9 +751,9 @@ void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomStrin
             if (needsToUnregister)
                 unregisterForSuspensionCallbackIfNeeded();
         }
-    } else if (name == typeAttr)
+    } else if (name == AttributeNames::type)
         updateType();
-    else if (name == valueAttr) {
+    else if (name == AttributeNames::value) {
         // Changes to the value attribute may change whether or not this element has a default value.
         // If this field is autocomplete=off that might affect the return value of needsSuspensionCallback.
         if (m_autocomplete == Off) {
@@ -765,7 +768,7 @@ void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomStrin
         }
         updateValidity();
         m_valueAttributeWasUpdatedAfterParsing = !m_parsingInProgress;
-    } else if (name == checkedAttr) {
+    } else if (name == AttributeNames::checked) {
         if (m_inputType->isCheckable())
             invalidateStyleForSubtree();
         // Another radio button in the same group might be checked by state
@@ -777,23 +780,23 @@ void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomStrin
             // setChecked() above sets the dirty checkedness flag so we need to reset it.
             m_dirtyCheckednessFlag = false;
         }
-    } else if (name == maxlengthAttr)
+    } else if (name == AttributeNames::maxlength)
         maxLengthAttributeChanged(value);
-    else if (name == minlengthAttr)
+    else if (name == AttributeNames::minlength)
         minLengthAttributeChanged(value);
-    else if (name == sizeAttr) {
+    else if (name == AttributeNames::size) {
         unsigned oldSize = m_size;
         m_size = limitToOnlyHTMLNonNegativeNumbersGreaterThanZero(value, defaultSize);
         if (m_size != oldSize && renderer())
             renderer()->setNeedsLayoutAndPrefWidthsRecalc();
-    } else if (name == resultsAttr)
+    } else if (name == AttributeNames::results)
         m_maxResults = value.isNull() ? -1 : std::min(parseHTMLInteger(value).value_or(0), maxSavedResults);
-    else if (name == autosaveAttr || name == incrementalAttr)
+    else if (name == AttributeNames::autosave || name == AttributeNames::incremental)
         invalidateStyleForSubtree();
-    else if (name == maxAttr || name == minAttr || name == multipleAttr || name == patternAttr || name == precisionAttr || name == stepAttr)
+    else if (name == AttributeNames::max || name == AttributeNames::min || name == AttributeNames::multiple || name == AttributeNames::pattern || name == AttributeNames::precision || name == AttributeNames::step)
         updateValidity();
 #if ENABLE(DATALIST_ELEMENT)
-    else if (name == listAttr) {
+    else if (name == AttributeNames::list) {
         m_hasNonEmptyList = !value.isEmpty();
         if (m_hasNonEmptyList) {
             resetListAttributeTargetObserver();

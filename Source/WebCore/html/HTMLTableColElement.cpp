@@ -30,6 +30,7 @@
 #include "HTMLNames.h"
 #include "HTMLParserIdioms.h"
 #include "HTMLTableElement.h"
+#include "NodeName.h"
 #include "RenderTableCol.h"
 #include "Text.h"
 #include <wtf/IsoMallocInlines.h>
@@ -55,9 +56,9 @@ Ref<HTMLTableColElement> HTMLTableColElement::create(const QualifiedName& tagNam
     return adoptRef(*new HTMLTableColElement(tagName, document));
 }
 
-bool HTMLTableColElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableColElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr)
+    if (name == AttributeNames::width)
         return true;
     return HTMLTablePartElement::hasPresentationalHintsForAttribute(name);
 }
@@ -72,13 +73,13 @@ void HTMLTableColElement::collectPresentationalHintsForAttribute(const Qualified
         HTMLTablePartElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-void HTMLTableColElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLTableColElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == spanAttr) {
+    if (name == AttributeNames::span) {
         m_span = clampHTMLNonNegativeIntegerToRange(value, minSpan, maxSpan, defaultSpan);
         if (is<RenderTableCol>(renderer()))
             downcast<RenderTableCol>(*renderer()).updateFromElement();
-    } else if (name == widthAttr) {
+    } else if (name == AttributeNames::width) {
         if (!value.isEmpty()) {
             if (is<RenderTableCol>(renderer())) {
                 auto& col = downcast<RenderTableCol>(*renderer());

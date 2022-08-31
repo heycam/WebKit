@@ -40,6 +40,7 @@
 #include "HTMLParserIdioms.h"
 #include "ImageBuffer.h"
 #include "Logging.h"
+#include "NodeName.h"
 #include "Page.h"
 #include "Performance.h"
 #include "PictureInPictureSupport.h"
@@ -125,16 +126,16 @@ void HTMLVideoElement::collectPresentationalHintsForAttribute(const QualifiedNam
         HTMLMediaElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool HTMLVideoElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLVideoElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr)
+    if (name == AttributeNames::width || name == AttributeNames::height)
         return true;
     return HTMLMediaElement::hasPresentationalHintsForAttribute(name);
 }
 
-void HTMLVideoElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void HTMLVideoElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == posterAttr) {
+    if (name == AttributeNames::poster) {
         if (shouldDisplayPosterImage()) {
             if (!m_imageLoader)
                 m_imageLoader = makeUnique<HTMLImageLoader>(*this);
@@ -150,7 +151,7 @@ void HTMLVideoElement::parseAttribute(const QualifiedName& name, const AtomStrin
         HTMLMediaElement::parseAttribute(name, value);    
 
 #if PLATFORM(IOS_FAMILY) && ENABLE(WIRELESS_PLAYBACK_TARGET)
-        if (name == webkitairplayAttr) {
+        if (name == AttributeNames::webkitairplay) {
             bool disabled = false;
             if (equalLettersIgnoringASCIICase(attributeWithoutSynchronization(HTMLNames::webkitairplayAttr), "deny"_s))
                 disabled = true;

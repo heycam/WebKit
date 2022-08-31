@@ -24,6 +24,7 @@
 #include "SVGFELightElement.h"
 
 #include "ElementIterator.h"
+#include "NodeName.h"
 #include "RenderObject.h"
 #include "RenderSVGResource.h"
 #include "SVGElementTypeHelpers.h"
@@ -68,54 +69,54 @@ SVGFELightElement* SVGFELightElement::findLightElement(const SVGElement* svgElem
     return nullptr;
 }
 
-void SVGFELightElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGFELightElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::azimuthAttr) {
+    if (name == AttributeNames::azimuth) {
         m_azimuth->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::elevationAttr) {
+    if (name == AttributeNames::elevation) {
         m_elevation->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::xAttr) {
+    if (name == AttributeNames::x) {
         m_x->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::yAttr) {
+    if (name == AttributeNames::y) {
         m_y->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::zAttr) {
+    if (name == AttributeNames::z) {
         m_z->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::pointsAtXAttr) {
+    if (name == AttributeNames::pointsAtX) {
         m_pointsAtX->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::pointsAtYAttr) {
+    if (name == AttributeNames::pointsAtY) {
         m_pointsAtY->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::pointsAtZAttr) {
+    if (name == AttributeNames::pointsAtZ) {
         m_pointsAtZ->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::specularExponentAttr) {
+    if (name == AttributeNames::specularExponent) {
         m_specularExponent->setBaseValInternal(value.toFloat());
         return;
     }
 
-    if (name == SVGNames::limitingConeAngleAttr) {
+    if (name == AttributeNames::limitingConeAngle) {
         m_limitingConeAngle->setBaseValInternal(value.toFloat());
         return;
     }

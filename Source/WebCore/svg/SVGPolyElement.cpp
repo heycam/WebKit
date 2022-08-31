@@ -24,6 +24,7 @@
 
 #include "Document.h"
 #include "LegacyRenderSVGPath.h"
+#include "NodeName.h"
 #include "RenderSVGPath.h"
 #include "RenderSVGResource.h"
 #include "SVGDocumentExtensions.h"
@@ -43,9 +44,9 @@ SVGPolyElement::SVGPolyElement(const QualifiedName& tagName, Document& document)
     });
 }
 
-void SVGPolyElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGPolyElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::pointsAttr) {
+    if (name == AttributeNames::points) {
         if (!m_points->baseVal()->parse(value))
             document().accessSVGExtensions().reportError("Problem parsing points=\"" + value + "\"");
         return;

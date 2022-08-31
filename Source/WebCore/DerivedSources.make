@@ -1611,8 +1611,6 @@ all : \
     CSSValueKeywords.h \
     ColorData.cpp \
     DOMJITAbstractHeapRepository.h \
-    ElementName.cpp \
-    ElementName.h \
     EventInterfaces.h \
     EventTargetInterfaces.h \
     HTMLElementFactory.cpp \
@@ -1630,6 +1628,8 @@ all : \
     LocalizableAdditions.strings.out \
     Namespace.cpp \
     Namespace.h \
+    NodeName.cpp \
+    NodeName.h \
     SVGElementFactory.cpp \
     SVGElementFactory.h \
     SVGElementTypeHelpers.h \
@@ -2096,7 +2096,7 @@ $(MATH_ML_GENERATED_PATTERNS) : $(WebCore)/dom/make_names.pl $(WebCore)/bindings
 
 # --------
 
-# TagName, ElementName, and Namespace enums
+# TagName, NodeName, and Namespace enums
 
 DOM_NAME_ENUM_DEPS = \
     $(WebCore)/dom/make_names.pl \
@@ -2136,14 +2136,14 @@ $(TAG_NAME_GENERATED_PATTERNS) : $(DOM_NAME_ENUM_DEPS)
 	$(PERL) $< --enum TagName $(DOM_NAME_ENUM_ARGUMENTS)
 
 ELEMENT_NAME_GENERATED_FILES = \
-    ElementName.cpp \
-    ElementName.h \
+    NodeName.cpp \
+    NodeName.h \
 #
 ELEMENT_NAME_GENERATED_PATTERNS = $(subst .,%,$(ELEMENT_NAME_GENERATED_FILES))
 
 all : $(ELEMENT_NAME_GENERATED_FILES)
 $(ELEMENT_NAME_GENERATED_PATTERNS) : $(DOM_NAME_ENUM_DEPS)
-	$(PERL) $< --enum ElementName $(DOM_NAME_ENUM_ARGUMENTS)
+	$(PERL) $< --enum NodeName $(DOM_NAME_ENUM_ARGUMENTS)
 
 NAMESPACE_GENERATED_FILES = \
     Namespace.cpp \

@@ -23,6 +23,7 @@
 #include "SVGPathElement.h"
 
 #include "LegacyRenderSVGPath.h"
+#include "NodeName.h"
 #include "RenderSVGPath.h"
 #include "RenderSVGResource.h"
 #include "SVGDocumentExtensions.h"
@@ -53,9 +54,9 @@ Ref<SVGPathElement> SVGPathElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGPathElement(tagName, document));
 }
 
-void SVGPathElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGPathElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::dAttr) {
+    if (name == AttributeNames::d) {
         if (!m_pathSegList->baseVal()->parse(value))
             document().accessSVGExtensions().reportError("Problem parsing d=\"" + value + "\"");
         return;

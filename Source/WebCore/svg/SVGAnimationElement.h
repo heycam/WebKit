@@ -88,7 +88,7 @@ protected:
 
     static bool isSupportedAttribute(const QualifiedName&);
     bool attributeContainsJavaScriptURL(const Attribute&) const final;
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
     void svgAttributeChanged(const QualifiedName&) override;
 
     String toValue() const;

@@ -71,8 +71,8 @@ public:
 private:
     HTMLTableElement(const QualifiedName&, Document&);
 
-    void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    void parseAttribute(NodeName, const AtomString&) final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
     bool isURLAttribute(const Attribute&) const final;
 

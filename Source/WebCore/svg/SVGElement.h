@@ -168,18 +168,18 @@ protected:
     virtual ~SVGElement();
 
     bool rendererIsNeeded(const RenderStyle&) override;
-    void parseAttribute(const QualifiedName&, const AtomString&) override;
+    void parseAttribute(NodeName, const AtomString&) override;
 
     void finishParsingChildren() override;
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
+    void attributeChanged(const QualifiedName&, NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
     bool childShouldCreateRenderer(const Node&) const override;
 
     SVGElementRareData& ensureSVGRareData();
 
-    void reportAttributeParsingError(SVGParsingError, const QualifiedName&, const AtomString&);
+    void reportAttributeParsingError(SVGParsingError, NodeName, const AtomString&);
     static CSSPropertyID cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
     void didFinishInsertingNode() override;

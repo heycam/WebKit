@@ -26,6 +26,7 @@
 #include "config.h"
 #include "SVGMaskElement.h"
 
+#include "NodeName.h"
 #include "RenderSVGResourceMaskerInlines.h"
 #include "SVGElementInlines.h"
 #include "SVGNames.h"
@@ -64,15 +65,15 @@ Ref<SVGMaskElement> SVGMaskElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new SVGMaskElement(tagName, document));
 }
 
-void SVGMaskElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+void SVGMaskElement::parseAttribute(NodeName name, const AtomString& value)
 {
-    if (name == SVGNames::maskUnitsAttr) {
+    if (name == AttributeNames::maskUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_maskUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
         return;
     }
-    if (name == SVGNames::maskContentUnitsAttr) {
+    if (name == AttributeNames::maskContentUnits) {
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_maskContentUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
@@ -81,13 +82,13 @@ void SVGMaskElement::parseAttribute(const QualifiedName& name, const AtomString&
 
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (name == AttributeNames::x)
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+    else if (name == AttributeNames::y)
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::widthAttr)
+    else if (name == AttributeNames::width)
         m_width->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::heightAttr)
+    else if (name == AttributeNames::height)
         m_height->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
 
     reportAttributeParsingError(parseError, name, value);
