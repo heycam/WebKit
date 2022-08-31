@@ -56,6 +56,7 @@
 		2CCD892A15C0390200285083 /* GregorianDateTime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CCD892915C0390200285083 /* GregorianDateTime.cpp */; };
 		2CDED0EF18115C38004DBA70 /* RunLoopCF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CDED0EE18115C38004DBA70 /* RunLoopCF.cpp */; };
 		2CDED0F318115C85004DBA70 /* RunLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2CDED0F118115C85004DBA70 /* RunLoop.cpp */; };
+		32B994E428B70BA60059CBDC /* EnumeratedBitSet.h in Headers */ = {isa = PBXBuildFile; fileRef = 32B994E328B70BA60059CBDC /* EnumeratedBitSet.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3337DB9CE743410FAF076E17 /* StackTrace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 313EDEC9778E49C9BEA91CFC /* StackTrace.cpp */; };
 		337B2D6A26546EB300DDFD3D /* LikelyDenseUnsignedIntegerSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 337B2D6826546EAA00DDFD3D /* LikelyDenseUnsignedIntegerSet.cpp */; };
 		339B7B1127C45EF50072BF9A /* FixedWidthDouble.h in Headers */ = {isa = PBXBuildFile; fileRef = 33479C1C27236F2000B2E1B7 /* FixedWidthDouble.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1075,6 +1076,7 @@
 		304CA4E41375437EBE931D03 /* Markable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Markable.h; sourceTree = "<group>"; };
 		3137E1D7DBD84AC38FAE4D34 /* IndexSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IndexSet.h; sourceTree = "<group>"; };
 		313EDEC9778E49C9BEA91CFC /* StackTrace.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StackTrace.cpp; sourceTree = "<group>"; };
+		32B994E328B70BA60059CBDC /* EnumeratedBitSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EnumeratedBitSet.h; sourceTree = "<group>"; };
 		33479C1C27236F2000B2E1B7 /* FixedWidthDouble.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FixedWidthDouble.h; sourceTree = "<group>"; };
 		337B2D6826546EAA00DDFD3D /* LikelyDenseUnsignedIntegerSet.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LikelyDenseUnsignedIntegerSet.cpp; sourceTree = "<group>"; };
 		337B2D6926546EAA00DDFD3D /* LikelyDenseUnsignedIntegerSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LikelyDenseUnsignedIntegerSet.h; sourceTree = "<group>"; };
@@ -2002,6 +2004,7 @@
 				E3538D4C276220880075DA50 /* EmbeddedFixedVector.h */,
 				5338EBA423AB04D100382662 /* EnumClassOperatorOverloads.h */,
 				1CFD5D3B2851AB3E00A0E30B /* EnumeratedArray.h */,
+				32B994E328B70BA60059CBDC /* EnumeratedBitSet.h */,
 				1AEA88E11D6BBCF400E5AD64 /* EnumTraits.h */,
 				AD7C434A1DD2A4A70026888B /* Expected.h */,
 				DF292D55278F9BC600BB2918 /* ExperimentalFeatureNames.h */,
@@ -2939,6 +2942,7 @@
 				DDF3076327C086CD006A526F /* Entitlements.h in Headers */,
 				DD3DC97827A4BF8E007E5B61 /* EnumClassOperatorOverloads.h in Headers */,
 				1CFD5D3D2851AB3E00A0E30B /* EnumeratedArray.h in Headers */,
+				32B994E428B70BA60059CBDC /* EnumeratedBitSet.h in Headers */,
 				DD3DC88C27A4BF8E007E5B61 /* EnumTraits.h in Headers */,
 				93853DD328755A6C00FF4E2B /* EscapedFormsForJSON.h in Headers */,
 				DD3DC87C27A4BF8E007E5B61 /* Expected.h in Headers */,
