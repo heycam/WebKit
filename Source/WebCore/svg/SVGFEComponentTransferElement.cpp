@@ -54,21 +54,19 @@ Ref<SVGFEComponentTransferElement> SVGFEComponentTransferElement::create(const Q
 
 void SVGFEComponentTransferElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
-    if (name == SVGNames::inAttr)
+    if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else
+        handleAttributeChangeNeedingRendererUpdate();
+    } else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGFEComponentTransferElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (attrName == SVGNames::inAttr) {
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::inAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 RefPtr<FilterEffect> SVGFEComponentTransferElement::createFilterEffect(const FilterEffectVector&, const GraphicsContext&) const

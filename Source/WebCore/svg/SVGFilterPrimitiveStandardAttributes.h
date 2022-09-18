@@ -70,6 +70,9 @@ protected:
     void svgAttributeChanged(const QualifiedName&) override;
     void childrenChanged(const ChildChange&) override;
 
+    void handlePrimitiveAttributeChangeNeedingEffectUpdate(const QualifiedName&);
+    void handlePrimitiveAttributeChangeNeedingEffectRebuild();
+
     virtual bool setFilterEffectAttribute(FilterEffect&, const QualifiedName&) { return false; }
     virtual RefPtr<FilterEffect> createFilterEffect(const FilterEffectVector&, const GraphicsContext& destinationContext) const = 0;
 

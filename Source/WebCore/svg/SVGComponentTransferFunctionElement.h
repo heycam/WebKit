@@ -94,6 +94,7 @@ protected:
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& value, AttributeModificationReason) override;
     void svgAttributeChanged(const QualifiedName&) override;
+    void componentTransferFunctionAttributeChanged();
 
     bool rendererIsNeeded(const RenderStyle&) override { return false; }
     

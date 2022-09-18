@@ -55,15 +55,19 @@ void SVGEllipseElement::attributeChanged(const QualifiedName& name, const AtomSt
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::cxAttr)
+    if (name == SVGNames::cxAttr) {
         m_cx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::cyAttr)
+        handlePresentationalHintAttributeChange();
+    } else if (name == SVGNames::cyAttr) {
         m_cy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rxAttr)
+        handlePresentationalHintAttributeChange();
+    } else if (name == SVGNames::rxAttr) {
         m_rx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else if (name == SVGNames::ryAttr)
+        handlePresentationalHintAttributeChange();
+    } else if (name == SVGNames::ryAttr) {
         m_ry->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else
+        handlePresentationalHintAttributeChange();
+    } else
         SVGGeometryElement::attributeChanged(name, oldValue, value, reason);
 
     reportAttributeParsingError(parseError, name, value);
@@ -71,13 +75,10 @@ void SVGEllipseElement::attributeChanged(const QualifiedName& name, const AtomSt
 
 void SVGEllipseElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        setPresentationalHintStyleIsDirty();
-        return;
-    }
-
-    SVGGeometryElement::svgAttributeChanged(attrName);
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        handlePresentationalHintAttributeChange();
+    else
+        SVGGeometryElement::svgAttributeChanged(attrName);
 }
 
 RenderPtr<RenderElement> SVGEllipseElement::createElementRenderer(RenderStyle&& style, const RenderTreePosition&)

@@ -106,6 +106,18 @@ void SVGFilterPrimitiveStandardAttributes::markFilterEffectForRebuild()
     m_effect = nullptr;
 }
 
+void SVGFilterPrimitiveStandardAttributes::handlePrimitiveAttributeChangeNeedingEffectUpdate(const QualifiedName& attrName)
+{
+    InstanceInvalidationGuard guard(*this);
+    primitiveAttributeChanged(attrName);
+}
+
+void SVGFilterPrimitiveStandardAttributes::handlePrimitiveAttributeChangeNeedingEffectRebuild()
+{
+    InstanceInvalidationGuard guard(*this);
+    markFilterEffectForRebuild();
+}
+
 void SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(const QualifiedName& attrName)
 {
     if (PropertyRegistry::isKnownAttribute(attrName)) {

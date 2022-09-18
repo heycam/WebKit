@@ -55,11 +55,14 @@ void SVGFEBlendElement::attributeChanged(const QualifiedName& name, const AtomSt
         BlendMode mode = BlendMode::Normal;
         if (parseBlendMode(value, mode))
             m_mode->setBaseValInternal<BlendMode>(mode);
-    } else if (name == SVGNames::inAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else if (name == SVGNames::in2Attr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::in2Attr) {
         m_in2->setBaseValInternal(value);
-    else
+        handleAttributeChangeNeedingRendererUpdate();
+    } else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
@@ -75,18 +78,12 @@ bool SVGFEBlendElement::setFilterEffectAttribute(FilterEffect& effect, const Qua
 
 void SVGFEBlendElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        if (attrName == SVGNames::modeAttr)
-            primitiveAttributeChanged(attrName);
-        else {
-            ASSERT(attrName == SVGNames::inAttr || attrName == SVGNames::in2Attr);
-            updateSVGRendererForElementChange();
-        }
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::modeAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(attrName);
+    else if (attrName == SVGNames::inAttr || attrName == SVGNames::in2Attr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 RefPtr<FilterEffect> SVGFEBlendElement::createFilterEffect(const FilterEffectVector&, const GraphicsContext&) const

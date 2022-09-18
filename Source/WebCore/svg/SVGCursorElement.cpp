@@ -58,18 +58,28 @@ SVGCursorElement::~SVGCursorElement()
         client->cursorElementRemoved(*this);
 }
 
+void SVGCursorElement::invalidateCursorClients()
+{
+    InstanceInvalidationGuard guard(*this);
+    for (auto& client : m_clients)
+        client->cursorElementChanged(*this);
+}
+
 void SVGCursorElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
-    if (SVGTests::parseAttribute(name, value) || SVGURIReference::parseAttribute(name, value))
-        return;
-
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::xAttr)
+    if (SVGTests::parseAttribute(name, value))
+        SVGTests::conditionalProcessingAttributeChanged();
+    else if (SVGURIReference::parseAttribute(name, value)) {
+        // FIXME: Do we need to respond to href changing?
+    } else if (name == SVGNames::xAttr) {
         m_x->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::yAttr)
+        invalidateCursorClients();
+    } else if (name == SVGNames::yAttr) {
         m_y->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else
+        invalidateCursorClients();
+    } else
         SVGElement::attributeChanged(name, oldValue, value, reason);
 
     reportAttributeParsingError(parseError, name, value);
@@ -87,14 +97,10 @@ void SVGCursorElement::removeClient(CSSCursorImageValue& value)
 
 void SVGCursorElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        for (auto& client : m_clients)
-            client->cursorElementChanged(*this);
-        return;
-    }
-
-    SVGElement::svgAttributeChanged(attrName);
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        invalidateCursorClients();
+    else
+        SVGElement::svgAttributeChanged(attrName);
 }
 
 void SVGCursorElement::addSubresourceAttributeURLs(ListHashSet<URL>& urls) const

@@ -144,14 +144,16 @@ bool SVGTests::parseAttribute(const QualifiedName& attributeName, const AtomStri
     return true;
 }
 
+void SVGTests::conditionalProcessingAttributeChanged()
+{
+    if (m_contextElement.isConnected())
+        m_contextElement.invalidateStyleAndRenderersForSubtree();
+}
+
 void SVGTests::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (!PropertyRegistry::isKnownAttribute(attrName))
-        return;
-
-    if (!m_contextElement.isConnected())
-        return;
-    m_contextElement.invalidateStyleAndRenderersForSubtree();
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        conditionalProcessingAttributeChanged();
 }
 
 void SVGTests::addSupportedAttributes(MemoryCompactLookupOnlyRobinHoodHashSet<QualifiedName>& supportedAttributes)

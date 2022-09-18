@@ -166,9 +166,8 @@ bool SVGAnimationElement::attributeContainsJavaScriptURL(const Attribute& attrib
 void SVGAnimationElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
     if (SVGTests::parseAttribute(name, value))
-        return;
-
-    if (name == SVGNames::valuesAttr) {
+        SVGTests::conditionalProcessingAttributeChanged();
+    else if (name == SVGNames::valuesAttr) {
         // Per the SMIL specification, leading and trailing white space,
         // and white space before and after semicolon separators, is allowed and will be ignored.
         // http://www.w3.org/TR/SVG11/animate.html#ValuesAttribute
@@ -178,37 +177,42 @@ void SVGAnimationElement::attributeChanged(const QualifiedName& name, const Atom
         });
 
         updateAnimationMode();
-    } else if (name == SVGNames::keyTimesAttr)
+        animationAttributeChanged();
+    } else if (name == SVGNames::keyTimesAttr) {
         parseKeyTimes(value, m_keyTimesFromAttribute, true);
-    else if (name == SVGNames::keyPointsAttr) {
+        animationAttributeChanged();
+    } else if (name == SVGNames::keyPointsAttr) {
         if (hasTagName(SVGNames::animateMotionTag)) {
             // This is specified to be an animateMotion attribute only but it is simpler to put it here 
             // where the other timing calculatations are.
             parseKeyTimes(value, m_keyPoints, false);
+            animationAttributeChanged();
         }
     } else if (name == SVGNames::keySplinesAttr) {
         if (auto keySplines = parseKeySplines(value))
             m_keySplines = WTFMove(*keySplines);
         else
             m_keySplines.clear();
-    } else if (name == SVGNames::attributeTypeAttr)
+        animationAttributeChanged();
+    } else if (name == SVGNames::attributeTypeAttr) {
         setAttributeType(value);
-    else if (name == SVGNames::calcModeAttr)
+        animationAttributeChanged();
+    } else if (name == SVGNames::calcModeAttr) {
         setCalcMode(value);
-    else if (name == SVGNames::fromAttr || name == SVGNames::toAttr || name == SVGNames::byAttr)
+        animationAttributeChanged();
+    } else if (name == SVGNames::fromAttr || name == SVGNames::toAttr || name == SVGNames::byAttr) {
         updateAnimationMode();
-    else
+        animationAttributeChanged();
+    } else
         SVGSMILElement::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGAnimationElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (!isSupportedAttribute(attrName)) {
+    if (isSupportedAttribute(attrName))
+        animationAttributeChanged();
+    else
         SVGSMILElement::svgAttributeChanged(attrName);
-        return;
-    }
-
-    animationAttributeChanged();
 }
 
 void SVGAnimationElement::animationAttributeChanged()

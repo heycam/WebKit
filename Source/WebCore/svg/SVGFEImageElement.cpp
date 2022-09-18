@@ -114,34 +114,32 @@ void SVGFEImageElement::buildPendingResource()
     updateSVGRendererForElementChange();
 }
 
+void SVGFEImageElement::rebuildEffectForHrefChange()
+{
+    InstanceInvalidationGuard guard(*this);
+    buildPendingResource();
+    markFilterEffectForRebuild();
+}
+
 void SVGFEImageElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
     if (SVGURIReference::parseAttribute(name, value))
-        return;
-
-    if (name == SVGNames::preserveAspectRatioAttr)
+        rebuildEffectForHrefChange();
+    else if (name == SVGNames::preserveAspectRatioAttr) {
         m_preserveAspectRatio->setBaseValInternal(SVGPreserveAspectRatioValue { value });
-    else
+        handleAttributeChangeNeedingRendererUpdate();
+    } else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGFEImageElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        ASSERT(attrName == SVGNames::preserveAspectRatioAttr);
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    if (SVGURIReference::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        buildPendingResource();
-        markFilterEffectForRebuild();
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (SVGURIReference::isKnownAttribute(attrName))
+        rebuildEffectForHrefChange();
+    else if (attrName == SVGNames::preserveAspectRatioAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 Node::InsertedIntoAncestorResult SVGFEImageElement::insertedIntoAncestor(InsertionType insertionType, ContainerNode& parentOfInsertedTree)

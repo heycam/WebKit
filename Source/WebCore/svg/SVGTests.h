@@ -56,6 +56,8 @@ public:
 protected:
     SVGTests(SVGElement* contextElement);
 
+    void conditionalProcessingAttributeChanged();
+
 private:
     SVGElement& m_contextElement;
     Ref<SVGStringList> m_requiredFeatures;

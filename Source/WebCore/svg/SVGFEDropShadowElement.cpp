@@ -63,38 +63,39 @@ void SVGFEDropShadowElement::attributeChanged(const QualifiedName& name, const A
         if (auto result = parseNumberOptionalNumber(value)) {
             m_stdDeviationX->setBaseValInternal(result->first);
             m_stdDeviationY->setBaseValInternal(result->second);
+            if (stdDeviationX() < 0 || stdDeviationY() < 0)
+                handlePrimitiveAttributeChangeNeedingEffectRebuild();
+            else
+                handlePrimitiveAttributeChangeNeedingEffectUpdate();
         }
-    } else if (name == SVGNames::inAttr)
+    } else if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else if (name == SVGNames::dxAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::dxAttr) {
         m_dx->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::dyAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate();
+    } else if (name == SVGNames::dyAttr) {
         m_dy->setBaseValInternal(value.toFloat());
+        handlePrimitiveAttributeChangeNeedingEffectUpdate();
+    } else if (name == SVGNames::flood_colorAttr || name == SVGNames::flood_opacityAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate();
     else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGFEDropShadowElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (attrName == SVGNames::inAttr) {
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    if (attrName == SVGNames::stdDeviationAttr && (stdDeviationX() < 0 || stdDeviationY() < 0)) {
-        InstanceInvalidationGuard guard(*this);
-        markFilterEffectForRebuild();
-        return;
-    }
-
-    if (attrName == SVGNames::stdDeviationAttr || attrName == SVGNames::dxAttr || attrName == SVGNames::dyAttr) {
-        InstanceInvalidationGuard guard(*this);
-        primitiveAttributeChanged(attrName);
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::inAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else if (attrName == SVGNames::stdDeviationAttr) {
+        if (stdDeviationX() < 0 || stdDeviationY() < 0)
+            handlePrimitiveAttributeChangeNeedingEffectRebuild();
+        else
+            handlePrimitiveAttributeChangeNeedingEffectUpdate();
+    } else if (attrName == SVGNames::dxAttr || attrName == SVGNames::dyAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate();
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 bool SVGFEDropShadowElement::setFilterEffectAttribute(FilterEffect& effect, const QualifiedName& attrName)

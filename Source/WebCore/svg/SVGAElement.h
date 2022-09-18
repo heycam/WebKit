@@ -49,6 +49,7 @@ private:
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& value, AttributeModificationReason) final;
     void svgAttributeChanged(const QualifiedName&) final;
+    void updateIsLink();
 
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;
     bool childShouldCreateRenderer(const Node&) const final;

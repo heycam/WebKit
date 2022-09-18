@@ -53,18 +53,24 @@ Ref<SVGFEDiffuseLightingElement> SVGFEDiffuseLightingElement::create(const Quali
 
 void SVGFEDiffuseLightingElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
-    if (name == SVGNames::inAttr)
+    if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else if (name == SVGNames::surfaceScaleAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::surfaceScaleAttr) {
         m_surfaceScale->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::diffuseConstantAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::diffuseConstantAttr) {
         m_diffuseConstant->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::kernelUnitLengthAttr) {
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::kernelUnitLengthAttr) {
         if (auto result = parseNumberOptionalNumber(value)) {
             m_kernelUnitLengthX->setBaseValInternal(result->first);
             m_kernelUnitLengthY->setBaseValInternal(result->second);
+            handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
         }
-    } else
+    } else if (name == SVGNames::lighting_colorAttr || name == SVGNames::azimuthAttr || name == SVGNames::elevationAttr || name == SVGNames::xAttr || name == SVGNames::yAttr || name == SVGNames::zAttr || name == SVGNames::pointsAtXAttr || name == SVGNames::pointsAtYAttr || name == SVGNames::pointsAtZAttr || name == SVGNames::specularExponentAttr || name == SVGNames::limitingConeAngle)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
@@ -114,19 +120,12 @@ bool SVGFEDiffuseLightingElement::setFilterEffectAttribute(FilterEffect& effect,
 
 void SVGFEDiffuseLightingElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (attrName == SVGNames::inAttr) {
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    if (attrName == SVGNames::diffuseConstantAttr || attrName == SVGNames::surfaceScaleAttr || attrName == SVGNames::kernelUnitLengthAttr) {
-        InstanceInvalidationGuard guard(*this);
-        primitiveAttributeChanged(attrName);
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::inAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else if (attrName == SVGNames::diffuseConstantAttr || attrName == SVGNames::surfaceScaleAttr || attrName == SVGNames::kernelUnitLengthAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(attrName);
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 void SVGFEDiffuseLightingElement::lightElementAttributeChanged(const SVGFELightElement* lightElement, const QualifiedName& attrName)

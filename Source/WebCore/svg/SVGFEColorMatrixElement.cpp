@@ -64,11 +64,14 @@ void SVGFEColorMatrixElement::attributeChanged(const QualifiedName& name, const 
         auto propertyValue = SVGPropertyTraits<ColorMatrixType>::fromString(value);
         if (propertyValue > 0)
             m_type->setBaseValInternal<ColorMatrixType>(propertyValue);
-    } else if (name == SVGNames::inAttr)
+        colorMatrixAttributeChanged(name);
+    } else if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else if (name == SVGNames::valuesAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::valuesAttr) {
         m_values->baseVal()->parse(value);
-    else
+        colorMatrixAttributeChanged(name);
+    } else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
@@ -85,24 +88,22 @@ bool SVGFEColorMatrixElement::setFilterEffectAttribute(FilterEffect& effect, con
     return false;
 }
 
+void SVGFEColorMatrixElement::colorMatrixAttributeChanged(const QualifiedName& attrName)
+{
+    if (isInvalidValuesLength())
+        handlePrimitiveAttributeChangeNeedingEffectRebuild();
+    else
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(attrName);
+}
+
 void SVGFEColorMatrixElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (attrName == SVGNames::inAttr) {
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    if (attrName == SVGNames::typeAttr || attrName == SVGNames::valuesAttr) {
-        InstanceInvalidationGuard guard(*this);
-        if (isInvalidValuesLength())
-            markFilterEffectForRebuild();
-        else
-            primitiveAttributeChanged(attrName);
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::inAttr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else if (attrName == SVGNames::typeAttr || attrName == SVGNames::valuesAttr)
+        colorMatrixAttributeChanged(attrName);
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 RefPtr<FilterEffect> SVGFEColorMatrixElement::createFilterEffect(const FilterEffectVector&, const GraphicsContext&) const

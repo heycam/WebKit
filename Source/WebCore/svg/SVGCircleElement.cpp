@@ -54,13 +54,16 @@ void SVGCircleElement::attributeChanged(const QualifiedName& name, const AtomStr
 {
     SVGParsingError parseError = NoError;
 
-    if (name == SVGNames::cxAttr)
+    if (name == SVGNames::cxAttr) {
         m_cx->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Width, value, parseError));
-    else if (name == SVGNames::cyAttr)
+        handlePresentationalHintAttributeChange();
+    } else if (name == SVGNames::cyAttr) {
         m_cy->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Height, value, parseError));
-    else if (name == SVGNames::rAttr)
+        handlePresentationalHintAttributeChange();
+    } else if (name == SVGNames::rAttr) {
         m_r->setBaseValInternal(SVGLengthValue::construct(SVGLengthMode::Other, value, parseError, SVGLengthNegativeValuesMode::Forbid));
-    else
+        handlePresentationalHintAttributeChange();
+    } else
         SVGGeometryElement::attributeChanged(name, oldValue, value, reason);
 
     reportAttributeParsingError(parseError, name, value);
@@ -68,13 +71,10 @@ void SVGCircleElement::attributeChanged(const QualifiedName& name, const AtomStr
 
 void SVGCircleElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        setPresentationalHintStyleIsDirty();
-        return;
-    }
-
-    SVGGeometryElement::svgAttributeChanged(attrName);
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        handlePresentationalHintAttributeChange();
+    else
+        SVGGeometryElement::svgAttributeChanged(attrName);
 }
 
 RenderPtr<RenderElement> SVGCircleElement::createElementRenderer(RenderStyle&& style, const RenderTreePosition&)

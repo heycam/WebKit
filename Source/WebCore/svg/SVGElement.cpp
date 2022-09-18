@@ -410,9 +410,14 @@ void SVGElement::setCorrespondingElement(SVGElement* correspondingElement)
 
 void SVGElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
-    if (name == HTMLNames::idAttr) {
+    if (auto propId = cssPropertyIdForSVGAttributeName(name)) {
+        attributeWithPresentationalHintChanged();
+        invalidateInstances();
+    } if (name == HTMLNames::idAttr) {
         idAttributeChanged(oldValue, value);
         document().accessSVGExtensions().rebuildAllElementReferencesForTarget(*this);
+        notifyResourcesIDChanged();
+        invalidateInstances();
     } else if (name == HTMLNames::styleAttr) {
         styleAttributeChanged(value, reason);
         invalidateInstances();
@@ -433,7 +438,6 @@ void SVGElement::attributeChanged(const QualifiedName& name, const AtomString& o
         }
 
         StyledElement::attributeChanged(name, oldValue, value, reason);
-        svgAttributeChanged(name);
     }
 }
 
@@ -941,29 +945,26 @@ void SVGElement::updateSVGRendererForElementChange()
     document().updateSVGRenderer(*this);
 }
 
+void SVGElement::notifyResourcesIDChanged()
+{
+    auto renderer = this->renderer();
+    // Notify resources about id changes, this is important as we cache resources by id in SVGDocumentExtensions
+    if (is<RenderSVGResourceContainer>(renderer))
+        downcast<RenderSVGResourceContainer>(*renderer).idChanged();
+    if (isConnected())
+        buildPendingResourcesIfNeeded();
+}
+
 void SVGElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    CSSPropertyID propId = cssPropertyIdForSVGAttributeName(attrName);
-    if (propId > 0) {
+    if (CSSPropertyID propId = cssPropertyIdForSVGAttributeName(attrName))
         invalidateInstances();
-        return;
-    }
-
-    if (attrName == HTMLNames::classAttr) {
+    else if (attrName == HTMLNames::classAttr) {
         classAttributeChanged(className());
         invalidateInstances();
-        return;
-    }
-
-    if (attrName == HTMLNames::idAttr) {
-        auto renderer = this->renderer();
-        // Notify resources about id changes, this is important as we cache resources by id in SVGDocumentExtensions
-        if (is<RenderSVGResourceContainer>(renderer))
-            downcast<RenderSVGResourceContainer>(*renderer).idChanged();
-        if (isConnected())
-            buildPendingResourcesIfNeeded();
+    } else if (attrName == HTMLNames::idAttr) {
+        notifyResourcesIDChanged();
         invalidateInstances();
-        return;
     }
 }
 
@@ -1087,6 +1088,18 @@ void SVGElement::invalidateInstances()
             useElement->invalidateShadowTree();
         instance->setCorrespondingElement(nullptr);
     }
+}
+
+void SVGElement::handleAttributeChangeNeedingRendererUpdate()
+{
+    InstanceInvalidationGuard guard(*this);
+    updateSVGRendererForElementChange();
+}
+
+void SVGElement::handlePresentationalHintAttributeChange()
+{
+    InstanceInvalidationGuard guard(*this);
+    attributeWithPresentationalHintChanged();
 }
 
 }

@@ -173,6 +173,9 @@ protected:
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) override;
     bool childShouldCreateRenderer(const Node&) const override;
 
+    void handlePresentationalHintAttributeChange();
+    void handleAttributeChangeNeedingRendererUpdate();
+
     SVGElementRareData& ensureSVGRareData();
 
     void reportAttributeParsingError(SVGParsingError, const QualifiedName&, const AtomString&);
@@ -200,6 +203,7 @@ private:
     virtual bool filterOutAnimatableAttribute(const QualifiedName&) const;
 #endif
 
+    void notifyResourcesIDChanged();
     void invalidateInstances();
 
     std::unique_ptr<SVGElementRareData> m_svgRareData;

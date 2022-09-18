@@ -46,37 +46,47 @@ SVGComponentTransferFunctionElement::SVGComponentTransferFunctionElement(const Q
     });
 }
 
+void SVGComponentTransferFunctionElement::componentTransferFunctionAttributeChanged()
+{
+    InstanceInvalidationGuard guard(*this);
+    SVGFilterPrimitiveStandardAttributes::invalidateFilterPrimitiveParent(this);
+}
+
 void SVGComponentTransferFunctionElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
     if (name == SVGNames::typeAttr) {
         ComponentTransferType propertyValue = SVGPropertyTraits<ComponentTransferType>::fromString(value);
         if (propertyValue > 0)
             m_type->setBaseValInternal<ComponentTransferType>(propertyValue);
-    } else if (name == SVGNames::tableValuesAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::tableValuesAttr) {
         m_tableValues->baseVal()->parse(value);
-    else if (name == SVGNames::slopeAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::slopeAttr) {
         m_slope->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::interceptAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::interceptAttr) {
         m_intercept->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::amplitudeAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::amplitudeAttr) {
         m_amplitude->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::exponentAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::exponentAttr) {
         m_exponent->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::offsetAttr)
+        componentTransferFunctionAttributeChanged();
+    } else if (name == SVGNames::offsetAttr) {
         m_offset->setBaseValInternal(value.toFloat());
-    else
+        componentTransferFunctionAttributeChanged();
+    } else
         SVGElement::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGComponentTransferFunctionElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-        SVGFilterPrimitiveStandardAttributes::invalidateFilterPrimitiveParent(this);
-        return;
-    }
-
-    SVGElement::svgAttributeChanged(attrName);
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        componentTransferFunctionAttributeChanged();
+    else
+        SVGElement::svgAttributeChanged(attrName);
 }
 
 ComponentTransferFunction SVGComponentTransferFunctionElement::transferFunction() const

@@ -55,22 +55,29 @@ Ref<SVGFECompositeElement> SVGFECompositeElement::create(const QualifiedName& ta
 void SVGFECompositeElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
     if (name == SVGNames::operatorAttr) {
-        CompositeOperationType propertyValue = SVGPropertyTraits<CompositeOperationType>::fromString(value);
-        if (propertyValue > 0)
+        if (auto propertyValue = SVGPropertyTraits<CompositeOperationType>::fromString(value)) {
             m_svgOperator->setBaseValInternal<CompositeOperationType>(propertyValue);
-    } else if (name == SVGNames::inAttr)
+            handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+        }
+    } else if (name == SVGNames::inAttr) {
         m_in1->setBaseValInternal(value);
-    else if (name == SVGNames::in2Attr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::in2Attr) {
         m_in2->setBaseValInternal(value);
-    else if (name == SVGNames::k1Attr)
+        handleAttributeChangeNeedingRendererUpdate();
+    } else if (name == SVGNames::k1Attr) {
         m_k1->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::k2Attr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::k2Attr) {
         m_k2->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::k3Attr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::k3Attr) {
         m_k3->setBaseValInternal(value.toFloat());
-    else if (name == SVGNames::k4Attr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else if (name == SVGNames::k4Attr) {
         m_k4->setBaseValInternal(value.toFloat());
-    else
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(name);
+    } else
         SVGFilterPrimitiveStandardAttributes::attributeChanged(name, oldValue, value, reason);
 }
 
@@ -92,22 +99,14 @@ bool SVGFECompositeElement::setFilterEffectAttribute(FilterEffect& effect, const
     return false;
 }
 
-
 void SVGFECompositeElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (attrName == SVGNames::inAttr || attrName == SVGNames::in2Attr) {
-        InstanceInvalidationGuard guard(*this);
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    if (attrName == SVGNames::k1Attr || attrName == SVGNames::k2Attr || attrName == SVGNames::k3Attr || attrName == SVGNames::k4Attr || attrName == SVGNames::operatorAttr) {
-        InstanceInvalidationGuard guard(*this);
-        primitiveAttributeChanged(attrName);
-        return;
-    }
-
-    SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
+    if (attrName == SVGNames::inAttr || attrName == SVGNames::in2Attr)
+        handleAttributeChangeNeedingRendererUpdate();
+    else if (attrName == SVGNames::k1Attr || attrName == SVGNames::k2Attr || attrName == SVGNames::k3Attr || attrName == SVGNames::k4Attr || attrName == SVGNames::operatorAttr)
+        handlePrimitiveAttributeChangeNeedingEffectUpdate(attrName);
+    else
+        SVGFilterPrimitiveStandardAttributes::svgAttributeChanged(attrName);
 }
 
 RefPtr<FilterEffect> SVGFECompositeElement::createFilterEffect(const FilterEffectVector&, const GraphicsContext&) const

@@ -52,6 +52,7 @@ private:
     
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& value, AttributeModificationReason) final;
     void svgAttributeChanged(const QualifiedName&) final;
+    void invalidateCursorClients();
 
     bool isValid() const final { return SVGTests::isValid(); }
     bool rendererIsNeeded(const RenderStyle&) final { return false; }

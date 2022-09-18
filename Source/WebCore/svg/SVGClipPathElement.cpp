@@ -56,20 +56,17 @@ void SVGClipPathElement::attributeChanged(const QualifiedName& name, const AtomS
         auto propertyValue = SVGPropertyTraits<SVGUnitTypes::SVGUnitType>::fromString(value);
         if (propertyValue > 0)
             m_clipPathUnits->setBaseValInternal<SVGUnitTypes::SVGUnitType>(propertyValue);
+        handleAttributeChangeNeedingRendererUpdate();
     } else
         SVGGraphicsElement::attributeChanged(name, oldValue, value, reason);
 }
 
 void SVGClipPathElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (PropertyRegistry::isKnownAttribute(attrName)) {
-        InstanceInvalidationGuard guard(*this);
-
-        updateSVGRendererForElementChange();
-        return;
-    }
-
-    SVGGraphicsElement::svgAttributeChanged(attrName);
+    if (PropertyRegistry::isKnownAttribute(attrName))
+        handleAttributeChangeNeedingRendererUpdate();
+    else
+        SVGGraphicsElement::svgAttributeChanged(attrName);
 }
 
 void SVGClipPathElement::childrenChanged(const ChildChange& change)

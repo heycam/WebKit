@@ -85,6 +85,7 @@ private:
 
     void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& value, AttributeModificationReason) final;
     void svgAttributeChanged(const QualifiedName&) override;
+    void colorMatrixAttributeChanged(const QualifiedName&);
 
     bool setFilterEffectAttribute(FilterEffect&, const QualifiedName&) override;
     Vector<AtomString> filterEffectInputsNames() const override { return { AtomString { in1() } }; }

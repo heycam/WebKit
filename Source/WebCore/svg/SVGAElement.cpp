@@ -78,12 +78,21 @@ String SVGAElement::title() const
     return SVGElement::title();
 }
 
+void SVGAElement::updateIsLink()
+{
+    bool wasLink = isLink();
+    setIsLink(!href().isNull() && !shouldProhibitLinks(this));
+    if (wasLink != isLink()) {
+        InstanceInvalidationGuard guard(*this);
+        invalidateStyleForSubtree();
+    }
+}
+
 void SVGAElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& value, AttributeModificationReason reason)
 {
     if (SVGURIReference::parseAttribute(name, value))
-        return;
-
-    if (name == SVGNames::targetAttr)
+        updateIsLink();
+    else if (name == SVGNames::targetAttr)
         m_target->setBaseValInternal(value);
     else if (name == SVGNames::relAttr) {
         if (m_relList)
@@ -94,17 +103,10 @@ void SVGAElement::attributeChanged(const QualifiedName& name, const AtomString& 
 
 void SVGAElement::svgAttributeChanged(const QualifiedName& attrName)
 {
-    if (SVGURIReference::isKnownAttribute(attrName)) {
-        bool wasLink = isLink();
-        setIsLink(!href().isNull() && !shouldProhibitLinks(this));
-        if (wasLink != isLink()) {
-            InstanceInvalidationGuard guard(*this);
-            invalidateStyleForSubtree();
-        }
-        return;
-    }
-
-    SVGGraphicsElement::svgAttributeChanged(attrName);
+    if (SVGURIReference::isKnownAttribute(attrName))
+        updateIsLink();
+    else
+        SVGGraphicsElement::svgAttributeChanged(attrName);
 }
 
 RenderPtr<RenderElement> SVGAElement::createElementRenderer(RenderStyle&& style, const RenderTreePosition&)
