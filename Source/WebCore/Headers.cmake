@@ -2127,7 +2127,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     ${WebCore_DERIVED_SOURCES_DIR}/CSSPropertyNames.h
     ${WebCore_DERIVED_SOURCES_DIR}/CSSValueKeywords.h
     ${WebCore_DERIVED_SOURCES_DIR}/CommandLineAPIModuleSourceBuiltins.h
-    ${WebCore_DERIVED_SOURCES_DIR}/ElementName.h
     ${WebCore_DERIVED_SOURCES_DIR}/EventInterfaces.h
     ${WebCore_DERIVED_SOURCES_DIR}/EventTargetInterfaces.h
     ${WebCore_DERIVED_SOURCES_DIR}/HTMLElementTypeHelpers.h
@@ -2167,6 +2166,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     ${WebCore_DERIVED_SOURCES_DIR}/JSXPathExpression.h
     ${WebCore_DERIVED_SOURCES_DIR}/JSXPathResult.h
     ${WebCore_DERIVED_SOURCES_DIR}/Namespace.h
+    ${WebCore_DERIVED_SOURCES_DIR}/NodeName.h
     ${WebCore_DERIVED_SOURCES_DIR}/ReadableByteStreamInternalsBuiltins.h
     ${WebCore_DERIVED_SOURCES_DIR}/ReadableStreamInternalsBuiltins.h
     ${WebCore_DERIVED_SOURCES_DIR}/Settings.h

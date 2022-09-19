@@ -424,7 +424,7 @@ void HTMLTreeBuilder::processFakeEndTag(TagName tagName)
 
 void HTMLTreeBuilder::processFakeEndTag(const HTMLStackItem& item)
 {
-    AtomHTMLToken fakeToken(HTMLToken::Type::EndTag, tagNameForElement(item.elementName()), item.localName());
+    AtomHTMLToken fakeToken(HTMLToken::Type::EndTag, tagNameForNodeName(item.elementName()), item.localName());
     processEndTag(WTFMove(fakeToken));
 }
 
@@ -1442,7 +1442,7 @@ bool HTMLTreeBuilder::processBodyEndTagForInBody(AtomHTMLToken&& token)
 
 static bool itemMatchesName(const HTMLStackItem& item, ElementName elementName)
 {
-    ASSERT(elementName != ElementName::Unknown);
+    ASSERT(elementName != NodeName::Unknown);
     return item.elementName() == elementName;
 }
 
@@ -1472,7 +1472,7 @@ void HTMLTreeBuilder::processAnyOtherEndTagForInBody(AtomHTMLToken&& token)
         }
     };
 
-    if (auto elementName = elementNameForTag(Namespace::HTML, token.tagName()); LIKELY(elementName != ElementName::Unknown))
+    if (auto elementName = nodeNameForTag(Namespace::HTML, token.tagName()); LIKELY(elementName != NodeName::Unknown))
         popOpenElements(elementName);
     else
         popOpenElements(token.name());
@@ -1493,7 +1493,7 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomHTMLToken& token)
     // and the current node is not in the list of active formatting elements,
     // then pop the current node off the stack of open elements and return.
     if (!m_tree.isEmpty() && m_tree.currentStackItem().isElement()
-        && m_tree.currentElement().elementName() == elementNameForTag(Namespace::HTML, token.tagName())
+        && m_tree.currentElement().elementName() == nodeNameForTag(Namespace::HTML, token.tagName())
         && !m_tree.activeFormattingElements().contains(m_tree.currentElement())) {
         m_tree.openElements().pop();
         return;
@@ -1502,7 +1502,7 @@ void HTMLTreeBuilder::callTheAdoptionAgency(AtomHTMLToken& token)
     // 4 is covered by the for() loop.
     for (int i = 0; i < outerIterationLimit; ++i) {
         // 4.3.
-        RefPtr<Element> formattingElement = m_tree.activeFormattingElements().closestElementInScopeWithName(elementNameForTag(Namespace::HTML, token.tagName()));
+        RefPtr<Element> formattingElement = m_tree.activeFormattingElements().closestElementInScopeWithName(nodeNameForTag(Namespace::HTML, token.tagName()));
         if (!formattingElement)
             return processAnyOtherEndTagForInBody(WTFMove(token));
         // 4.5.
@@ -1679,7 +1679,7 @@ void HTMLTreeBuilder::processEndTagForInTableBody(AtomHTMLToken&& token)
     case TagName::tbody:
     case TagName::tfoot:
     case TagName::thead:
-        if (!m_tree.openElements().inTableScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inTableScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
@@ -1733,7 +1733,7 @@ void HTMLTreeBuilder::processEndTagForInRow(AtomHTMLToken&& token)
     case TagName::tbody:
     case TagName::tfoot:
     case TagName::thead:
-        if (!m_tree.openElements().inTableScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inTableScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
@@ -1762,14 +1762,14 @@ void HTMLTreeBuilder::processEndTagForInCell(AtomHTMLToken&& token)
     switch (token.tagName()) {
     case TagName::th:
     case TagName::td:
-        if (!m_tree.openElements().inTableScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inTableScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
         m_tree.generateImpliedEndTags();
-        if (m_tree.currentStackItem().elementName() != elementNameForTag(Namespace::HTML, token.tagName()))
+        if (m_tree.currentStackItem().elementName() != nodeNameForTag(Namespace::HTML, token.tagName()))
             parseError(token);
-        m_tree.openElements().popUntilPopped(elementNameForTag(Namespace::HTML, token.tagName()));
+        m_tree.openElements().popUntilPopped(nodeNameForTag(Namespace::HTML, token.tagName()));
         m_tree.activeFormattingElements().clearToLastMarker();
         m_insertionMode = InsertionMode::InRow;
         return;
@@ -1785,7 +1785,7 @@ void HTMLTreeBuilder::processEndTagForInCell(AtomHTMLToken&& token)
     case TagName::tbody:
     case TagName::tfoot:
     case TagName::thead:
-        if (!m_tree.openElements().inTableScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inTableScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             ASSERT(isTableBodyContextTag(token.tagName()) || m_tree.openElements().inTableScope(HTML::template_) || isParsingFragment());
             parseError(token);
             return;
@@ -1838,14 +1838,14 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomHTMLToken&& token)
     case TagName::section:
     case TagName::summary:
     case TagName::ul:
-        if (!m_tree.openElements().inScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
         m_tree.generateImpliedEndTags();
-        if (m_tree.currentStackItem().elementName() != elementNameForTag(Namespace::HTML, token.tagName()))
+        if (m_tree.currentStackItem().elementName() != nodeNameForTag(Namespace::HTML, token.tagName()))
             parseError(token);
-        m_tree.openElements().popUntilPopped(elementNameForTag(Namespace::HTML, token.tagName()));
+        m_tree.openElements().popUntilPopped(nodeNameForTag(Namespace::HTML, token.tagName()));
         return;
     case TagName::form:
         if (!isParsingTemplateContents()) {
@@ -1894,14 +1894,14 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomHTMLToken&& token)
         return;
     case TagName::dd:
     case TagName::dt:
-        if (!m_tree.openElements().inScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
-        m_tree.generateImpliedEndTagsWithExclusion(elementNameForTag(Namespace::HTML, token.tagName()));
-        if (m_tree.currentStackItem().elementName() != elementNameForTag(Namespace::HTML, token.tagName()))
+        m_tree.generateImpliedEndTagsWithExclusion(nodeNameForTag(Namespace::HTML, token.tagName()));
+        if (m_tree.currentStackItem().elementName() != nodeNameForTag(Namespace::HTML, token.tagName()))
             parseError(token);
-        m_tree.openElements().popUntilPopped(elementNameForTag(Namespace::HTML, token.tagName()));
+        m_tree.openElements().popUntilPopped(nodeNameForTag(Namespace::HTML, token.tagName()));
         return;
     case TagName::h1:
     case TagName::h2:
@@ -1914,7 +1914,7 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomHTMLToken&& token)
             return;
         }
         m_tree.generateImpliedEndTags();
-        if (m_tree.currentStackItem().elementName() != elementNameForTag(Namespace::HTML, token.tagName()))
+        if (m_tree.currentStackItem().elementName() != nodeNameForTag(Namespace::HTML, token.tagName()))
             parseError(token);
         m_tree.openElements().popUntilNumberedHeaderElementPopped();
         return;
@@ -1937,14 +1937,14 @@ void HTMLTreeBuilder::processEndTagForInBody(AtomHTMLToken&& token)
     case TagName::applet:
     case TagName::marquee:
     case TagName::object:
-        if (!m_tree.openElements().inScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+        if (!m_tree.openElements().inScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
             parseError(token);
             return;
         }
         m_tree.generateImpliedEndTags();
-        if (m_tree.currentStackItem().elementName() != elementNameForTag(Namespace::HTML, token.tagName()))
+        if (m_tree.currentStackItem().elementName() != nodeNameForTag(Namespace::HTML, token.tagName()))
             parseError(token);
-        m_tree.openElements().popUntilPopped(elementNameForTag(Namespace::HTML, token.tagName()));
+        m_tree.openElements().popUntilPopped(nodeNameForTag(Namespace::HTML, token.tagName()));
         m_tree.activeFormattingElements().clearToLastMarker();
         return;
     case TagName::br:
@@ -2255,7 +2255,7 @@ void HTMLTreeBuilder::processEndTag(AtomHTMLToken&& token)
         case TagName::th:
         case TagName::td:
             parseError(token);
-            if (m_tree.openElements().inTableScope(elementNameForTag(Namespace::HTML, token.tagName()))) {
+            if (m_tree.openElements().inTableScope(nodeNameForTag(Namespace::HTML, token.tagName()))) {
                 AtomHTMLToken endSelect(HTMLToken::Type::EndTag, TagName::select);
                 processEndTag(WTFMove(endSelect));
                 processEndTag(WTFMove(token));

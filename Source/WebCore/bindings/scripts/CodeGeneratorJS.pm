@@ -3082,9 +3082,11 @@ sub GenerateHeader
 
     if ($interface->extendedAttributes->{GenerateForEachEventHandlerContentAttribute}) {
         push(@headerContent, "    static void forEachEventHandlerContentAttribute(const Function<void(const AtomString& attributeName, const AtomString& eventName)>&);\n\n");
+        GenerateIsEventHandlerContentAttribute(\@headerContent, $interface, "isEventHandlerContentAttribute");
     }
     if ($interface->extendedAttributes->{GenerateForEachWindowEventHandlerContentAttribute}) {
         push(@headerContent, "    static void forEachWindowEventHandlerContentAttribute(const Function<void(const AtomString& attributeName, const AtomString& eventName)>&);\n\n");
+        GenerateIsEventHandlerContentAttribute(\@headerContent, $interface, "isWindowEventHandlerContentAttribute", "WindowEventHandler");
     }
 
     my $numCustomOperations = 0;
@@ -5254,6 +5256,27 @@ sub GenerateForEachEventHandlerContentAttribute
     push(@$outputArray, "    for (auto& names : table)\n");
     push(@$outputArray, "        function(names.first.get().localName(), eventNames.*names.second);\n");
     push(@$outputArray, "}\n\n");
+}
+
+sub GenerateIsEventHandlerContentAttribute
+{
+    my ($outputArray, $interface, $functionName, $eventHandlerExtendedAttributeName) = @_;
+    $headerIncludes{"NodeName.h"} = 1;
+    push(@$outputArray, "    static bool $functionName(NodeName name)\n");
+    push(@$outputArray, "    {\n");
+    push(@$outputArray, "        switch (name) {\n");
+    foreach my $attribute(@{$interface->attributes}) {
+        if ($attribute->type->name eq "EventHandler" && (!defined $eventHandlerExtendedAttributeName || $attribute->extendedAttributes->{$eventHandlerExtendedAttributeName})) {
+            my $attributeName = $attribute->name;
+            push(@$outputArray, "        case AttributeNames::${attributeName}:\n");
+        }
+    }
+    push(@$outputArray, "            return true;\n");
+    push(@$outputArray, "        default:\n");
+    push(@$outputArray, "            return false;\n");
+    push(@$outputArray, "        }\n");
+    push(@$outputArray, "    }\n");
+    push(@$outputArray, "\n");
 }
 
 sub GenerateAttributeGetterBodyDefinition
