@@ -89,27 +89,18 @@ const Color& HTMLMetaElement::contentColor()
     return *m_contentColor;
 }
 
-void HTMLMetaElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+bool HTMLMetaElement::nameAttributeChanged(const AtomString& oldValue, const AtomString& newValue)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
+    HTMLElement::nameAttributeChanged(oldValue, newValue);
 
-    if (!isInDocumentTree())
-        return;
-
-    if (name == nameAttr) {
-        if (equalLettersIgnoringASCIICase(oldValue, "theme-color"_s) && !equalLettersIgnoringASCIICase(newValue, "theme-color"_s))
-            document().metaElementThemeColorChanged(*this);
-        return;
-    }
+    if (isInDocumentTree() && equalLettersIgnoringASCIICase(oldValue, "theme-color"_s) && !equalLettersIgnoringASCIICase(newValue, "theme-color"_s))
+        document().metaElementThemeColorChanged(*this);
+    process();
+    return true;
 }
 
 void HTMLMetaElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == nameAttr) {
-        process();
-        return;
-    }
-
     if (name == contentAttr) {
         m_contentColor = std::nullopt;
         process();

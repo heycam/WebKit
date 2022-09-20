@@ -167,14 +167,17 @@ int HTMLOptionElement::index() const
     return 0;
 }
 
-void HTMLOptionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+bool HTMLOptionElement::valueAttributeChanged(const AtomString&)
 {
 #if ENABLE(DATALIST_ELEMENT)
-    if (name == valueAttr) {
-        for (auto& dataList : ancestorsOfType<HTMLDataListElement>(*this))
-            dataList.optionElementChildrenChanged();
-    } else
+    for (auto& dataList : ancestorsOfType<HTMLDataListElement>(*this))
+        dataList.optionElementChildrenChanged();
 #endif
+    return true;
+}
+
+void HTMLOptionElement::parseAttribute(const QualifiedName& name, const AtomString& value)
+{
     if (name == disabledAttr) {
         bool newDisabled = !value.isNull();
         if (m_disabled != newDisabled) {

@@ -237,21 +237,25 @@ void HTMLAnchorElement::setActive(bool down, Style::InvalidationScope invalidati
     HTMLElement::setActive(down, invalidationScope);
 }
 
+bool HTMLAnchorElement::hrefAttributeChanged(const AtomString& value)
+{
+    bool wasLink = isLink();
+    setIsLink(!value.isNull() && !shouldProhibitLinks(this));
+    if (wasLink != isLink())
+        invalidateStyleForSubtree();
+    if (isLink()) {
+        String parsedURL = stripLeadingAndTrailingHTMLSpaces(value);
+        if (document().isDNSPrefetchEnabled() && document().frame()) {
+            if (protocolIsInHTTPFamily(parsedURL) || parsedURL.startsWith("//"_s))
+                document().frame()->loader().client().prefetchDNS(document().completeURL(parsedURL).host().toString());
+        }
+    }
+    return true;
+}
+
 void HTMLAnchorElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == hrefAttr) {
-        bool wasLink = isLink();
-        setIsLink(!value.isNull() && !shouldProhibitLinks(this));
-        if (wasLink != isLink())
-            invalidateStyleForSubtree();
-        if (isLink()) {
-            String parsedURL = stripLeadingAndTrailingHTMLSpaces(value);
-            if (document().isDNSPrefetchEnabled() && document().frame()) {
-                if (protocolIsInHTTPFamily(parsedURL) || parsedURL.startsWith("//"_s))
-                    document().frame()->loader().client().prefetchDNS(document().completeURL(parsedURL).host().toString());
-            }
-        }
-    } else if (name == nameAttr || name == titleAttr) {
+    if (name == nameAttr || name == titleAttr) {
         // Do nothing.
     } else if (name == relAttr) {
         // Update HTMLAnchorElement::relList() if more rel attributes values are supported.

@@ -77,12 +77,16 @@ RenderProgress* HTMLProgressElement::renderProgress() const
     return downcast<RenderProgress>(descendantsOfType<Element>(*userAgentShadowRoot()).first()->renderer());
 }
 
+bool HTMLProgressElement::valueAttributeChanged(const AtomString&)
+{
+    updateDeterminateState();
+    didElementStateChange();
+    return true;
+}
+
 void HTMLProgressElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == valueAttr) {
-        updateDeterminateState();
-        didElementStateChange();
-    } else if (name == maxAttr)
+    if (name == maxAttr)
         didElementStateChange();
     else
         LabelableElement::parseAttribute(name, value);

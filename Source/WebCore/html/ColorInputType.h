@@ -78,6 +78,8 @@ private:
     bool shouldRespectListAttribute() final;
     bool shouldResetOnDocumentActivation() final;
 
+    void valueAttributeChanged() final;
+
     void endColorChooser();
     void updateColorSwatch();
     HTMLElement* shadowColorSwatch() const;

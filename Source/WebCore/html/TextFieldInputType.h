@@ -85,6 +85,8 @@ protected:
     void updateInnerTextValue() final;
     String sanitizeValue(const String&) const override;
 
+    void valueAttributeChanged() final;
+
     virtual String convertFromVisibleValue(const String&) const;
     virtual void didSetValueByUserEdit();
 

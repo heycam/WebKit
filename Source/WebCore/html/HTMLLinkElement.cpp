@@ -163,6 +163,13 @@ void HTMLLinkElement::setDisabledState(bool disabled)
     }
 }
 
+bool HTMLLinkElement::typeAttributeChanged(const AtomString& value)
+{
+    m_type = value;
+    process();
+    return true;
+}
+
 void HTMLLinkElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     if (name == relAttr) {
@@ -176,11 +183,6 @@ void HTMLLinkElement::parseAttribute(const QualifiedName& name, const AtomString
         return;
     }
     if (name == hrefAttr) {
-        process();
-        return;
-    }
-    if (name == typeAttr) {
-        m_type = value;
         process();
         return;
     }

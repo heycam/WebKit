@@ -138,7 +138,7 @@ protected:
     bool disabledByAncestorFieldset() const { return m_disabledByAncestorFieldset; }
 
     void parseAttribute(const QualifiedName&, const AtomString&) override;
-    virtual void disabledAttributeChanged();
+    virtual void disabledAttributeDidChange();
     virtual void disabledStateChanged();
     virtual void readOnlyStateChanged();
     virtual void requiredStateChanged();

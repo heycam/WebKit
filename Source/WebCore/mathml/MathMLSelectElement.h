@@ -47,9 +47,11 @@ private:
 
     void finishParsingChildren() final;
     void childrenChanged(const ChildChange&) final;
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) final;
     void defaultEventHandler(Event&) final;
     bool willRespondToMouseClickEventsWithEditability(Editability) const final;
+
+    bool actiontypeAttributeChanged(const AtomString&) final;
+    bool selectionAttributeChanged(const AtomString&) final;
 
     void toggle();
     int getSelectedActionChildAndIndex(Element*& selectedChild);

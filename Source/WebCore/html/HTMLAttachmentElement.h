@@ -97,6 +97,8 @@ private:
     bool canContainRangeEndPoint() const final { return false; }
     void parseAttribute(const QualifiedName&, const AtomString&) final;
 
+    bool typeAttributeChanged(const AtomString&) final;
+
 #if ENABLE(SERVICE_CONTROLS)
     bool childShouldCreateRenderer(const Node&) const final;
 #endif

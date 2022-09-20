@@ -95,16 +95,20 @@ static bool hasTypeOrSrc(const HTMLEmbedElement& embed)
     return embed.hasAttributeWithoutSynchronization(typeAttr) || embed.hasAttributeWithoutSynchronization(srcAttr);
 }
 
+bool HTMLEmbedElement::typeAttributeChanged(const AtomString& value)
+{
+    m_serviceType = value.string().left(value.find(';')).convertToASCIILowercase();
+    // FIXME: The only difference between this and HTMLObjectElement's corresponding
+    // code is that HTMLObjectElement does setNeedsWidgetUpdate(true). Consider moving
+    // this up to the HTMLPlugInImageElement to be shared.
+    if (renderer() && !hasTypeOrSrc(*this))
+        invalidateStyle();
+    return true;
+}
+
 void HTMLEmbedElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == typeAttr) {
-        m_serviceType = value.string().left(value.find(';')).convertToASCIILowercase();
-        // FIXME: The only difference between this and HTMLObjectElement's corresponding
-        // code is that HTMLObjectElement does setNeedsWidgetUpdate(true). Consider moving
-        // this up to the HTMLPlugInImageElement to be shared.
-        if (renderer() && !hasTypeOrSrc(*this))
-            invalidateStyle();
-    } else if (name == codeAttr) {
+    if (name == codeAttr) {
         m_url = stripLeadingAndTrailingHTMLSpaces(value);
         // FIXME: Why no call to updateImageLoaderWithNewURLSoon?
         // FIXME: If both code and src attributes are specified, last one parsed/changed wins. That can't be right!

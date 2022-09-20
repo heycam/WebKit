@@ -381,16 +381,19 @@ bool BaseDateAndTimeInputType::hasCustomFocusLogic() const
     return InputType::hasCustomFocusLogic();
 }
 
+void BaseDateAndTimeInputType::valueAttributeChanged()
+{
+    if (auto* element = this->element()) {
+        if (!element->hasDirtyValue())
+            updateInnerTextValue();
+    }
+}
+
 void BaseDateAndTimeInputType::attributeChanged(const QualifiedName& name)
 {
     if (name == maxAttr || name == minAttr) {
         if (auto* element = this->element())
             element->invalidateStyleForSubtree();
-    } else if (name == valueAttr) {
-        if (auto* element = this->element()) {
-            if (!element->hasDirtyValue())
-                updateInnerTextValue();
-        }
     } else if (name == stepAttr && m_dateTimeEditElement)
         updateInnerTextValue();
 

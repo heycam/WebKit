@@ -166,6 +166,13 @@ RefPtr<HTMLImageElement> HTMLAttachmentElement::enclosingImageElement() const
     return { };
 }
 
+bool HTMLAttachmentElement::typeAttributeChanged(const AtomString&)
+{
+    if (auto* renderer = this->renderer())
+        renderer->invalidate();
+    return true;
+}
+
 void HTMLAttachmentElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     if (name == progressAttr || name == subtitleAttr || name == titleAttr || name == typeAttr) {

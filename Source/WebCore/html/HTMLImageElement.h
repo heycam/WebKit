@@ -161,12 +161,14 @@ protected:
     void didMoveToNewDocument(Document& oldDocument, Document& newDocument) override;
 
 private:
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
     void parseAttribute(const QualifiedName&, const AtomString&) override;
     bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
     void collectExtraStyleForPresentationalHints(MutableStyleProperties&) override;
     void invalidateAttributeMapping();
+
+    bool referrerpolicyAttributeChanged(const AtomString& oldValue, const AtomString& newValue) final;
+    bool crossoriginAttributeChanged(const AtomString& oldValue, const AtomString& newValue) final;
 
     Ref<Element> cloneElementWithoutAttributesAndChildren(Document& targetDocument) final;
 

@@ -25,6 +25,7 @@
 #pragma once
 
 #include "AXTextStateChangeIntent.h"
+#include "AttributeHandler.h"
 #include "ContainerNode.h"
 #include "ElementIdentifier.h"
 #include "EventOptions.h"
@@ -105,7 +106,12 @@ struct ElementStyle;
 struct ResolutionContext;
 }
 
-class Element : public ContainerNode {
+enum class AttributeModificationReason : uint8_t {
+    ModifiedDirectly,
+    ModifiedByCloning
+};
+
+class Element : public ContainerNode, protected AttributeHandler {
     WTF_MAKE_ISO_ALLOCATED(Element);
 public:
     static Ref<Element> create(const QualifiedName&, Document&);
@@ -291,13 +297,8 @@ public:
     // For exposing to DOM only.
     WEBCORE_EXPORT NamedNodeMap& attributes() const;
 
-    enum AttributeModificationReason {
-        ModifiedDirectly,
-        ModifiedByCloning
-    };
-
     // These functions are called whenever an attribute is added, changed or removed.
-    virtual void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly);
+    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = AttributeModificationReason::ModifiedDirectly);
     virtual void parseAttribute(const QualifiedName&, const AtomString&) { }
 
     // Only called by the parser immediately after element construction.
@@ -704,8 +705,11 @@ protected:
 
     void setTabIndexExplicitly(std::optional<int>);
 
-    void classAttributeChanged(const AtomString& newClassString);
-    void partAttributeChanged(const AtomString& newValue);
+    bool classAttributeChanged(const AtomString&) override;
+    bool idAttributeChanged(const AtomString& oldValue, const AtomString& newValue) override;
+    bool nameAttributeChanged(const AtomString& oldValue, const AtomString& newValue) override;
+
+    void updateClassNames(const AtomString&);
 
     void addShadowRoot(Ref<ShadowRoot>&&);
 
@@ -745,6 +749,12 @@ private:
 
     inline const Attribute* getAttributeInternal(const QualifiedName&) const;
     inline const Attribute* getAttributeInternal(const AtomString& qualifiedName) const;
+
+    bool accesskeyAttributeChanged() final;
+    bool nonceAttributeChanged(const AtomString&) final;
+    bool pseudoAttributeChanged() final;
+    bool slotAttributeChanged(const AtomString& oldValue, const AtomString& newValue) final;
+    bool partAttributeChanged(const AtomString&) final;
 
     void updateName(const AtomString& oldName, const AtomString& newName);
     void updateNameForTreeScope(TreeScope&, const AtomString& oldName, const AtomString& newName);

@@ -364,11 +364,11 @@ bool HTMLModelElement::isInteractive() const
     return hasAttributeWithoutSynchronization(HTMLNames::interactiveAttr);
 }
 
-void HTMLModelElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+bool HTMLModelElement::interactiveAttributeChanged()
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
-    if (m_modelPlayer && name == HTMLNames::interactiveAttr)
+    if (m_modelPlayer)
         m_modelPlayer->setInteractionEnabled(isInteractive());
+    return true;
 }
 
 void HTMLModelElement::defaultEventHandler(Event& event)

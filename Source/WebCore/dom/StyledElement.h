@@ -66,6 +66,7 @@ public:
     virtual void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) { }
     virtual const StyleProperties* additionalPresentationalHintStyle() const { return nullptr; }
     virtual void collectExtraStyleForPresentationalHints(MutableStyleProperties&) { }
+    void invalidateStyleForAttributeWithPresentationalHintsIfNeeded(const QualifiedName&);
 
 protected:
     StyledElement(const QualifiedName& name, Document& document, ConstructionType type)
@@ -73,9 +74,9 @@ protected:
     {
     }
 
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
-
     virtual bool hasPresentationalHintsForAttribute(const QualifiedName&) const { return false; }
+
+    bool styleAttributeChanged(const AtomString& newStyleString, AttributeModificationReason) override;
 
     void addPropertyToPresentationalHintStyle(MutableStyleProperties&, CSSPropertyID, CSSValueID identifier);
     void addPropertyToPresentationalHintStyle(MutableStyleProperties&, CSSPropertyID, double value, CSSUnitType);
@@ -84,7 +85,6 @@ protected:
     void addSubresourceAttributeURLs(ListHashSet<URL>&) const override;
 
 private:
-    void styleAttributeChanged(const AtomString& newStyleString, AttributeModificationReason);
     void synchronizeStyleAttributeInternalImpl();
 
     void inlineStyleChanged();

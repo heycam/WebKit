@@ -99,18 +99,32 @@ void HTMLObjectElement::collectPresentationalHintsForAttribute(const QualifiedNa
         HTMLPlugInImageElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
+bool HTMLObjectElement::typeAttributeChanged(const AtomString& value)
+{
+    m_serviceType = value.string().left(value.find(';')).convertToASCIILowercase();
+    bool invalidateRenderer = !hasAttributeWithoutSynchronization(classidAttr);
+    bool needsWidgetUpdate = true;
+
+    if (needsWidgetUpdate) {
+        setNeedsWidgetUpdate(true);
+        m_useFallbackContent = false;
+    }
+
+    if (!invalidateRenderer || !isConnected() || !renderer())
+        return true;
+
+    scheduleUpdateForAfterStyleResolution();
+    invalidateStyleAndRenderersForSubtree();
+
+    return true;
+}
+
 void HTMLObjectElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     bool invalidateRenderer = false;
     bool needsWidgetUpdate = false;
 
-    if (name == formAttr)
-        formAttributeChanged();
-    else if (name == typeAttr) {
-        m_serviceType = value.string().left(value.find(';')).convertToASCIILowercase();
-        invalidateRenderer = !hasAttributeWithoutSynchronization(classidAttr);
-        needsWidgetUpdate = true;
-    } else if (name == dataAttr) {
+    if (name == dataAttr) {
         m_url = stripLeadingAndTrailingHTMLSpaces(value);
         invalidateRenderer = !hasAttributeWithoutSynchronization(classidAttr);
         needsWidgetUpdate = true;

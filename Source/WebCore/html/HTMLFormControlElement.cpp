@@ -155,15 +155,13 @@ void HTMLFormControlElement::setAncestorDisabled(bool isDisabled)
 
 void HTMLFormControlElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == formAttr)
-        formAttributeChanged();
-    else if (name == disabledAttr) {
+    if (name == disabledAttr) {
         if (canBeActuallyDisabled()) {
             bool newDisabled = !value.isNull();
             if (m_disabled != newDisabled) {
                 Style::PseudoClassChangeInvalidation disabledInvalidation(*this, { { CSSSelector::PseudoClassDisabled, newDisabled }, { CSSSelector::PseudoClassEnabled, !newDisabled } });
                 m_disabled = newDisabled;
-                disabledAttributeChanged();
+                disabledAttributeDidChange();
             }
         }
     } else if (name == readonlyAttr) {
@@ -185,7 +183,7 @@ void HTMLFormControlElement::parseAttribute(const QualifiedName& name, const Ato
         HTMLElement::parseAttribute(name, value);
 }
 
-void HTMLFormControlElement::disabledAttributeChanged()
+void HTMLFormControlElement::disabledAttributeDidChange()
 {
     disabledStateChanged();
 }

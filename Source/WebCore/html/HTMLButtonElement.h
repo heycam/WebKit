@@ -59,6 +59,8 @@ private:
     bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
     void defaultEventHandler(Event&) final;
 
+    bool typeAttributeChanged(const AtomString&) final;
+
     bool appendFormData(DOMFormData&) final;
 
     bool isEnumeratable() const final { return true; }

@@ -106,23 +106,27 @@ bool HTMLButtonElement::hasPresentationalHintsForAttribute(const QualifiedName& 
     return HTMLFormControlElement::hasPresentationalHintsForAttribute(name);
 }
 
+bool HTMLButtonElement::typeAttributeChanged(const AtomString& value)
+{
+    Type oldType = m_type;
+    if (equalLettersIgnoringASCIICase(value, "reset"_s))
+        m_type = RESET;
+    else if (equalLettersIgnoringASCIICase(value, "button"_s))
+        m_type = BUTTON;
+    else
+        m_type = SUBMIT;
+    if (oldType != m_type) {
+        updateWillValidateAndValidity();
+        if (form() && (oldType == SUBMIT || m_type == SUBMIT))
+            form()->resetDefaultButton();
+    }
+
+    return true;
+}
+
 void HTMLButtonElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == typeAttr) {
-        Type oldType = m_type;
-        if (equalLettersIgnoringASCIICase(value, "reset"_s))
-            m_type = RESET;
-        else if (equalLettersIgnoringASCIICase(value, "button"_s))
-            m_type = BUTTON;
-        else
-            m_type = SUBMIT;
-        if (oldType != m_type) {
-            updateWillValidateAndValidity();
-            if (form() && (oldType == SUBMIT || m_type == SUBMIT))
-                form()->resetDefaultButton();
-        }
-    } else
-        HTMLFormControlElement::parseAttribute(name, value);
+    HTMLFormControlElement::parseAttribute(name, value);
 }
 
 void HTMLButtonElement::defaultEventHandler(Event& event)

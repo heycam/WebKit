@@ -363,11 +363,6 @@ bool HTMLElement::matchesReadWritePseudoClass() const
 
 void HTMLElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == dirAttr) {
-        dirAttributeChanged(value);
-        return;
-    }
-
     if (name == tabindexAttr) {
         if (auto optionalTabIndex = parseHTMLInteger(value))
             setTabIndexExplicitly(optionalTabIndex.value());
@@ -849,7 +844,12 @@ auto HTMLElement::computeDirectionalityFromText() const -> TextDirectionWithStro
     return { TextDirection::LTR, nullptr };
 }
 
-void HTMLElement::dirAttributeChanged(const AtomString& value)
+bool HTMLElement::contenteditableAttributeChanged(const AtomString&)
+{
+    return true;
+}
+
+bool HTMLElement::dirAttributeChanged(const AtomString& value)
 {
     RefPtr<Element> parent = parentOrShadowHostElement();
     bool isValid = true;
@@ -888,6 +888,8 @@ void HTMLElement::dirAttributeChanged(const AtomString& value)
             setHasDirAutoFlagRecursively(this, false);
         downcast<HTMLElement>(*parent).adjustDirectionalityIfNeededAfterChildAttributeChanged(this);
     }
+
+    return true;
 }
 
 void HTMLElement::updateEffectiveDirectionality(TextDirection direction)

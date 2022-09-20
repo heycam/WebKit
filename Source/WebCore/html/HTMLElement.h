@@ -179,7 +179,9 @@ private:
 
     void mapLanguageAttributeToLocale(const AtomString&, MutableStyleProperties&);
 
-    void dirAttributeChanged(const AtomString&);
+    bool contenteditableAttributeChanged(const AtomString&) final;
+    bool dirAttributeChanged(const AtomString&) final;
+
     void updateEffectiveDirectionality(TextDirection);
     void adjustDirectionalityIfNeededAfterChildAttributeChanged(Element* child);
     void adjustDirectionalityIfNeededAfterChildrenChanged(Element* beforeChange, ChildChange::Type);

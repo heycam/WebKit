@@ -151,10 +151,42 @@ void HTMLSourceElement::stop()
     cancelPendingErrorEvent();
 }
 
+bool HTMLSourceElement::typeAttributeChanged(const AtomString&)
+{
+    RefPtr parent = parentNode();
+    if (m_shouldCallSourcesChanged)
+        downcast<HTMLPictureElement>(*parent).sourcesChanged();
+
+#if ENABLE(MODEL_ELEMENT)
+    if (is<HTMLModelElement>(parent))
+        downcast<HTMLModelElement>(*parent).sourcesChanged();
+#endif
+
+    return true;
+}
+
+void HTMLSourceElement::sourceDimensionAttributeChanged()
+{
+    if (RefPtr parent = parentNode(); is<HTMLPictureElement>(parent))
+        downcast<HTMLPictureElement>(*parent).sourceDimensionAttributesChanged(*this);
+}
+
+bool HTMLSourceElement::widthAttributeChanged(const AtomString&)
+{
+    sourceDimensionAttributeChanged();
+    return true;
+}
+
+bool HTMLSourceElement::heightAttributeChanged(const AtomString&)
+{
+    sourceDimensionAttributeChanged();
+    return true;
+}
+
 void HTMLSourceElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     HTMLElement::parseAttribute(name, value);
-    if (name == srcsetAttr || name == sizesAttr || name == mediaAttr || name == typeAttr) {
+    if (name == srcsetAttr || name == sizesAttr || name == mediaAttr) {
         if (name == mediaAttr)
             m_cachedParsedMediaAttribute = std::nullopt;
         RefPtr parent = parentNode();
@@ -162,7 +194,7 @@ void HTMLSourceElement::parseAttribute(const QualifiedName& name, const AtomStri
             downcast<HTMLPictureElement>(*parent).sourcesChanged();
     }
 #if ENABLE(MODEL_ELEMENT)
-    if (name == srcAttr ||  name == typeAttr) {
+    if (name == srcAttr) {
         RefPtr<Element> parent = parentElement();
         if (is<HTMLModelElement>(parent))
             downcast<HTMLModelElement>(*parent).sourcesChanged();
@@ -180,15 +212,6 @@ const MediaQuerySet* HTMLSourceElement::parsedMediaAttribute(Document& document)
         m_cachedParsedMediaAttribute = WTFMove(parsedAttribute);
     }
     return m_cachedParsedMediaAttribute.value().get();
-}
-
-void HTMLSourceElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
-{
-    if (name == widthAttr || name == heightAttr) {
-        if (RefPtr parent = parentNode(); is<HTMLPictureElement>(parent))
-            downcast<HTMLPictureElement>(*parent).sourceDimensionAttributesChanged(*this);
-    }
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
 }
 
 }

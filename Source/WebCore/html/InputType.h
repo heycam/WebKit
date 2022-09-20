@@ -352,6 +352,7 @@ public:
     virtual void updateInnerTextValue();
     virtual void updatePlaceholderText();
     virtual void attributeChanged(const QualifiedName&) { }
+    virtual void valueAttributeChanged() { }
     virtual void disabledStateChanged() { }
     virtual void readOnlyStateChanged() { }
     virtual void requiredStateChanged() { }

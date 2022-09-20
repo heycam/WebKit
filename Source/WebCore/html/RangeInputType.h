@@ -64,6 +64,9 @@ private:
     HTMLElement* sliderThumbElement() const final;
     HTMLElement* sliderTrackElement() const final;
 
+    void updateValue();
+    void valueAttributeChanged() final;
+
     SliderThumbElement& typedSliderThumbElement() const;
 
 #if ENABLE(DATALIST_ELEMENT)

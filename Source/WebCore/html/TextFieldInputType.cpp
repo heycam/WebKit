@@ -439,12 +439,19 @@ void TextFieldInputType::destroyShadowSubtree()
     m_container = nullptr;
 }
 
+void TextFieldInputType::valueAttributeChanged()
+{
+    if (element())
+        updateInnerTextValue();
+}
+
 void TextFieldInputType::attributeChanged(const QualifiedName& name)
 {
-    if (name == valueAttr || name == placeholderAttr) {
+    if (name == placeholderAttr) {
         if (element())
             updateInnerTextValue();
     }
+
     InputType::attributeChanged(name);
 }
 

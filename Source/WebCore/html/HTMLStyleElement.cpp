@@ -75,6 +75,16 @@ Ref<HTMLStyleElement> HTMLStyleElement::create(Document& document)
     return adoptRef(*new HTMLStyleElement(styleTag, document, false));
 }
 
+bool HTMLStyleElement::typeAttributeChanged(const AtomString& value)
+{
+    m_styleSheetOwner.setContentType(value);
+    m_styleSheetOwner.childrenChanged(*this);
+    if (auto* scope = m_styleSheetOwner.styleScope())
+        scope->didChangeStyleSheetContents();
+
+    return true;
+}
+
 void HTMLStyleElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     if (name == titleAttr && sheet() && !isInShadowTree())
@@ -87,11 +97,6 @@ void HTMLStyleElement::parseAttribute(const QualifiedName& name, const AtomStrin
                 scope->didChangeStyleSheetContents();
         } else
             m_styleSheetOwner.childrenChanged(*this);
-    } else if (name == typeAttr) {
-        m_styleSheetOwner.setContentType(value);
-        m_styleSheetOwner.childrenChanged(*this);
-        if (auto* scope = m_styleSheetOwner.styleScope())
-            scope->didChangeStyleSheetContents();
     } else
         HTMLElement::parseAttribute(name, value);
 }

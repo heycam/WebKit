@@ -6,7 +6,7 @@ attrsNullNamespace
 abbr
 accept
 accept-charset
-accesskey
+accesskey handlerWantsNewValue=0
 action
 align
 alink
@@ -111,7 +111,7 @@ content
 contenteditable
 controls
 coords
-crossorigin
+crossorigin handlerWantsOldValue=1
 data
 datetime
 declare
@@ -154,7 +154,7 @@ href
 hreflang
 hspace
 http-equiv
-id
+id handlerWantsOldValue=1
 imagesizes
 imagesrcset
 incremental
@@ -162,7 +162,7 @@ indeterminate
 inert
 inputmode
 integrity
-interactive
+interactive handlerWantsNewValue=0
 is
 ismap
 itemid
@@ -198,7 +198,7 @@ min
 minlength
 multiple
 muted
-name
+name handlerWantsOldValue=1
 nohref
 nomodule
 nonce
@@ -368,9 +368,9 @@ primary
 profile
 progress
 prompt
-pseudo
+pseudo handlerWantsNewValue=0
 readonly
-referrerpolicy
+referrerpolicy handlerWantsOldValue=1
 rel
 required
 results
@@ -392,7 +392,7 @@ selected
 shape
 size
 sizes
-slot
+slot handlerWantsOldValue=1
 sortable
 sortdirection
 span
@@ -404,7 +404,7 @@ srcset
 standby
 start
 step
-style
+style handlerWantsReason=1
 subtitle
 summary
 tabindex

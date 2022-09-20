@@ -126,6 +126,8 @@ private:
     void elementDidBlur() final;
     void detach() final;
 
+    void valueAttributeChanged() final;
+
     ShouldCallBaseEventHandler handleKeydownEvent(KeyboardEvent&) final;
     void handleKeypressEvent(KeyboardEvent&) final;
     void handleKeyupEvent(KeyboardEvent&) final;

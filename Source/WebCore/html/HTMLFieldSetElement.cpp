@@ -78,7 +78,7 @@ static void updateFromControlElementsAncestorDisabledStateUnder(HTMLElement& sta
     }
 }
 
-void HTMLFieldSetElement::disabledAttributeChanged()
+void HTMLFieldSetElement::disabledAttributeDidChange()
 {
     bool hasDisabledAttribute = hasAttributeWithoutSynchronization(disabledAttr);
     if (m_hasDisabledAttribute != hasDisabledAttribute) {
@@ -89,7 +89,7 @@ void HTMLFieldSetElement::disabledAttributeChanged()
             document().removeDisabledFieldsetElement();
     }
 
-    HTMLFormControlElement::disabledAttributeChanged();
+    HTMLFormControlElement::disabledAttributeDidChange();
 }
 
 void HTMLFieldSetElement::disabledStateChanged()

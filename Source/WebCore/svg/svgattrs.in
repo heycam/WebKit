@@ -123,7 +123,7 @@ media
 method
 min
 mode
-name
+name handlerWantsOldValue=1
 numOctaves
 offset
 onbegin
@@ -193,7 +193,7 @@ stroke-linejoin
 stroke-miterlimit
 stroke-opacity
 stroke-width
-style
+style handlerWantsReason=1
 surfaceScale
 systemLanguage
 tableValues

@@ -60,6 +60,8 @@ private:
     void removedFromAncestor(RemovalType, ContainerNode&) final;
     void childrenChanged(const ChildChange&) final;
 
+    bool typeAttributeChanged(const AtomString&) final;
+
     bool isLoading() const { return m_styleSheetOwner.isLoading(); }
     bool sheetLoaded() final { return m_styleSheetOwner.sheetLoaded(*this); }
     void notifyLoadedSheetAndAllCriticalSubresources(bool errorOccurred) final;

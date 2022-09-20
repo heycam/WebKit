@@ -171,7 +171,11 @@ protected:
     void parseAttribute(const QualifiedName&, const AtomString&) override;
 
     void finishParsingChildren() override;
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason = ModifiedDirectly) override;
+
+    bool classAttributeChanged(const AtomString&) final;
+    bool idAttributeChanged(const AtomString& oldValue, const AtomString& newValue) final;
+    bool styleAttributeChanged(const AtomString&, AttributeModificationReason) final;
+
     bool childShouldCreateRenderer(const Node&) const override;
 
     SVGElementRareData& ensureSVGRareData();

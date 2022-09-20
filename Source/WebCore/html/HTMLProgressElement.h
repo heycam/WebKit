@@ -56,6 +56,8 @@ private:
 
     void parseAttribute(const QualifiedName&, const AtomString&) final;
 
+    bool valueAttributeChanged(const AtomString&) final;
+
     void didAttachRenderers() final;
 
     void updateDeterminateState();

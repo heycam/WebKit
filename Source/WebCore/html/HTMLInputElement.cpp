@@ -723,6 +723,58 @@ inline void HTMLInputElement::initializeInputType()
     updateValidity();
 }
 
+bool HTMLInputElement::checkedAttributeChanged(const AtomString& value)
+{
+    ASSERT(m_inputType);
+    Ref protectedInputType { *m_inputType };
+
+    if (m_inputType->isCheckable())
+        invalidateStyleForSubtree();
+    // Another radio button in the same group might be checked by state
+    // restore. We shouldn't call setChecked() even if this has the checked
+    // attribute. So, delay the setChecked() call until
+    // finishParsingChildren() is called if parsing is in progress.
+    if ((!m_parsingInProgress || !document().formController().hasFormStateToRestore()) && !m_dirtyCheckednessFlag) {
+        setChecked(!value.isNull());
+        // setChecked() above sets the dirty checkedness flag so we need to reset it.
+        m_dirtyCheckednessFlag = false;
+    }
+    // m_inputType->attributeChanged(checkedAttr);
+    return true;
+}
+
+bool HTMLInputElement::typeAttributeChanged(const AtomString&)
+{
+    ASSERT(m_inputType);
+    Ref protectedInputType { *m_inputType };
+    updateType();
+    // m_inputType->attributeChanged(typeAttr);
+    return true;
+}
+
+bool HTMLInputElement::valueAttributeChanged(const AtomString&)
+{
+    ASSERT(m_inputType);
+    Ref protectedInputType { *m_inputType };
+
+    // Changes to the value attribute may change whether or not this element has a default value.
+    // If this field is autocomplete=off that might affect the return value of needsSuspensionCallback.
+    if (m_autocomplete == Off) {
+        unregisterForSuspensionCallbackIfNeeded();
+        registerForSuspensionCallbackIfNeeded();
+    }
+    // We only need to setChanged if the form is looking at the default value right now.
+    if (!hasDirtyValue()) {
+        updatePlaceholderVisibility();
+        invalidateStyleForSubtree();
+        setFormControlValueMatchesRenderer(false);
+    }
+    updateValidity();
+    m_valueAttributeWasUpdatedAfterParsing = !m_parsingInProgress;
+    m_inputType->valueAttributeChanged();
+    return true;
+}
+
 void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
     ASSERT(m_inputType);
@@ -747,35 +799,6 @@ void HTMLInputElement::parseAttribute(const QualifiedName& name, const AtomStrin
 
             if (needsToUnregister)
                 unregisterForSuspensionCallbackIfNeeded();
-        }
-    } else if (name == typeAttr)
-        updateType();
-    else if (name == valueAttr) {
-        // Changes to the value attribute may change whether or not this element has a default value.
-        // If this field is autocomplete=off that might affect the return value of needsSuspensionCallback.
-        if (m_autocomplete == Off) {
-            unregisterForSuspensionCallbackIfNeeded();
-            registerForSuspensionCallbackIfNeeded();
-        }
-        // We only need to setChanged if the form is looking at the default value right now.
-        if (!hasDirtyValue()) {
-            updatePlaceholderVisibility();
-            invalidateStyleForSubtree();
-            setFormControlValueMatchesRenderer(false);
-        }
-        updateValidity();
-        m_valueAttributeWasUpdatedAfterParsing = !m_parsingInProgress;
-    } else if (name == checkedAttr) {
-        if (m_inputType->isCheckable())
-            invalidateStyleForSubtree();
-        // Another radio button in the same group might be checked by state
-        // restore. We shouldn't call setChecked() even if this has the checked
-        // attribute. So, delay the setChecked() call until
-        // finishParsingChildren() is called if parsing is in progress.
-        if ((!m_parsingInProgress || !document().formController().hasFormStateToRestore()) && !m_dirtyCheckednessFlag) {
-            setChecked(!value.isNull());
-            // setChecked() above sets the dirty checkedness flag so we need to reset it.
-            m_dirtyCheckednessFlag = false;
         }
     } else if (name == maxlengthAttr)
         maxLengthAttributeChanged(value);

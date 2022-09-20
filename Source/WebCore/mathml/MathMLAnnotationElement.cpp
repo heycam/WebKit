@@ -97,14 +97,23 @@ bool MathMLAnnotationElement::childShouldCreateRenderer(const Node& child) const
     return false;
 }
 
-void MathMLAnnotationElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+void MathMLAnnotationElement::updateChildSelectionOnParent()
 {
-    if (name == MathMLNames::srcAttr || name == MathMLNames::encodingAttr) {
-        auto* parent = parentElement();
-        if (is<MathMLElement>(parent) && parent->hasTagName(semanticsTag))
-            downcast<MathMLElement>(*parent).updateSelectedChild();
-    }
-    MathMLPresentationElement::attributeChanged(name, oldValue, newValue, reason);
+    auto* parent = parentElement();
+    if (is<MathMLElement>(parent) && parent->hasTagName(semanticsTag))
+        downcast<MathMLElement>(*parent).updateSelectedChild();
+}
+
+bool MathMLAnnotationElement::srcAttributeChanged(const AtomString&)
+{
+    updateChildSelectionOnParent();
+    return true;
+}
+
+bool MathMLAnnotationElement::encodingAttributeChanged(const AtomString&)
+{
+    updateChildSelectionOnParent();
+    return true;
 }
 
 }

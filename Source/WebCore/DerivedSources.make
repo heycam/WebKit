@@ -1606,6 +1606,8 @@ all : \
     $(JS_DOM_IMPLEMENTATIONS) \
     $(WEB_DOM_HEADERS) \
     \
+    AttributeHandler.cpp \
+    AttributeHandler.h \
     CSSPropertyNames.cpp \
     CSSPropertyNames.h \
     CSSValueKeywords.cpp \
@@ -2114,10 +2116,13 @@ DOM_NAME_ENUM_DEPS = \
     $(WebCore)/xml/xmlnsattrs.in \
 #
 
-DOM_NAME_ENUM_ARGUMENTS = \
+DOM_NAME_ELEMENT_ARGUMENTS = \
     --elements $(WebCore)/html/HTMLTagNames.in \
     --elements $(WebCore)/svg/svgtags.in \
     --elements $(WebCore)/mathml/mathtags.in \
+#
+
+DOM_NAME_ATTR_ARGUMENTS = \
     --attrs $(WebCore)/html/HTMLAttributeNames.in \
     --attrs $(WebCore)/mathml/mathattrs.in \
     --attrs $(WebCore)/svg/svgattrs.in \
@@ -2125,6 +2130,8 @@ DOM_NAME_ENUM_ARGUMENTS = \
     --attrs $(WebCore)/xml/xmlattrs.in \
     --attrs $(WebCore)/xml/xmlnsattrs.in \
 #
+
+DOM_NAME_ENUM_ARGUMENTS = $(DOM_NAME_ELEMENT_ARGUMENTS) $(DOM_NAME_ATTR_ARGUMENTS)
 
 TAG_NAME_GENERATED_FILES = \
     TagName.cpp \
@@ -2155,6 +2162,21 @@ NAMESPACE_GENERATED_PATTERNS = $(subst .,%,$(NAMESPACE_GENERATED_FILES))
 all : $(NAMESPACE_GENERATED_FILES)
 $(NAMESPACE_GENERATED_PATTERNS) : $(DOM_NAME_ENUM_DEPS)
 	$(PERL) $< --enum Namespace $(DOM_NAME_ENUM_ARGUMENTS)
+
+# --------
+
+# AttributeHandler
+
+ATTRIBUTE_HANDLER_GENERATED_FILES = \
+    AttributeHandler.cpp \
+    AttributeHandler.h \
+#
+
+ATTRIBUTE_HANDLER_GENERATED_PATTERNS = $(subst .,%,$(ATTRIBUTE_HANDLER_GENERATED_FILES))
+
+all : $(ATTRIBUTE_HANDLER_GENERATED_FILES)
+$(ATTRIBUTE_HANDLER_GENERATED_PATTERNS) : $(WebCore)/dom/make_names.pl $(WebCore)/bindings/scripts/Hasher.pm $(WebCore)/bindings/scripts/StaticString.pm $(WebCore)/html/HTMLAttributeNames.in $(WebCore)/mathml/mathattrs.in $(WebCore)/svg/svgattrs.in $(WebCore)/svg/xlinkattrs.in $(WebCore)/xml/xmlattrs.in $(WebCore)/xml/xmlnsattrs.in
+	$(PERL) $< $(DOM_NAME_ATTR_ARGUMENTS) --attributeHandler
 
 # --------
 

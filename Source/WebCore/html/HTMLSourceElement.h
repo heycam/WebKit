@@ -57,7 +57,11 @@ private:
 
     void parseAttribute(const QualifiedName&, const AtomString&) final;
 
-    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
+    bool typeAttributeChanged(const AtomString&) final;
+    bool widthAttributeChanged(const AtomString&) final;
+    bool heightAttributeChanged(const AtomString&) final;
+
+    void sourceDimensionAttributeChanged();
 
     TaskCancellationGroup m_errorEventCancellationGroup;
     bool m_shouldCallSourcesChanged { false };

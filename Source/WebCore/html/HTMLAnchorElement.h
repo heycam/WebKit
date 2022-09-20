@@ -100,6 +100,8 @@ private:
 
     AtomString effectiveTarget() const;
 
+    bool hrefAttributeChanged(const AtomString&) final;
+
     void sendPings(const URL& destinationURL);
 
     std::optional<URL> attributionDestinationURLForPCM() const;

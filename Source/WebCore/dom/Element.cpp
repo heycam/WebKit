@@ -1949,43 +1949,21 @@ static inline bool isElementsArrayReflectionAttribute(const QualifiedName& name)
         || name == HTMLNames::aria_ownsAttr;
 }
 
-void Element::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason)
+void Element::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
 {
     bool valueIsSameAsBefore = oldValue == newValue;
 
-    if (!valueIsSameAsBefore) {
-        if (name == HTMLNames::accesskeyAttr)
-            document().invalidateAccessKeyCache();
-        else if (name == HTMLNames::classAttr)
-            classAttributeChanged(newValue);
-        else if (name == HTMLNames::idAttr) {
-            AtomString oldId = elementData()->idForStyleResolution();
-            AtomString newId = makeIdForStyleResolution(newValue, document().inQuirksMode());
-            if (newId != oldId) {
-                Style::IdChangeInvalidation styleInvalidation(*this, oldId, newId);
-                elementData()->setIdForStyleResolution(newId);
-            }
+    auto handleAttributeChange = [&] {
+        if (isSVGElement())
+            downcast<SVGElement>(*this).svgAttributeChanged(name);
 
-            if (!oldValue.isEmpty())
-                treeScope().idTargetObserverRegistry().notifyObservers(*oldValue.impl());
-            if (!newValue.isEmpty())
-                treeScope().idTargetObserverRegistry().notifyObservers(*newValue.impl());
-        } else if (name == HTMLNames::nameAttr)
-            elementData()->setHasNameAttribute(!newValue.isNull());
-        else if (name == HTMLNames::nonceAttr) {
-            if (is<HTMLElement>(*this) || is<SVGElement>(*this))
-                setNonce(newValue.isNull() ? emptyAtom() : newValue);
-        } else if (name == HTMLNames::pseudoAttr) {
-            if (needsStyleInvalidation() && isInShadowTree())
-                invalidateStyleForSubtree();
-        } else if (name == HTMLNames::slotAttr) {
-            if (auto* parent = parentElement()) {
-                if (auto* shadowRoot = parent->shadowRoot())
-                    shadowRoot->hostChildElementDidChangeSlotAttribute(*this, oldValue, newValue);
-            }
-        } else if (name == HTMLNames::partAttr)
-            partAttributeChanged(newValue);
-        else if (document().settings().ariaReflectionForElementReferencesEnabled() && (isElementReflectionAttribute(name) || isElementsArrayReflectionAttribute(name))) {
+        if (isStyledElement())
+            downcast<StyledElement>(*this).invalidateStyleForAttributeWithPresentationalHintsIfNeeded(name);
+
+        if (AttributeHandler::attributeChanged(name.nodeName(), oldValue, newValue, reason))
+            return;
+
+        if (document().settings().ariaReflectionForElementReferencesEnabled() && (isElementReflectionAttribute(name) || isElementsArrayReflectionAttribute(name))) {
             if (auto* map = explicitlySetAttrElementsMapIfExists())
                 map->remove(name);
         } else if (name == HTMLNames::exportpartsAttr) {
@@ -2020,9 +1998,12 @@ void Element::attributeChanged(const QualifiedName& name, const AtomString& oldV
                 }
             }
         }
-    }
 
-    parseAttribute(name, newValue);
+        parseAttribute(name, newValue);
+    };
+
+    if (!valueIsSameAsBefore)
+        handleAttributeChange();
 
     document().incDOMTreeVersion();
 
@@ -2156,7 +2137,13 @@ void Element::setElementsArrayAttribute(const QualifiedName& attributeName, std:
     explicitlySetAttrElementsMap().set(attributeName, WTFMove(newElements));
 }
 
-void Element::classAttributeChanged(const AtomString& newClassString)
+bool Element::accesskeyAttributeChanged()
+{
+    document().invalidateAccessKeyCache();
+    return true;
+}
+
+void Element::updateClassNames(const AtomString& newClassString)
 {
     // Note: We'll need ElementData, but it doesn't have to be UniqueElementData.
     if (!elementData())
@@ -2175,7 +2162,59 @@ void Element::classAttributeChanged(const AtomString& newClassString)
     }
 }
 
-void Element::partAttributeChanged(const AtomString& newValue)
+bool Element::classAttributeChanged(const AtomString& newValue)
+{
+    updateClassNames(newValue);
+    return true;
+}
+
+bool Element::idAttributeChanged(const AtomString& oldValue, const AtomString& newValue)
+{
+    AtomString oldId = elementData()->idForStyleResolution();
+    AtomString newId = makeIdForStyleResolution(newValue, document().inQuirksMode());
+    if (newId != oldId) {
+        Style::IdChangeInvalidation styleInvalidation(*this, oldId, newId);
+        elementData()->setIdForStyleResolution(newId);
+    }
+
+    if (!oldValue.isEmpty())
+        treeScope().idTargetObserverRegistry().notifyObservers(*oldValue.impl());
+    if (!newValue.isEmpty())
+        treeScope().idTargetObserverRegistry().notifyObservers(*newValue.impl());
+
+    return true;
+}
+
+bool Element::nameAttributeChanged(const AtomString&, const AtomString& newValue)
+{
+    elementData()->setHasNameAttribute(!newValue.isNull());
+    return true;
+}
+
+bool Element::nonceAttributeChanged(const AtomString& newValue)
+{
+    if (is<HTMLElement>(*this) || is<SVGElement>(*this))
+        setNonce(newValue.isNull() ? emptyAtom() : newValue);
+    return true;
+}
+
+bool Element::pseudoAttributeChanged()
+{
+    if (needsStyleInvalidation() && isInShadowTree())
+        invalidateStyleForSubtree();
+    return true;
+}
+
+bool Element::slotAttributeChanged(const AtomString& oldValue, const AtomString& newValue)
+{
+    if (auto* parent = parentElement()) {
+        if (auto* shadowRoot = parent->shadowRoot())
+            shadowRoot->hostChildElementDidChangeSlotAttribute(*this, oldValue, newValue);
+    }
+    return true;
+}
+
+bool Element::partAttributeChanged(const AtomString& newValue)
 {
     SpaceSplitString newParts(newValue, SpaceSplitString::ShouldFoldCase::No);
     if (!newParts.isEmpty() || !partNames().isEmpty())
@@ -2188,6 +2227,8 @@ void Element::partAttributeChanged(const AtomString& newValue)
 
     if (needsStyleInvalidation() && isInShadowTree())
         invalidateStyleInternal();
+
+    return true;
 }
 
 URL Element::absoluteLinkURL() const
@@ -2379,7 +2420,7 @@ void Element::parserSetAttributes(const Vector<Attribute>& attributeVector)
 
     // Use attributeVector instead of m_elementData because attributeChanged might modify m_elementData.
     for (const auto& attribute : attributeVector)
-        attributeChanged(attribute.name(), nullAtom(), attribute.value(), ModifiedDirectly);
+        attributeChanged(attribute.name(), nullAtom(), attribute.value(), AttributeModificationReason::ModifiedDirectly);
 }
 
 void Element::parserDidSetAttributes()
@@ -4702,7 +4743,7 @@ void Element::cloneAttributesFromElement(const Element& other)
         m_elementData = other.m_elementData->makeUniqueCopy();
 
     for (const Attribute& attribute : attributesIterator())
-        attributeChanged(attribute.name(), nullAtom(), attribute.value(), ModifiedByCloning);
+        attributeChanged(attribute.name(), nullAtom(), attribute.value(), AttributeModificationReason::ModifiedByCloning);
 
     setNonce(other.nonce());
 }

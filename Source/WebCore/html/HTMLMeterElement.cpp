@@ -70,9 +70,15 @@ bool HTMLMeterElement::childShouldCreateRenderer(const Node& child) const
     return !is<RenderMeter>(renderer()) && HTMLElement::childShouldCreateRenderer(child);
 }
 
+bool HTMLMeterElement::valueAttributeChanged(const AtomString&)
+{
+    didElementStateChange();
+    return true;
+}
+
 void HTMLMeterElement::parseAttribute(const QualifiedName& name, const AtomString& value)
 {
-    if (name == valueAttr || name == minAttr || name == maxAttr || name == lowAttr || name == highAttr || name == optimumAttr)
+    if (name == minAttr || name == maxAttr || name == lowAttr || name == highAttr || name == optimumAttr)
         didElementStateChange();
     else
         LabelableElement::parseAttribute(name, value);

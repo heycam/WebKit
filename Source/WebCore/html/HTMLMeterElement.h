@@ -73,6 +73,8 @@ private:
     bool childShouldCreateRenderer(const Node&) const final;
     void parseAttribute(const QualifiedName&, const AtomString&) final;
 
+    bool valueAttributeChanged(const AtomString&) final;
+
     void didElementStateChange();
     void didAddUserAgentShadowRoot(ShadowRoot&) final;
 

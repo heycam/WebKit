@@ -93,6 +93,8 @@ public:
 private:
     void parseAttribute(const QualifiedName&, const AtomString&) final;
 
+    bool typeAttributeChanged(const AtomString&) final;
+
     bool shouldLoadLink() final;
     void process();
     static void processCallback(Node*);

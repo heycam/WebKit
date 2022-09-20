@@ -404,6 +404,10 @@ private:
     void finishParsingChildren() final;
     void parserDidSetAttributes() final;
 
+    bool checkedAttributeChanged(const AtomString&) final;
+    bool typeAttributeChanged(const AtomString&) final;
+    bool valueAttributeChanged(const AtomString&) final;
+
     void copyNonAttributePropertiesFromElement(const Element&) final;
 
     bool appendFormData(DOMFormData&) final;

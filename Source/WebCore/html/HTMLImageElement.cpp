@@ -291,19 +291,22 @@ static CrossOriginState parseCrossoriginState(const AtomString& crossoriginValue
     return equalLettersIgnoringASCIICase(crossoriginValue, "use-credentials"_s) ? UseCredentials : Anonymous;
 }
 
-void HTMLImageElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)
+bool HTMLImageElement::referrerpolicyAttributeChanged(const AtomString& oldValue, const AtomString& newValue)
 {
-    HTMLElement::attributeChanged(name, oldValue, newValue, reason);
-
-    if (name == referrerpolicyAttr && document().settings().referrerPolicyAttributeEnabled()) {
+    if (document().settings().referrerPolicyAttributeEnabled()) {
         auto oldReferrerPolicy = parseReferrerPolicy(oldValue, ReferrerPolicySource::ReferrerPolicyAttribute).value_or(ReferrerPolicy::EmptyString);
         auto newReferrerPolicy = parseReferrerPolicy(newValue, ReferrerPolicySource::ReferrerPolicyAttribute).value_or(ReferrerPolicy::EmptyString);
         if (oldReferrerPolicy != newReferrerPolicy)
             m_imageLoader->updateFromElementIgnoringPreviousError(RelevantMutation::Yes);
-    } else if (name == crossoriginAttr) {
-        if (parseCrossoriginState(oldValue) != parseCrossoriginState(newValue))
-            m_imageLoader->updateFromElementIgnoringPreviousError(RelevantMutation::Yes);
     }
+    return true;
+}
+
+bool HTMLImageElement::crossoriginAttributeChanged(const AtomString& oldValue, const AtomString& newValue)
+{
+    if (parseCrossoriginState(oldValue) != parseCrossoriginState(newValue))
+        m_imageLoader->updateFromElementIgnoringPreviousError(RelevantMutation::Yes);
+    return true;
 }
 
 void HTMLImageElement::parseAttribute(const QualifiedName& name, const AtomString& value)

@@ -52,7 +52,7 @@ private:
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;
     const AtomString& formControlType() const final;
     bool computeWillValidate() const final { return false; }
-    void disabledAttributeChanged() final;
+    void disabledAttributeDidChange() final;
     void disabledStateChanged() final;
     void childrenChanged(const ChildChange&) final;
     void didMoveToNewDocument(Document& oldDocument, Document& newDocument) final;

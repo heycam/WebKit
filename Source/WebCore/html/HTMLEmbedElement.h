@@ -38,6 +38,8 @@ private:
     void parseAttribute(const QualifiedName&, const AtomString&) final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
 
+    bool typeAttributeChanged(const AtomString&) final;
+
     bool rendererIsNeeded(const RenderStyle&) final;
 
     bool isURLAttribute(const Attribute&) const final;

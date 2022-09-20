@@ -48,6 +48,7 @@ sub readAttrs($$);
 my $printFactory = 0; 
 my $printEnum = "";
 my $printWrapperFactory = 0; 
+my $printAttributeHandler = 0;
 my $fontNamesIn = "";
 my @elementsFiles = ();
 my @attrsFiles = ();
@@ -79,7 +80,8 @@ GetOptions(
     'outputDir=s' => \$outputDir,
     'wrapperFactory' => \$printWrapperFactory,
     'fonts=s' => \$fontNamesIn,
-    'enum=s' => \$printEnum
+    'enum=s' => \$printEnum,
+    'attributeHandler' => \$printAttributeHandler
 );
 
 mkpath($outputDir);
@@ -170,8 +172,8 @@ END
 }
 
 die "You must specify at least one of --elements <file> or --attrs <file>" unless (@elementsFiles || @attrsFiles);
-die "You must not specify multiple --elements <file> arguments unless --domNames is also specified" if $printEnum eq "" && @elementsFiles > 1;
-die "You must not specify multiple --attrs <file> arguments unless --domNames is also specified" if $printEnum eq "" && @attrsFiles > 1;
+die "You must not specify multiple --elements <file> arguments unless --enum is also specified" if $printEnum eq "" && @elementsFiles > 1;
+die "You must not specify multiple --attrs <file> arguments unless --enum or --attributeHandler is also specified" if $printEnum eq "" && !$printAttributeHandler && @attrsFiles > 1;
 die "--enum must not be specified with --factory, --wrapperFactory, or --fonts" if $printEnum ne "" && ($printFactory || $printWrapperFactory || length($fontNamesIn));
 die "Unsupported value for --enum" if $printEnum !~ /^(:?TagName|NodeName|Namespace)?$/;
 
@@ -182,16 +184,16 @@ for my $elementsFile (@elementsFiles) {
 
 for my $attrsFile (@attrsFiles) {
     readAttrs(\%allAttrs, $attrsFile);
-    %parameters = () if $printEnum ne "";
+    %parameters = () if $printEnum ne "" || $printAttributeHandler;
 }
 
-if ($printEnum eq "") {
+if ($printEnum eq "" && !$printAttributeHandler) {
     $parameters{fallbackJSInterfaceName} = $parameters{fallbackInterfaceName} unless $parameters{fallbackJSInterfaceName};
 }
 
 collectAllElementsAndAttrsPerNamespace();
 
-if ($printEnum eq "") {
+if ($printEnum eq "" && !$printAttributeHandler) {
     my $typeHelpersBasePath = "$outputDir/$parameters{namespace}ElementTypeHelpers";
     my $namesBasePath = "$outputDir/$parameters{namespace}Names";
 
@@ -229,6 +231,11 @@ if ($printEnum eq "Namespace") {
     printNamespaceCppFile("$outputDir/Namespace.cpp");
 }
 
+if ($printAttributeHandler) {
+    printAttributeHandlerHeaderFile("$outputDir/AttributeHandler.h");
+    printAttributeHandlerCppFile("$outputDir/AttributeHandler.cpp");
+}
+
 ### Hash initialization
 
 sub defaultElementPropertyHash
@@ -264,6 +271,13 @@ sub defaultElementPropertyHash
     );
 }
 
+sub snakeCaseToCamelCase
+{
+    my $s = shift;
+
+    return $s =~ s/_([a-z])/\U$1/gr;
+}
+
 sub defaultAttrPropertyHash
 {
     my $localName = shift;
@@ -271,16 +285,22 @@ sub defaultAttrPropertyHash
     my $identifier = $localName =~ s/^x-webkit-/webkit/r =~ s/-/_/gr;
     my $namespace = $parameters{attrsNullNamespace} ? "" : $parameters{namespace};
     my $prefix = $namespace eq "" ? "" : "${namespace}_";
+    my $namespacedIdentifier = snakeCaseToCamelCase(lc($prefix) . $identifier);
     my $nodeNameEnumValue = avoidConflictingName("$prefix$identifier");
     my $convenienceVariableName = avoidConflictingName($identifier);
 
     return (
         cppNamespace => $parameters{namespace},
-        namespace => $parameters{attrsNullNamespace} ? "" : $parameters{namespace},
+        namespace => $namespace,
         localName => $localName,
         identifier => $identifier,
+        namespacedIdentifier => $namespacedIdentifier,
         nodeNameEnumValue => $nodeNameEnumValue,
         convenienceVariableName => $convenienceVariableName,
+        handlerWantsName => 0,
+        handlerWantsOldValue => 0,
+        handlerWantsNewValue => 1,
+        handlerWantsReason => 0,
     );
 }
 
@@ -1262,6 +1282,98 @@ sub printNodeNameCppFile
     print F "\n";
     print F "} // namespace WebCore\n";
     close F;
+}
+
+sub printAttributeHandlerHeaderFile
+{
+    my ($headerPath) = shift;
+    my $F;
+    open F, ">$headerPath";
+
+    printLicenseHeader($F);
+    print F "#pragma once\n";
+    print F "\n";
+    print F "namespace WebCore {\n";
+    print F "\n";
+    print F "enum class AttributeModificationReason : uint8_t;\n";
+    print F "enum class NodeName : uint16_t;\n";
+    print F "\n";
+    print F "class AttributeHandler {\n";
+    print F "public:\n";
+    print F "    virtual ~AttributeHandler() = default;\n";
+    print F "\n";
+    print F "protected:\n";
+    print F "    bool attributeChanged(NodeName, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason);\n";
+    print F "\n";
+
+    my %handledAttrs = ();
+    for my $attrKey (sort byAttrNameOrder keys %allAttrs) {
+        my $namespacedIdentifier = $allAttrs{$attrKey}{namespacedIdentifier};
+        my @arguments = ();
+        push @arguments, "NodeName" if $allAttrs{$attrKey}{handlerWantsName};
+        push @arguments, "const AtomString&" if $allAttrs{$attrKey}{handlerWantsOldValue};
+        push @arguments, "const AtomString&" if $allAttrs{$attrKey}{handlerWantsNewValue};
+        push @arguments, "AttributeModificationReason" if $allAttrs{$attrKey}{handlerWantsReason};
+        my $arguments = join(", ", @arguments);
+        if (exists $handledAttrs{$namespacedIdentifier}) {
+            die "Attribute $allAttrs{$attrKey}{localName} must have consistent values for handlerWantsName, handlerWantsOldValue, handlerWantsNewValue, and handlerWantsReason across these files: " . join(", ", @attrsFiles) unless $handledAttrs{$namespacedIdentifier} eq $arguments;
+            next;
+        }
+        print F "    virtual bool $allAttrs{$attrKey}{namespacedIdentifier}AttributeChanged($arguments) { return false; }\n";
+        $handledAttrs{$namespacedIdentifier} = $arguments;
+    }
+
+    print F "};\n";
+    print F "\n";
+    print F "} // namespace WebCore\n";
+}
+
+sub printAttributeHandlerCppFile
+{
+    my $cppPath = shift;
+    my $F;
+    open F, ">$cppPath";
+
+    printLicenseHeader($F);
+    print F "#include \"config.h\"\n";
+    print F "#include \"AttributeHandler.h\"\n";
+    print F "\n";
+    print F "#include \"NodeName.h\"\n";
+    print F "\n";
+    print F "namespace WTF {\n";
+    print F "class AtomString;\n";
+    print F "}\n";
+    print F "\n";
+    print F "namespace WebCore {\n";
+    print F "\n";
+    print F "bool AttributeHandler::attributeChanged(NodeName name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason reason)\n";
+    print F "{\n";
+    print F "    UNUSED_PARAM(oldValue);\n";
+    print F "    UNUSED_PARAM(reason);\n";
+    print F "\n";
+    print F "    switch (name) {\n";
+
+    my %handledAttrs = ();
+    for my $attrKey (sort byAttrNameOrder keys %allAttrs) {
+        my $namespacedIdentifier = $allAttrs{$attrKey}{namespacedIdentifier};
+        next if $handledAttrs{$namespacedIdentifier};
+        my @arguments = ();
+        push @arguments, "name" if $allAttrs{$attrKey}{handlerWantsName};
+        push @arguments, "oldValue" if $allAttrs{$attrKey}{handlerWantsOldValue};
+        push @arguments, "newValue" if $allAttrs{$attrKey}{handlerWantsNewValue};
+        push @arguments, "reason" if $allAttrs{$attrKey}{handlerWantsReason};
+        my $arguments = join(", ", @arguments);
+        print F "    case NodeName::$allAttrs{$attrKey}{nodeNameEnumValue}:\n";
+        print F "        return $allAttrs{$attrKey}{namespacedIdentifier}AttributeChanged($arguments);\n";
+        $handledAttrs{$namespacedIdentifier} = 1;
+    }
+
+    print F "    default:\n";
+    print F "        return true;\n";
+    print F "    }\n";
+    print F "}\n";
+    print F "\n";
+    print F "} // namespace WebCore\n";
 }
 
 sub printNamespaceHeaderFile

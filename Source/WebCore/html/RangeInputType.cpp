@@ -334,18 +334,28 @@ bool RangeInputType::accessKeyAction(bool sendMouseEvents)
     return InputType::accessKeyAction(sendMouseEvents) || (element && element->dispatchSimulatedClick(0, sendMouseEvents ? SendMouseUpDownEvents : SendNoEvents));
 }
 
+void RangeInputType::valueAttributeChanged()
+{
+    updateValue();
+}
+
+void RangeInputType::updateValue()
+{
+    // Sanitize the value.
+    if (auto* element = this->element()) {
+        if (element->hasDirtyValue())
+            element->setValue(element->value());
+    }
+    if (hasCreatedShadowSubtree())
+        typedSliderThumbElement().setPositionFromValue();
+}
+
 void RangeInputType::attributeChanged(const QualifiedName& name)
 {
     // FIXME: Don't we need to do this work for precisionAttr too?
-    if (name == maxAttr || name == minAttr || name == valueAttr) {
-        // Sanitize the value.
-        if (auto* element = this->element()) {
-            if (element->hasDirtyValue())
-                element->setValue(element->value());
-        }
-        if (hasCreatedShadowSubtree())
-            typedSliderThumbElement().setPositionFromValue();
-    }
+    if (name == maxAttr || name == minAttr)
+        updateValue();
+
     InputType::attributeChanged(name);
 }
 

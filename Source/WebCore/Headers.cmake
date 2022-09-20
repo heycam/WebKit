@@ -2124,6 +2124,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     xml/XPathResult.h
     xml/XPathValue.h
 
+    ${WebCore_DERIVED_SOURCES_DIR}/AttributeHandler.h
     ${WebCore_DERIVED_SOURCES_DIR}/CSSPropertyNames.h
     ${WebCore_DERIVED_SOURCES_DIR}/CSSValueKeywords.h
     ${WebCore_DERIVED_SOURCES_DIR}/CommandLineAPIModuleSourceBuiltins.h
