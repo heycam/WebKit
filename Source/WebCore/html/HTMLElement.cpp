@@ -147,9 +147,9 @@ void HTMLElement::mapLanguageAttributeToLocale(const AtomString& value, MutableS
     }
 }
 
-bool HTMLElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr || name == contenteditableAttr || name == hiddenAttr || name == langAttr || name.matches(XMLNames::langAttr) || name == draggableAttr || name == dirAttr)
+    if (name == NodeName::align || name == NodeName::contenteditable || name == NodeName::hidden || name == NodeName::lang || name == NodeName::XML_lang || name == NodeName::draggable || name == NodeName::dir)
         return true;
     return StyledElement::hasPresentationalHintsForAttribute(name);
 }

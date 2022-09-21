@@ -399,7 +399,7 @@ private:
     bool accessKeyAction(bool sendMouseEvents) final;
 
     void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
     void finishParsingChildren() final;
     void parserDidSetAttributes() final;

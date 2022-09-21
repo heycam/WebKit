@@ -55,9 +55,9 @@ Ref<HTMLTableColElement> HTMLTableColElement::create(const QualifiedName& tagNam
     return adoptRef(*new HTMLTableColElement(tagName, document));
 }
 
-bool HTMLTableColElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableColElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr)
+    if (name == NodeName::width)
         return true;
     return HTMLTablePartElement::hasPresentationalHintsForAttribute(name);
 }

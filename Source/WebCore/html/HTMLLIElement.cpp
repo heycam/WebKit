@@ -57,9 +57,9 @@ Ref<HTMLLIElement> HTMLLIElement::create(const QualifiedName& tagName, Document&
     return adoptRef(*new HTMLLIElement(tagName, document));
 }
 
-bool HTMLLIElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLLIElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == typeAttr)
+    if (name == NodeName::type)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

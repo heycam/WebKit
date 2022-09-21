@@ -64,9 +64,9 @@ Ref<HTMLBodyElement> HTMLBodyElement::create(const QualifiedName& tagName, Docum
 
 HTMLBodyElement::~HTMLBodyElement() = default;
 
-bool HTMLBodyElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLBodyElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == backgroundAttr || name == marginwidthAttr || name == leftmarginAttr || name == marginheightAttr || name == topmarginAttr || name == bgcolorAttr || name == textAttr || name == bgpropertiesAttr)
+    if (name == NodeName::background || name == NodeName::marginwidth || name == NodeName::leftmargin || name == NodeName::marginheight || name == NodeName::topmargin || name == NodeName::bgcolor || name == NodeName::text || name == NodeName::bgproperties)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

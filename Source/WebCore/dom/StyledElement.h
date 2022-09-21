@@ -66,7 +66,7 @@ public:
     virtual void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) { }
     virtual const StyleProperties* additionalPresentationalHintStyle() const { return nullptr; }
     virtual void collectExtraStyleForPresentationalHints(MutableStyleProperties&) { }
-    void invalidateStyleForAttributeWithPresentationalHintsIfNeeded(const QualifiedName&);
+    void invalidateStyleForAttributeWithPresentationalHintsIfNeeded(NodeName);
 
 protected:
     StyledElement(const QualifiedName& name, Document& document, ConstructionType type)
@@ -74,7 +74,7 @@ protected:
     {
     }
 
-    virtual bool hasPresentationalHintsForAttribute(const QualifiedName&) const { return false; }
+    virtual bool hasPresentationalHintsForAttribute(NodeName) const { return false; }
 
     bool styleAttributeChanged(const AtomString& newStyleString, AttributeModificationReason) override;
 

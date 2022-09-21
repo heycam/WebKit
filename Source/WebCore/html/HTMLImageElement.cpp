@@ -118,9 +118,9 @@ Ref<HTMLImageElement> HTMLImageElement::createForLegacyFactoryFunction(Document&
     return image;
 }
 
-bool HTMLImageElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLImageElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == borderAttr || name == vspaceAttr || name == hspaceAttr || name == valignAttr)
+    if (name == NodeName::width || name == NodeName::height || name == NodeName::border || name == NodeName::vspace || name == NodeName::hspace || name == NodeName::valign)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

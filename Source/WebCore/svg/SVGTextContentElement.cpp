@@ -141,9 +141,9 @@ ExceptionOr<void> SVGTextContentElement::selectSubString(unsigned charnum, unsig
     return { };
 }
 
-bool SVGTextContentElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool SVGTextContentElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name.matches(XMLNames::spaceAttr))
+    if (name == NodeName::XML_space)
         return true;
     return SVGGraphicsElement::hasPresentationalHintsForAttribute(name);
 }

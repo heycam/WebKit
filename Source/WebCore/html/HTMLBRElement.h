@@ -38,7 +38,7 @@ public:
 private:
     HTMLBRElement(const QualifiedName&, Document&);
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
 
     RenderPtr<RenderElement> createElementRenderer(RenderStyle&&, const RenderTreePosition&) final;

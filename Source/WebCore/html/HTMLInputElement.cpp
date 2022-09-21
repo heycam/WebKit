@@ -669,10 +669,14 @@ bool HTMLInputElement::accessKeyAction(bool sendMouseEvents)
     return Ref { *m_inputType }->accessKeyAction(sendMouseEvents);
 }
 
-bool HTMLInputElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLInputElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == vspaceAttr || name == hspaceAttr || name == widthAttr || name == heightAttr || (name == borderAttr && isImageButton()))
+    if (name == NodeName::border)
+        return isImageButton();
+
+    if (name == NodeName::vspace || name == NodeName::hspace || name == NodeName::width || name == NodeName::height)
         return true;
+
     return HTMLTextFormControlElement::hasPresentationalHintsForAttribute(name);
 }
 

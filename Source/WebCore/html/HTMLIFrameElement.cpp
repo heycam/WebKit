@@ -71,9 +71,9 @@ DOMTokenList& HTMLIFrameElement::sandbox()
     return *m_sandbox;
 }
 
-bool HTMLIFrameElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLIFrameElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == frameborderAttr)
+    if (name == NodeName::width || name == NodeName::height || name == NodeName::frameborder)
         return true;
     return HTMLFrameElementBase::hasPresentationalHintsForAttribute(name);
 }

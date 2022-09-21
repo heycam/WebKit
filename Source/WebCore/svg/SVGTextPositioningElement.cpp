@@ -88,9 +88,9 @@ void SVGTextPositioningElement::collectPresentationalHintsForAttribute(const Qua
     SVGTextContentElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool SVGTextPositioningElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool SVGTextPositioningElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == SVGNames::xAttr || name == SVGNames::yAttr)
+    if (name == NodeName::x || name == NodeName::y)
         return false;
     return SVGTextContentElement::hasPresentationalHintsForAttribute(name);
 }

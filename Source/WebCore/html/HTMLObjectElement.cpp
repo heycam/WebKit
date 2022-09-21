@@ -84,9 +84,9 @@ int HTMLObjectElement::defaultTabIndex() const
     return 0;
 }
 
-bool HTMLObjectElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLObjectElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == borderAttr)
+    if (name == NodeName::border)
         return true;
     return HTMLPlugInImageElement::hasPresentationalHintsForAttribute(name);
 }

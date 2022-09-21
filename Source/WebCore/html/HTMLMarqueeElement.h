@@ -54,7 +54,7 @@ public:
 private:
     HTMLMarqueeElement(const QualifiedName&, Document&);
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
 
     void suspend(ReasonForSuspension) final;

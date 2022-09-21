@@ -63,9 +63,9 @@ int HTMLMarqueeElement::minimumDelay() const
     return 16; // Don't allow timers at < 16ms intervals to avoid CPU hogging: webkit.org/b/160609
 }
 
-bool HTMLMarqueeElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLMarqueeElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == bgcolorAttr || name == vspaceAttr || name == hspaceAttr || name == scrollamountAttr || name == scrolldelayAttr || name == loopAttr || name == behaviorAttr || name == directionAttr)
+    if (name == NodeName::width || name == NodeName::height || name == NodeName::bgcolor || name == NodeName::vspace || name == NodeName::hspace || name == NodeName::scrollamount || name == NodeName::scrolldelay || name == NodeName::loop || name == NodeName::behavior || name == NodeName::direction)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

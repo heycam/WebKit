@@ -1954,13 +1954,17 @@ void Element::attributeChanged(const QualifiedName& name, const AtomString& oldV
     bool valueIsSameAsBefore = oldValue == newValue;
 
     auto handleAttributeChange = [&] {
+        auto nodeName = name.nodeName();
+        if (nodeName == NodeName::Unknown)
+            return;
+
         if (isSVGElement())
             downcast<SVGElement>(*this).svgAttributeChanged(name);
 
         if (isStyledElement())
-            downcast<StyledElement>(*this).invalidateStyleForAttributeWithPresentationalHintsIfNeeded(name);
+            downcast<StyledElement>(*this).invalidateStyleForAttributeWithPresentationalHintsIfNeeded(nodeName);
 
-        if (AttributeHandler::attributeChanged(name.nodeName(), oldValue, newValue, reason))
+        if (AttributeHandler::attributeChanged(nodeName, oldValue, newValue, reason))
             return;
 
         if (document().settings().ariaReflectionForElementReferencesEnabled() && (isElementReflectionAttribute(name) || isElementsArrayReflectionAttribute(name))) {

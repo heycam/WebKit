@@ -125,9 +125,9 @@ void HTMLVideoElement::collectPresentationalHintsForAttribute(const QualifiedNam
         HTMLMediaElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool HTMLVideoElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLVideoElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr)
+    if (name == NodeName::width || name == NodeName::height)
         return true;
     return HTMLMediaElement::hasPresentationalHintsForAttribute(name);
 }

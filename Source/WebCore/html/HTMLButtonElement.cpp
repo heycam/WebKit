@@ -95,14 +95,12 @@ const AtomString& HTMLButtonElement::formControlType() const
     return emptyAtom();
 }
 
-bool HTMLButtonElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLButtonElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
-        // Don't map 'align' attribute.  This matches what Firefox and IE do, but not Opera.
-        // See http://bugs.webkit.org/show_bug.cgi?id=12071
+    // Don't map 'align' attribute.  This matches what Firefox and IE do, but not Opera.
+    // See http://bugs.webkit.org/show_bug.cgi?id=12071
+    if (name == NodeName::align)
         return false;
-    }
-
     return HTMLFormControlElement::hasPresentationalHintsForAttribute(name);
 }
 

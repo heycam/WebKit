@@ -95,7 +95,7 @@ protected:
     void parseAttribute(const QualifiedName&, const AtomString&) override;
     bool childShouldCreateRenderer(const Node&) const override;
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
 
     bool willRespondToMouseClickEventsWithEditability(Editability) const override;

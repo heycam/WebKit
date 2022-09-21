@@ -127,7 +127,7 @@ private:
     bool rendererIsNeeded(const RenderStyle&) final;
     void didAttachRenderers() final;
     void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
     bool isVideo() const final { return true; }
     bool hasVideo() const final { return player() && player()->hasVideo(); }

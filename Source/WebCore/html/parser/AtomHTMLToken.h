@@ -31,7 +31,6 @@
 #include "HTMLToken.h"
 #include "NodeName.h"
 #include "TagName.h"
-#include <bitset>
 #include <wtf/HashSet.h>
 #include <wtf/text/AtomStringHash.h>
 
@@ -214,27 +213,6 @@ inline bool hasAttribute(const Vector<Attribute>& attributes, const AtomString& 
     }
     return false;
 }
-
-class AttributeNameSet
-{
-public:
-    bool contains(NodeName name)
-    {
-        return LIKELY(isAttribute(name)) ? m_bits[makeIndex(name)] : false;
-    }
-
-    void set(NodeName name)
-    {
-        if (LIKELY(isAttribute(name)))
-            m_bits[makeIndex(name)] = true;
-    }
-
-private:
-    static bool isAttribute(NodeName name) { return static_cast<uint16_t>(name) < static_cast<uint16_t>(firstAttributeNodeName); }
-    static size_t makeIndex(NodeName name) { return static_cast<uint16_t>(name) - static_cast<uint16_t>(firstAttributeNodeName); }
-
-    std::bitset<attributeNodeNameCount> m_bits;
-};
 
 inline void AtomHTMLToken::initializeAttributes(const HTMLToken::AttributeList& attributes)
 {

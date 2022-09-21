@@ -43,7 +43,7 @@ private:
     HTMLTableColElement(const QualifiedName& tagName, Document&);
 
     void parseAttribute(const QualifiedName&, const AtomString&) final;
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const final;
+    bool hasPresentationalHintsForAttribute(NodeName) const final;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) final;
     const StyleProperties* additionalPresentationalHintStyle() const final;
 

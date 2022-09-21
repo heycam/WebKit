@@ -175,9 +175,9 @@ bool HTMLFontElement::cssValueFromFontSizeNumber(const String& s, CSSValueID& si
     return true;
 }
 
-bool HTMLFontElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLFontElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == sizeAttr || name == colorAttr || name == faceAttr)
+    if (name == NodeName::size || name == NodeName::color || name == NodeName::face)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

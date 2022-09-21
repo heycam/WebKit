@@ -355,9 +355,9 @@ void HTMLTableElement::collectPresentationalHintsForAttribute(const QualifiedNam
         HTMLElement::collectPresentationalHintsForAttribute(name, value, style);
 }
 
-bool HTMLTableElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == bgcolorAttr || name == backgroundAttr || name == valignAttr || name == vspaceAttr || name == hspaceAttr || name == cellspacingAttr || name == borderAttr || name == bordercolorAttr || name == frameAttr || name == rulesAttr)
+    if (name == NodeName::width || name == NodeName::height || name == NodeName::bgcolor || name == NodeName::background || name == NodeName::valign || name == NodeName::vspace || name == NodeName::hspace || name == NodeName::cellspacing || name == NodeName::border || name == NodeName::bordercolor || name == NodeName::frame || name == NodeName::rules)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

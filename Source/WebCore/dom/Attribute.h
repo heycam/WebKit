@@ -25,7 +25,9 @@
 #pragma once
 
 #include "CommonAtomStrings.h"
+#include "NodeName.h"
 #include "QualifiedName.h"
+#include <bitset>
 #include <wtf/Hasher.h>
 
 namespace WebCore {
@@ -92,5 +94,26 @@ inline bool Attribute::matches(const AtomString& prefix, const AtomString& local
 {
     return nameMatchesFilter(m_name, prefix, localName, namespaceURI);
 }
+
+class AttributeNameSet
+{
+public:
+    bool contains(NodeName name)
+    {
+        return LIKELY(isAttribute(name)) ? m_bits[makeIndex(name)] : false;
+    }
+
+    void set(NodeName name, bool value = true)
+    {
+        if (LIKELY(isAttribute(name)))
+            m_bits[makeIndex(name)] = value;
+    }
+
+private:
+    static bool isAttribute(NodeName name) { return static_cast<uint16_t>(name) < static_cast<uint16_t>(firstAttributeNodeName); }
+    static size_t makeIndex(NodeName name) { return static_cast<uint16_t>(name) - static_cast<uint16_t>(firstAttributeNodeName); }
+
+    std::bitset<attributeNodeNameCount> m_bits;
+};
 
 } // namespace WebCore

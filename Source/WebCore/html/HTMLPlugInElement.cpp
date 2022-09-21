@@ -133,9 +133,9 @@ RenderWidget* HTMLPlugInElement::renderWidgetLoadingPlugin() const
     return renderWidget(); // This will return nullptr if the renderer is not a RenderWidget.
 }
 
-bool HTMLPlugInElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLPlugInElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr || name == vspaceAttr || name == hspaceAttr || name == alignAttr)
+    if (name == NodeName::width || name == NodeName::height || name == NodeName::vspace || name == NodeName::hspace || name == NodeName::align)
         return true;
     return HTMLFrameOwnerElement::hasPresentationalHintsForAttribute(name);
 }

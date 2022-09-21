@@ -45,9 +45,9 @@ Ref<HTMLPreElement> HTMLPreElement::create(const QualifiedName& tagName, Documen
     return adoptRef(*new HTMLPreElement(tagName, document));
 }
 
-bool HTMLPreElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLPreElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == wrapAttr)
+    if (name == NodeName::wrap)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

@@ -139,15 +139,15 @@ void HTMLTextAreaElement::childrenChanged(const ChildChange& change)
         setNonDirtyValue(defaultValue(), TextControlSetValueSelection::Clamp);
 }
 
-bool HTMLTextAreaElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTextAreaElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
+    if (name == NodeName::align) {
         // Don't map 'align' attribute.  This matches what Firefox, Opera and IE do.
         // See http://bugs.webkit.org/show_bug.cgi?id=7075
         return false;
     }
 
-    if (name == wrapAttr)
+    if (name == NodeName::wrap)
         return true;
     return HTMLTextFormControlElement::hasPresentationalHintsForAttribute(name);
 }

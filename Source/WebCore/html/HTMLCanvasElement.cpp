@@ -153,9 +153,9 @@ HTMLCanvasElement::~HTMLCanvasElement()
     setImageBuffer(nullptr);
 }
 
-bool HTMLCanvasElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLCanvasElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == heightAttr)
+    if (name == NodeName::width || name == NodeName::height)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

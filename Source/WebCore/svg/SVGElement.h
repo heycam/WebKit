@@ -181,9 +181,10 @@ protected:
     SVGElementRareData& ensureSVGRareData();
 
     void reportAttributeParsingError(SVGParsingError, const QualifiedName&, const AtomString&);
+    static CSSPropertyID cssPropertyIdForSVGAttributeName(NodeName);
     static CSSPropertyID cssPropertyIdForSVGAttributeName(const QualifiedName&);
 
-    bool hasPresentationalHintsForAttribute(const QualifiedName&) const override;
+    bool hasPresentationalHintsForAttribute(NodeName) const override;
     void collectPresentationalHintsForAttribute(const QualifiedName&, const AtomString&, MutableStyleProperties&) override;
     InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) override;
     void didFinishInsertingNode() override;

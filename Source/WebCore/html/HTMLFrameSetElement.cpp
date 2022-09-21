@@ -69,9 +69,9 @@ Ref<HTMLFrameSetElement> HTMLFrameSetElement::create(const QualifiedName& tagNam
     return adoptRef(*new HTMLFrameSetElement(tagName, document));
 }
 
-bool HTMLFrameSetElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLFrameSetElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == bordercolorAttr)
+    if (name == NodeName::bordercolor)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

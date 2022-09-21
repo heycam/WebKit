@@ -91,9 +91,9 @@ int HTMLTableCellElement::cellIndex() const
     return index;
 }
 
-bool HTMLTableCellElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLTableCellElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == nowrapAttr || name == widthAttr || name == heightAttr)
+    if (name == NodeName::nowrap || name == NodeName::width || name == NodeName::height)
         return true;
     return HTMLTablePartElement::hasPresentationalHintsForAttribute(name);
 }

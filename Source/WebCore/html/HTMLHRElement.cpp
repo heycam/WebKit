@@ -54,9 +54,9 @@ Ref<HTMLHRElement> HTMLHRElement::create(const QualifiedName& tagName, Document&
     return adoptRef(*new HTMLHRElement(tagName, document));
 }
 
-bool HTMLHRElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLHRElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == widthAttr || name == colorAttr || name == noshadeAttr || name == sizeAttr)
+    if (name == NodeName::width || name == NodeName::color || name == NodeName::noshade || name == NodeName::size)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

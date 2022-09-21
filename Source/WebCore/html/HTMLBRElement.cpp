@@ -51,9 +51,9 @@ Ref<HTMLBRElement> HTMLBRElement::create(const QualifiedName& tagName, Document&
     return adoptRef(*new HTMLBRElement(tagName, document));
 }
 
-bool HTMLBRElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLBRElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == clearAttr)
+    if (name == NodeName::clear)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

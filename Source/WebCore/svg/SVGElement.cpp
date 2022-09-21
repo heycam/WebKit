@@ -158,6 +158,94 @@ static NEVER_INLINE MemoryCompactLookupOnlyRobinHoodHashMap<AtomString, CSSPrope
     return map;
 }
 
+static NEVER_INLINE std::array<CSSPropertyID, attributeNodeNameCount> createAttributeNameToCSSPropertyIDTable()
+{
+    // This list should include all base CSS and SVG CSS properties which are exposed as SVG XML attributes.
+    static constexpr std::array attributeNames {
+        NodeName::alignment_baseline,
+        NodeName::baseline_shift,
+        NodeName::buffered_rendering,
+        NodeName::clip,
+        NodeName::clip_path,
+        NodeName::clip_rule,
+        NodeName::color,
+        NodeName::color_interpolation,
+        NodeName::color_interpolation_filters,
+        NodeName::cursor,
+        NodeName::cx,
+        NodeName::cy,
+        NodeName::direction,
+        NodeName::display,
+        NodeName::dominant_baseline,
+        NodeName::fill,
+        NodeName::fill_opacity,
+        NodeName::fill_rule,
+        NodeName::filter,
+        NodeName::flood_color,
+        NodeName::flood_opacity,
+        NodeName::font_family,
+        NodeName::font_size,
+        NodeName::font_stretch,
+        NodeName::font_style,
+        NodeName::font_variant,
+        NodeName::font_weight,
+        NodeName::glyph_orientation_horizontal,
+        NodeName::glyph_orientation_vertical,
+        NodeName::image_rendering,
+        NodeName::height,
+        NodeName::kerning,
+        NodeName::letter_spacing,
+        NodeName::lighting_color,
+        NodeName::marker_end,
+        NodeName::marker_mid,
+        NodeName::marker_start,
+        NodeName::mask,
+        NodeName::mask_type,
+        NodeName::opacity,
+        NodeName::overflow,
+        NodeName::paint_order,
+        NodeName::pointer_events,
+        NodeName::r,
+        NodeName::rx,
+        NodeName::ry,
+        NodeName::shape_rendering,
+        NodeName::stop_color,
+        NodeName::stop_opacity,
+        NodeName::stroke,
+        NodeName::stroke_dasharray,
+        NodeName::stroke_dashoffset,
+        NodeName::stroke_linecap,
+        NodeName::stroke_linejoin,
+        NodeName::stroke_miterlimit,
+        NodeName::stroke_opacity,
+        NodeName::stroke_width,
+        NodeName::text_anchor,
+        NodeName::text_decoration,
+        NodeName::text_rendering,
+        NodeName::unicode_bidi,
+        NodeName::vector_effect,
+        NodeName::visibility,
+        NodeName::width,
+        NodeName::word_spacing,
+        NodeName::writing_mode,
+        NodeName::x,
+        NodeName::y,
+    };
+
+    std::array<CSSPropertyID, attributeNodeNameCount> table;
+
+    for (auto name : attributeNames) {
+        auto& localName = qualifiedNameForNodeName(name).localName();
+        table[static_cast<uint16_t>(name) - static_cast<uint16_t>(firstAttributeNodeName)] = cssPropertyID(localName);
+    }
+
+    // FIXME: When CSS supports "transform-origin" this special case can be removed,
+    // and we can add transform_originAttr to the table above instead.
+    table[static_cast<uint16_t>(NodeName::transform_origin) - static_cast<uint16_t>(firstAttributeNodeName)] = CSSPropertyTransformOrigin;
+
+    return table;
+}
+
 SVGElement::SVGElement(const QualifiedName& tagName, Document& document, UniqueRef<SVGPropertyRegistry>&& propertyRegistry, ConstructionType constructionType)
     : StyledElement(tagName, document, constructionType)
     , m_propertyAnimatorFactory(makeUnique<SVGPropertyAnimatorFactory>())
@@ -937,7 +1025,20 @@ CSSPropertyID SVGElement::cssPropertyIdForSVGAttributeName(const QualifiedName& 
     return properties.get().get(attrName.localName());
 }
 
-bool SVGElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+CSSPropertyID SVGElement::cssPropertyIdForSVGAttributeName(NodeName name)
+{
+    if (static_cast<uint16_t>(name) < static_cast<uint16_t>(firstAttributeNodeName))
+        return CSSPropertyInvalid;
+
+    size_t index = static_cast<uint16_t>(name) - static_cast<uint16_t>(firstAttributeNodeName);
+    if (index > attributeNodeNameCount)
+        return CSSPropertyInvalid;
+
+    static NeverDestroyed properties = createAttributeNameToCSSPropertyIDTable();
+    return properties.get()[index];
+}
+
+bool SVGElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
     if (cssPropertyIdForSVGAttributeName(name) > 0)
         return true;

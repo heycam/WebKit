@@ -59,9 +59,9 @@ Ref<HTMLOListElement> HTMLOListElement::create(const QualifiedName& tagName, Doc
     return adoptRef(*new HTMLOListElement(tagName, document));
 }
 
-bool HTMLOListElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLOListElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == typeAttr)
+    if (name == NodeName::type)
         return true;
     return HTMLElement::hasPresentationalHintsForAttribute(name);
 }

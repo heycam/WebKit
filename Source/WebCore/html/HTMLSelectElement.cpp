@@ -274,9 +274,9 @@ void HTMLSelectElement::setValue(const String& value)
     setSelectedIndex(-1);
 }
 
-bool HTMLSelectElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool HTMLSelectElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == alignAttr) {
+    if (name == NodeName::align) {
         // Don't map 'align' attribute. This matches what Firefox, Opera and IE do.
         // See http://bugs.webkit.org/show_bug.cgi?id=12072
         return false;

@@ -174,7 +174,7 @@ MutableStyleProperties& StyledElement::ensureMutableInlineStyle()
     return downcast<MutableStyleProperties>(*inlineStyle);
 }
 
-void StyledElement::invalidateStyleForAttributeWithPresentationalHintsIfNeeded(const QualifiedName& name)
+void StyledElement::invalidateStyleForAttributeWithPresentationalHintsIfNeeded(NodeName name)
 {
     if (hasPresentationalHintsForAttribute(name)) {
         elementData()->setPresentationalHintStyleIsDirty(true);

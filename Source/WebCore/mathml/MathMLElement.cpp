@@ -107,9 +107,9 @@ void MathMLElement::parseAttribute(const QualifiedName& name, const AtomString& 
     }
 }
 
-bool MathMLElement::hasPresentationalHintsForAttribute(const QualifiedName& name) const
+bool MathMLElement::hasPresentationalHintsForAttribute(NodeName name) const
 {
-    if (name == backgroundAttr || name == colorAttr || name == dirAttr || name == fontfamilyAttr || name == fontsizeAttr || name == fontstyleAttr || name == fontweightAttr || name == mathbackgroundAttr || name == mathcolorAttr || name == mathsizeAttr || name == displaystyleAttr)
+    if (name == NodeName::background || name == NodeName::color || name == NodeName::dir || name == NodeName::fontfamily || name == NodeName::fontsize || name == NodeName::fontstyle || name == NodeName::fontweight || name == NodeName::mathbackground || name == NodeName::mathcolor || name == NodeName::mathsize || name == NodeName::displaystyle)
         return true;
     return StyledElement::hasPresentationalHintsForAttribute(name);
 }
