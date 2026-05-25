@@ -111,6 +111,13 @@ PlatformWebView::PlatformWebView(WKPageConfigurationRef configuration, const Tes
 
     NSRect windowRect = m_options.shouldShowWindow() ? NSOffsetRect(rect, 100, 100) : NSOffsetRect(rect, -10000, [firstScreen frame].size.height - rect.size.height + 10000);
 
+    if (m_options.shouldShowWindow()) {
+        if (const char* offsetX = getenv("WTR_WINDOW_OFFSET_X"))
+            windowRect.origin.x += atof(offsetX);
+        if (const char* offsetY = getenv("WTR_WINDOW_OFFSET_Y"))
+            windowRect.origin.y += atof(offsetY);
+    }
+
     m_window = [[WebKitTestRunnerWindow alloc] initWithContentRect:windowRect styleMask:NSWindowStyleMaskBorderless backing:(NSBackingStoreType)_NSBackingStoreUnbuffered defer:YES];
     m_window.platformWebView = this;
     [m_window setHasShadow:NO];

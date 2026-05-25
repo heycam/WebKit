@@ -339,6 +339,9 @@ class Worker(object):
         self._batch_size = self._port.get_option('batch_size') or 0
 
     def run_tests(self, shard):
+        if self._port.get_option('self_compare_with_framework_path'):
+            return self._run_tests_self_compare(shard)
+
         for input in shard.test_inputs:
             if not TaskPool.Process.working:
                 break
@@ -353,6 +356,63 @@ class Worker(object):
         if not self._port.get_option('run_singly'):
             additional_results = self._do_post_tests_work(self._driver)
         return additional_results
+
+    def _run_tests_self_compare(self, shard):
+        # Two-pass execution for --self-compare-with-framework-path: run the
+        # whole shard once with the primary driver (reference, no override) to
+        # capture per-test outputs to disk, then run the whole shard again with
+        # the comparison driver (framework override applied) and diff each test
+        # against its captured reference. This keeps WebKitTestRunner warm
+        # within each pass, which matters on iOS simulator where two app
+        # instances cannot coexist on a single device.
+        fs = self._port.host.filesystem
+        override_path = self._port.get_option('self_compare_with_framework_path')
+        dump_dir = fs.mkdtemp(suffix='-wkself-{}'.format(TaskPool.Process.name.replace('/', '_')))
+        # mkdtemp returns a TemporaryDirectory context manager; resolve to the path string.
+        dump_dir_path = str(dump_dir)
+        try:
+            dump_paths = {}
+            for index, input in enumerate(shard.test_inputs):
+                dump_paths[input.test_name] = fs.join(dump_dir_path, 'ref-{}.pickle'.format(index))
+
+            # Pass 1: capture references with the primary driver. Don't report
+            # these runs to the manager queue.
+            _log.info('Self-compare pass 1 of 2 (reference, no framework override): {} tests in shard {}'.format(len(shard.test_inputs), shard.name))
+            for input in shard.test_inputs:
+                if not TaskPool.Process.working:
+                    break
+                self._run_self_compare_pass(input, shard.name, dump_paths[input.test_name], report_result=False)
+
+            # Release the primary driver so the comparison driver can launch.
+            # On iOS simulator this frees the app bundle slot on the device;
+            # on Mac it is just a cheap restart.
+            if self._driver and self._driver.has_crashed():
+                self._kill_driver()
+            elif self._driver:
+                self._driver.stop()
+
+            # Pass 2: run with the comparison driver and compare against the
+            # captured references. These are the real reported test results.
+            _log.info('Self-compare pass 2 of 2 (comparison, framework override = {}): {} tests in shard {}'.format(override_path, len(shard.test_inputs), shard.name))
+            for input in shard.test_inputs:
+                if not TaskPool.Process.working:
+                    break
+                self._run_self_compare_pass(input, shard.name, dump_paths[input.test_name], report_result=True)
+
+            _log.debug('finished test group')
+
+            if self._driver and self._driver.has_crashed():
+                self._kill_driver()
+
+            additional_results = []
+            if not self._port.get_option('run_singly'):
+                additional_results = self._do_post_tests_work(self._driver)
+            return additional_results
+        finally:
+            try:
+                fs.rmtree(dump_dir_path)
+            except Exception as e:
+                _log.warning('Failed to remove self-compare dump dir {}: {}'.format(dump_dir_path, e))
 
     def run_test(self, test_input, shard_name):
         self._batch_count += 1
@@ -383,6 +443,65 @@ class Worker(object):
         ))
 
         self._clean_up_after_test(test_input, result)
+
+    def _run_self_compare_pass(self, test_input, shard_name, dump_path, report_result):
+        # Per-test driver for either pass of --self-compare-with-framework-path.
+        # On the capture pass (report_result=False) we run the primary driver
+        # and stash its output to dump_path; on the comparison pass
+        # (report_result=True) we run the comparison driver, diff against the
+        # stashed reference, and report the result like a normal test run.
+        self._batch_count += 1
+
+        stop_when_done = False
+        if 0 < self._batch_size <= self._batch_count:
+            self._batch_count = 0
+            stop_when_done = True
+
+        start = time.time()
+
+        if report_result:
+            TaskPool.Process.queue.send(TaskPool.Task(
+                handle_started_test, None, TaskPool.Process.name,
+                test_input.test_name,
+            ))
+
+        if self._driver and self._driver.has_crashed():
+            self._kill_driver()
+        if not self._driver:
+            self._driver = self._port.create_driver(int((TaskPool.Process.name).split('/')[-1]), self._port.get_option('no_timeout'))
+
+        if report_result:
+            result = single_test_runner.run_single_test_self_compare_against(
+                self._port, self._port._options, self._results_directory,
+                TaskPool.Process.name,
+                self._driver, test_input, stop_when_done, dump_path,
+            )
+        else:
+            result = single_test_runner.run_single_test_self_compare_capture(
+                self._port, self._port._options, self._results_directory,
+                TaskPool.Process.name,
+                self._driver, test_input, stop_when_done, dump_path,
+            )
+
+        result.shard_name = shard_name
+        result.worker_name = TaskPool.Process.name
+        result.total_run_time = time.time() - start
+
+        if report_result:
+            result.test_number = self._num_tests
+            self._num_tests += 1
+            TaskPool.Process.queue.send(TaskPool.Task(
+                handle_finished_test, None, TaskPool.Process.name,
+                result,
+            ))
+            self._clean_up_after_test(test_input, result)
+        elif result.failures:
+            # A crash or other driver-fatal failure during the reference pass
+            # would normally trigger a driver restart via _clean_up_after_test.
+            # Mirror that so a bad test doesn't poison the rest of the pass.
+            if any([f.driver_needs_restart() for f in result.failures]):
+                self._kill_driver()
+                self._batch_count = 0
 
     def _do_post_tests_work(self, driver):
         additional_results = []

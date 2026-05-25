@@ -148,7 +148,7 @@ class DriverPostTestOutput(object):
 class Driver(object):
     """object for running test(s) using DumpRenderTree/WebKitTestRunner."""
 
-    def __init__(self, port, worker_number, pixel_tests, no_timeout=False):
+    def __init__(self, port, worker_number, pixel_tests, no_timeout=False, framework_path_override=None):
         """Initialize a Driver to subsequently run tests.
 
         Typically this routine will spawn DumpRenderTree in a config
@@ -156,11 +156,16 @@ class Driver(object):
 
         port - reference back to the port object.
         worker_number - identifier for a particular worker/driver instance
+        framework_path_override - if set, prepended to DYLD_FRAMEWORK_PATH and
+            __XPC_DYLD_FRAMEWORK_PATH so the driver loads WebKit frameworks from
+            this directory instead of the in-tree build. Used by the comparison
+            driver for --self-compare-with-framework-path.
         """
         self._port = port
         self._worker_number = worker_number
         self._no_timeout = no_timeout
         self._target_host = port.target_host(worker_number)
+        self._framework_path_override = framework_path_override
 
         self._driver_tempdir = None
         self._driver_user_directory_suffix = None
@@ -469,6 +474,15 @@ class Driver(object):
         self._append_environment_variable_path(environment, '__XPC_DYLD_LIBRARY_PATH', build_root_path)
         self._append_environment_variable_path(environment, 'DYLD_FRAMEWORK_PATH', build_root_path)
         self._append_environment_variable_path(environment, '__XPC_DYLD_FRAMEWORK_PATH', build_root_path)
+
+        if self._framework_path_override:
+            override = str(self._framework_path_override)
+            for var in ('DYLD_FRAMEWORK_PATH', '__XPC_DYLD_FRAMEWORK_PATH'):
+                existing = environment.get(var)
+                environment[var] = override if not existing else override + os.pathsep + existing
+            # Offset the window so it doesn't stack on top of the primary
+            # driver's window when --show-window is used.
+            environment['WTR_WINDOW_OFFSET_X'] = '820'
 
         self._port.port_adjust_environment_for_test_driver(environment)
 
@@ -854,8 +868,15 @@ class DriverProxy(object):
         self._driver = self._make_driver(pixel_tests)
         self._driver_cmd_line = None
 
+        self._framework_path_override = port.get_option('self_compare_with_framework_path')
+        self._comparison_driver = None
+        self._comparison_driver_cmd_line = None
+
     def _make_driver(self, pixel_tests):
         return self._driver_instance_constructor(self._port, self._worker_number, pixel_tests, self._no_timeout)
+
+    def _make_comparison_driver(self, pixel_tests):
+        return self._driver_instance_constructor(self._port, self._worker_number, pixel_tests, self._no_timeout, framework_path_override=self._framework_path_override)
 
     @property
     def host(self):
@@ -889,6 +910,18 @@ class DriverProxy(object):
 
         return self._driver.run_test(driver_input, stop_when_done)
 
+    def run_comparison_test(self, driver_input, stop_when_done):
+        assert self._framework_path_override, 'run_comparison_test requires --self-compare-with-framework-path'
+        pixel_tests_needed = driver_input.should_run_pixel_test
+        cmd_line_key = self._cmd_line_as_key(pixel_tests_needed, driver_input.args)
+        if self._comparison_driver is None or cmd_line_key != self._comparison_driver_cmd_line:
+            if self._comparison_driver is not None:
+                self._comparison_driver.stop()
+            self._comparison_driver = self._make_comparison_driver(pixel_tests_needed)
+            self._comparison_driver_cmd_line = cmd_line_key
+
+        return self._comparison_driver.run_test(driver_input, stop_when_done)
+
     def do_post_tests_work(self):
         return self._driver.do_post_tests_work()
 
@@ -897,6 +930,8 @@ class DriverProxy(object):
 
     def stop(self):
         self._driver.stop()
+        if self._comparison_driver is not None:
+            self._comparison_driver.stop()
 
     # FIXME: this should be a @classmethod (or implemented on Port instead).
     def cmd_line(self, pixel_tests=None, per_test_args=None):

@@ -386,6 +386,7 @@ def parse_args(args):
         optparse.make_option("--show-window", action="store_true", default=False, help="Make the test runner window visible during testing."),
         optparse.make_option("--show-cursor", action="store_true", default=False, help="Show the cursor overlay in the test runner window during testing (for debugging). Use with --show-window"),
         optparse.make_option("--self-compare-with-header", help="Run all tests as A/B tests between the default configuration and the given test features header (ignoring expected results)."),
+        optparse.make_option("--self-compare-with-framework-path", help="Run all tests as A/B tests between the default configuration and a build whose frameworks are loaded from the given directory via DYLD_FRAMEWORK_PATH / __XPC_DYLD_FRAMEWORK_PATH (ignoring expected results). Each worker runs its shard twice, once with each configuration, and diffs the outputs."),
     ]))
 
     option_group_definitions.append(("Web Platform Test Server Options", [
@@ -515,6 +516,19 @@ def _set_up_derived_options(port, options):
         for path in options.additional_platform_directory:
             additional_platform_directories.append(port.host.filesystem.abspath(path))
         options.additional_platform_directory = additional_platform_directories
+
+    if options.self_compare_with_framework_path:
+        is_apple_port = port.port_name == "mac" or port.port_name.startswith(('ios', 'iphone', 'ipad'))
+        if not is_apple_port:
+            raise RuntimeError('--self-compare-with-framework-path is only supported on Apple Mac/iOS ports (uses DYLD_FRAMEWORK_PATH).')
+        if options.self_compare_with_header:
+            raise RuntimeError('--self-compare-with-framework-path cannot be combined with --self-compare-with-header.')
+        if options.site_isolation:
+            raise RuntimeError('--self-compare-with-framework-path cannot be combined with --site-isolation.')
+        framework_path = port.host.filesystem.abspath(options.self_compare_with_framework_path)
+        if not port.host.filesystem.isdir(framework_path):
+            raise RuntimeError('--self-compare-with-framework-path %s is not a directory.' % options.self_compare_with_framework_path)
+        options.self_compare_with_framework_path = framework_path
 
     if options.force:
         if options.skipped not in ('ignore', 'default'):

@@ -29,6 +29,7 @@
 
 import logging
 import os
+import pickle
 import re
 from collections import deque
 
@@ -50,6 +51,16 @@ _render_tree_dump_pattern = re.compile(r"^layer at \(\d+,\d+\) size \d+x\d+\n")
 def run_single_test(port, options, results_directory, worker_name, driver, test_input, stop_when_done):
     runner = SingleTestRunner(port, options, results_directory, worker_name, driver, test_input, stop_when_done)
     return runner.run()
+
+
+def run_single_test_self_compare_capture(port, options, results_directory, worker_name, driver, test_input, stop_when_done, dump_path):
+    runner = SingleTestRunner(port, options, results_directory, worker_name, driver, test_input, stop_when_done)
+    return runner.run_self_compare_capture(dump_path)
+
+
+def run_single_test_self_compare_against(port, options, results_directory, worker_name, driver, test_input, stop_when_done, dump_path):
+    runner = SingleTestRunner(port, options, results_directory, worker_name, driver, test_input, stop_when_done)
+    return runner.run_self_compare_against(dump_path)
 
 
 class SingleTestRunner(object):
@@ -160,6 +171,10 @@ class SingleTestRunner(object):
         self_comparison_header = self._port.get_option('self_compare_with_header')
         if self_comparison_header:
             return self._run_self_comparison_test(self_comparison_header)
+        if self._port.get_option('self_compare_with_framework_path'):
+            if self._reference_files:
+                return self._run_self_comparison_with_framework_test()
+            return self._run_self_comparison_with_framework_without_reference_test()
         if self._options.site_isolation:
             comparison_header = 'SiteIsolationEnabled=true'
             if self._reference_files:
@@ -527,6 +542,73 @@ class SingleTestRunner(object):
         test_result = self._compare_output(expected_driver_output, driver_output)
         test_result_writer.write_test_result(self._filesystem, self._port, self._results_directory, self._test_name, driver_output, expected_driver_output, test_result.failures)
         return test_result
+
+    def _run_self_comparison_with_framework_test(self):
+        reference_output = self._capture_self_compare_with_framework_reference(with_reference_files=True)
+        return self._compare_self_compare_with_framework_against_reference(reference_output, with_reference_files=True)
+
+    def _run_self_comparison_with_framework_without_reference_test(self):
+        reference_output = self._capture_self_compare_with_framework_reference(with_reference_files=False)
+        return self._compare_self_compare_with_framework_against_reference(reference_output, with_reference_files=False)
+
+    def _capture_self_compare_with_framework_reference(self, with_reference_files):
+        driver_input = self._driver_input()
+        if with_reference_files:
+            driver_input.should_run_pixel_test = True
+            driver_input.force_dump_pixels = True
+        return self._driver.run_test(driver_input, self._stop_when_done)
+
+    def _compare_self_compare_with_framework_against_reference(self, reference_output, with_reference_files):
+        driver_input = self._driver_input()
+        if with_reference_files:
+            driver_input.should_run_pixel_test = True
+            driver_input.force_dump_pixels = True
+            test_output = self._driver.run_comparison_test(driver_input, self._stop_when_done)
+            test_full_path = self._port.abspath_for_test(self._test_name)
+            test_result = self._compare_output_with_reference(reference_output, test_output, test_full_path, False, allow_fuzzy_tolerance=False)
+            assert(reference_output)
+            test_result_writer.write_test_result(self._filesystem, self._port, self._results_directory, self._test_name, test_output, reference_output, test_result.failures)
+            return TestResult(self._test_input, test_result.failures, test_result.test_run_time, test_result.has_stderr, pid=test_result.pid)
+
+        expected_driver_output = reference_output
+        driver_output = self._driver.run_comparison_test(driver_input, self._stop_when_done)
+
+        for output in (expected_driver_output, driver_output):
+            if self._options.ignore_metrics:
+                output.strip_metrics()
+            output.strip_patterns(self._port.logging_patterns_to_strip())
+            output.strip_text_start_if_needed(self._port.logging_detectors_to_strip_text_start(driver_input.test_name))
+            output.strip_stderror_patterns(self._port.stderr_patterns_to_strip())
+
+        if expected_driver_output.text:
+            expected_driver_output.text = self._get_normalized_output_text(expected_driver_output.text)
+
+        test_result = self._compare_output(expected_driver_output, driver_output)
+        test_result_writer.write_test_result(self._filesystem, self._port, self._results_directory, self._test_name, driver_output, expected_driver_output, test_result.failures)
+        return test_result
+
+    def run_self_compare_capture(self, dump_path):
+        # Pass 1 of two-pass --self-compare-with-framework-path: run with the
+        # primary driver (no framework override), serialize the DriverOutput
+        # to dump_path so pass 2 can compare against it. The returned
+        # TestResult is bookkeeping only; the worker does not report it.
+        reference_output = self._capture_self_compare_with_framework_reference(with_reference_files=bool(self._reference_files))
+        self._filesystem.write_binary_file(dump_path, pickle.dumps(reference_output))
+        return TestResult(
+            self._test_input,
+            failures=[],
+            test_run_time=reference_output.test_time,
+            has_stderr=reference_output.has_stderr(),
+            pid=reference_output.pid,
+        )
+
+    def run_self_compare_against(self, dump_path):
+        # Pass 2 of two-pass --self-compare-with-framework-path: load the
+        # reference DriverOutput captured in pass 1, run with the comparison
+        # driver (framework override applied), compare, and return the real
+        # TestResult.
+        reference_output = pickle.loads(self._filesystem.read_binary_file(dump_path))
+        return self._compare_self_compare_with_framework_against_reference(reference_output, with_reference_files=bool(self._reference_files))
 
     def _fuzzy_metadata_for_file(self, filename):
         test_doc = Parser(self._filesystem.read_binary_file(filename))
