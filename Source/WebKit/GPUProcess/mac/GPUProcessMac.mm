@@ -80,12 +80,14 @@ ALLOW_NONLITERAL_FORMAT_END
 
 void GPUProcess::initializeSandbox(const AuxiliaryProcessInitializationParameters& parameters, SandboxInitializationParameters& sandboxParameters)
 {
+#if 0
     // Need to overide the default, because service has a different bundle ID.
     RetainPtr webKit2Bundle = [NSBundle bundleForClass:NSClassFromString(@"WKWebView")];
 
     sandboxParameters.setOverrideSandboxProfilePath([webKit2Bundle pathForResource:@"com.apple.WebKit.GPUProcess" ofType:@"sb"]);
 
     AuxiliaryProcess::initializeSandbox(parameters, sandboxParameters);
+#endif
 }
 
 #if PLATFORM(MAC)
