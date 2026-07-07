@@ -438,7 +438,7 @@ inlineCase:
     auto [readArea, inlineReply] = sendResult.takeReply();
     if (!readArea)
         return;
-    copyToData(inlineReply, *readArea);
+    copyToData(inlineReply.span(), *readArea);
 }
 
 void RemoteGraphicsContextGLProxy::multiDrawArraysANGLE(GCGLenum mode, GCGLSpanTuple<const GCGLint, const GCGLsizei> firstsAndCounts)
